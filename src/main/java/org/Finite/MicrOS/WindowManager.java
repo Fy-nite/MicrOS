@@ -1,0 +1,362 @@
+/**
+ * Manages the creation, tracking and manipulation of windows in the MicrOS desktop environment.
+ * Provides factory-based window creation and management of console windows.
+ */
+package org.Finite.MicrOS;
+
+import java.awt.*;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+import javax.swing.*;
+import org.Finite.MicrOS.VirtualFileSystem;
+
+/**
+ * Core window management class for MicrOS desktop environment.
+ */
+public class WindowManager {
+
+    /** Reference to the taskbar for window tracking */
+    private Taskbar taskbar;
+
+    /** The main desktop pane that contains all windows and icons */
+    private final JDesktopPane desktop;
+
+    /** Map of window IDs to window instances */
+    private final Map<String, JInternalFrame> windows;
+
+    /** Map of window type names to their factory implementations */
+    private final Map<String, WindowFactory> windowFactories;
+
+    /** Reference to the virtual file system */
+    private final VirtualFileSystem vfs;
+
+    /** Map of executable file types to window types */
+    private final Map<String, String> executableFileTypes = new HashMap<>();
+
+    /**
+     * Creates a new WindowManager for the given desktop pane and VFS.
+     *
+     * @param desktop The JDesktopPane that will contain the windows
+     * @param vfs The VirtualFileSystem instance
+     */
+    public WindowManager(JDesktopPane desktop, VirtualFileSystem vfs) {
+        this.desktop = desktop;
+        this.vfs = vfs;
+        this.windows = new HashMap<>();
+        this.windowFactories = new HashMap<>();
+        registerDefaultFactories();
+    }
+
+    /**
+     * Registers the default window factory implementations.
+     */
+    private void registerDefaultFactories() {
+        // Register default window factory first
+        registerWindowFactory("default", (windowId, title) -> {
+            JInternalFrame frame = createBaseFrame(title);
+            JPanel contentPanel = new JPanel(new BorderLayout());
+            contentPanel.add(new JLabel("Window: " + title, SwingConstants.CENTER));
+            frame.setContentPane(contentPanel);
+            return frame;
+        });
+
+        // Register console window factory
+        registerWindowFactory("console", (windowId, title) -> {
+            JInternalFrame frame = createBaseFrame(title);
+            Console console = new Console();
+            JScrollPane scrollPane = new JScrollPane(console);
+            frame.add(scrollPane);
+            frame.putClientProperty("console", console);
+            return frame;
+        });
+
+        // Update text editor factory
+        registerWindowFactory("texteditor", (windowId, title) -> {
+            JInternalFrame frame = createBaseFrame(title);
+            TextEditor editor = new TextEditor(vfs); // Pass vfs to TextEditor constructor
+            frame.add(editor);
+            frame.putClientProperty("editor", editor);
+            return frame;
+        });
+
+        // Add image viewer factory
+        registerWindowFactory("imageviewer", (windowId, title) -> {
+            JInternalFrame frame = createBaseFrame(title);
+            frame.setLayout(new BorderLayout());
+            return frame;
+        });
+
+        // Add web viewer factory
+        registerWindowFactory("webviewer", (windowId, title) -> {
+            JInternalFrame frame = createBaseFrame(title);
+            frame.setLayout(new BorderLayout());
+            return frame;
+        });
+    }
+
+    /**
+     * Registers a new window factory for creating windows of a specific type.
+     *
+     * @param type Factory type identifier
+     * @param factory WindowFactory implementation
+     */
+    public void registerWindowFactory(String type, WindowFactory factory) {
+        windowFactories.put(type, factory);
+    }
+
+    /**
+     * Sets the taskbar reference for window tracking.
+     *
+     * @param taskbar The taskbar instance
+     */
+    public void setTaskbar(Taskbar taskbar) {
+        this.taskbar = taskbar;
+    }
+
+    /**
+     * Creates a basic internal frame with default settings.
+     *
+     * @param title Title of the window
+     * @return Configured JInternalFrame
+     */
+    private JInternalFrame createBaseFrame(String title) {
+        JInternalFrame frame = new JInternalFrame(
+            title,
+            true,
+            true,
+            true,
+            true
+        );
+        frame.setSize(600, 400);
+        frame.setLayout(new BorderLayout());
+
+        int offset = 30 * windows.size();
+        frame.setLocation(offset, offset);
+
+        return frame;
+    }
+
+    /**
+     * Creates a new window using the specified factory type.
+     *
+     * @param windowId Unique identifier for the window
+     * @param title Window title
+     * @param type Window factory type identifier
+     * @return The created window frame
+     * @throws IllegalArgumentException if window type is not registered
+     */
+    public JInternalFrame createWindow(
+        String windowId,
+        String title,
+        String type
+    ) {
+        System.out.println("Creating window: " + windowId + ", Title: " + title + ", Type: " + type);
+        WindowFactory factory = windowFactories.get(type);
+        if (factory == null) {
+            throw new IllegalArgumentException("Unknown window type: " + type);
+        }
+
+        JInternalFrame frame = factory.createWindow(windowId, title);
+
+        frame.addInternalFrameListener(
+            new javax.swing.event.InternalFrameAdapter() {
+                @Override
+                public void internalFrameClosed(
+                    javax.swing.event.InternalFrameEvent e
+                ) {
+                    if (taskbar != null) {
+                        taskbar.removeWindow(windowId);
+                    }
+                }
+            }
+        );
+
+        if (taskbar != null) {
+            taskbar.addWindow(windowId, frame);
+        }
+
+        desktop.add(frame);
+        windows.put(windowId, frame);
+        frame.setVisible(true); // Ensure the frame is visible
+        System.out.println("Window created and added to desktop: " + windowId);
+        return frame;
+    }
+
+    /**
+     * Legacy window creation method for backwards compatibility.
+     *
+     * @param windowId Unique window identifier
+     * @param title Window title
+     * @param isConsole Whether to create a console window
+     * @return The created window frame
+     */
+    public JInternalFrame createWindow(
+        String windowId,
+        String title,
+        boolean isConsole
+    ) {
+        return createWindow(windowId, title, isConsole ? "console" : "default");
+    }
+
+    /**
+     * Retrieves a window by its ID.
+     *
+     * @param windowId Window identifier
+     * @return The window frame or null if not found
+     */
+    public JInternalFrame getWindow(String windowId) {
+        return windows.get(windowId);
+    }
+
+    /**
+     * Writes text to a console window.
+     *
+     * @param windowId Console window identifier
+     * @param text Text to write
+     */
+    public void writeToConsole(String windowId, String text) {
+        JInternalFrame frame = windows.get(windowId);
+        if (frame != null) {
+            Console console = (Console) frame.getClientProperty("console");
+            if (console != null) {
+                console.appendText(text + "\n");
+            }
+        }
+    }
+
+    /**
+     * Clears the content of a console window.
+     *
+     * @param windowId Console window identifier
+     */
+    public void clearConsole(String windowId) {
+        JInternalFrame frame = windows.get(windowId);
+        if (frame != null) {
+            JTextArea console = (JTextArea) frame.getClientProperty("console");
+            if (console != null) {
+                console.setText("");
+            }
+        }
+    }
+
+    /**
+     * Gets text content from a text editor window.
+     *
+     * @param windowId Text editor window identifier
+     * @return The text content or null if window not found/not a text editor
+     */
+    public String getEditorText(String windowId) {
+        JInternalFrame frame = windows.get(windowId);
+        if (frame != null) {
+            TextEditor editor = (TextEditor) frame.getClientProperty("editor");
+            if (editor != null) {
+                return editor.getText();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Sets text content in a text editor window.
+     *
+     * @param windowId Text editor window identifier
+     * @param text Text to set
+     * @return true if successful, false if window not found/not a text editor
+     */
+    public boolean setEditorText(String windowId, String text) {
+        JInternalFrame frame = windows.get(windowId);
+        if (frame != null) {
+            TextEditor editor = (TextEditor) frame.getClientProperty("editor");
+            if (editor != null) {
+                editor.setText(text);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Opens a file in a text editor window using the VFS.
+     *
+     * @param virtualPath Path to the file in the VFS
+     * @return The created window frame
+     */
+    public JInternalFrame openFileInEditor(String virtualPath) {
+        String windowId = "editor-" + virtualPath.hashCode();
+        JInternalFrame frame = createWindow(windowId, virtualPath, "texteditor");
+        TextEditor editor = (TextEditor) frame.getContentPane().getComponent(0); // Get editor component
+        String fileContent = "";
+        try {
+            fileContent = new String(vfs.readFile(virtualPath));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } // Convert byte[] to String
+        editor.setText(fileContent);
+        return frame;
+    }
+
+    /**
+     * Closes and disposes a specific window.
+     *
+     * @param windowId Window identifier to close
+     */
+    public void closeWindow(String windowId) {
+        JInternalFrame frame = windows.remove(windowId);
+        if (frame != null) {
+            frame.dispose();
+        }
+    }
+
+    /**
+     * Closes all windows managed by this WindowManager.
+     */
+    public void closeAllWindows() {
+        for (JInternalFrame frame : windows.values()) {
+            frame.dispose();
+        }
+        windows.clear();
+    }
+
+    /**
+     * Registers a new executable file type and its associated window type.
+     *
+     * @param extension File extension
+     * @param windowType Window type identifier
+     */
+    public void registerExecutableFileType(String extension, String windowType) {
+        executableFileTypes.put(extension, windowType);
+    }
+
+    /**
+     * Runs an executable file by creating a window of the associated type.
+     *
+     * @param virtualPath Path to the executable file in the VFS
+     */
+    public void runExecutable(String virtualPath) {
+        String extension = vfs.getFileExtension(virtualPath);
+        String windowType = executableFileTypes.get(extension);
+        if (windowType != null) {
+            createWindow("exec-" + virtualPath.hashCode(), virtualPath, windowType);
+        } else {
+            System.out.println("No registered executable for file type: " + extension);
+        }
+    }
+
+    /**
+     * Factory interface for creating window instances.
+     */
+    @FunctionalInterface
+    public interface WindowFactory {
+        /**
+         * Creates a new window instance.
+         *
+         * @param windowId Unique window identifier
+         * @param title Window title
+         * @return Created window frame
+         */
+        JInternalFrame createWindow(String windowId, String title);
+    }
+}

@@ -1,17 +1,86 @@
-package org.Finite;
+package org.Finite.MicrOS;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
+// import swing
+import javax.swing.*;
+
+/**
+ * Main class for launching the MicrOS desktop environment.
+ */
 public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+    private static WindowManager windowManager;
+
+    /**
+     * Main method to set the look and feel and launch the desktop environment.
+     *
+     * @param args Command-line arguments
+     */
+    public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        SwingUtilities.invokeLater(Main::Desktopenviroment);
+    }
+
+    /**
+     * Initializes and displays the desktop environment.
+     */
+    public static void Desktopenviroment() {
+        JFrame frame = new JFrame("MicrOS");
+        frame.setSize(800, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+
+        JDesktopPane desktop = new JDesktopPane();
+        VirtualFileSystem vfs = VirtualFileSystem.getInstance();
+        windowManager = new WindowManager(desktop, vfs);
+
+        Taskbar taskbar = new Taskbar(windowManager);
+        frame.add(taskbar, BorderLayout.SOUTH);
+        windowManager.setTaskbar(taskbar);
+
+        // Register apps
+        taskbar.addApp("Text Editor", "texteditor");
+        taskbar.addApp("Image Viewer", "imageviewer");
+        taskbar.addApp("Web Viewer", "webviewer");
+
+        // Register executable file types
+        windowManager.registerExecutableFileType("txt", "texteditor");
+        windowManager.registerExecutableFileType("png", "imageviewer");
+        windowManager.registerExecutableFileType("jpg", "imageviewer");
+
+        desktop.setBackground(new Color(0, 78, 152));
+        frame.add(desktop, BorderLayout.CENTER); // Ensure desktop is added to the frame
+
+        frame.setVisible(true);
+
+        // Create initial windows
+        windowManager.createWindow("main", "Main Console", true);
+        windowManager.writeToConsole("main", "MicroAssembly Interpreter v1.0");
+        
+        // Create and demonstrate text editor
+        JInternalFrame editorFrame = windowManager.createWindow("editor1", "Text Editor Demo", "texteditor");
+        windowManager.setEditorText("editor1", "Hello World!\n\nThis is a demo of the text editor.");
+        
+        // After 2 seconds, read and display the content in console
+        new Timer(2000, e -> {
+            String content = windowManager.getEditorText("editor1");
+            windowManager.writeToConsole("main", "\nText Editor content:\n" + content);
+            ((Timer)e.getSource()).stop();
+        }).start();
+    }
+
+    /**
+     * Gets the WindowManager instance.
+     *
+     * @return WindowManager instance
+     */
+    public static WindowManager getWindowManager() {
+        return windowManager;
     }
 }
