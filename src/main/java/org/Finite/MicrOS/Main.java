@@ -1,9 +1,6 @@
 package org.Finite.MicrOS;
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
-// import swing
 import javax.swing.*;
 
 /**
@@ -40,6 +37,18 @@ public class Main {
         VirtualFileSystem vfs = VirtualFileSystem.getInstance();
         windowManager = new WindowManager(desktop, vfs);
 
+        // Add background panel
+        BackgroundPanel backgroundPanel = new BackgroundPanel("/images/image.png");
+        backgroundPanel.setLayout(new BorderLayout());
+        desktop.add(backgroundPanel, JLayeredPane.FRAME_CONTENT_LAYER);
+        desktop.setLayer(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
+        backgroundPanel.setBounds(0, 0, desktop.getWidth(), desktop.getHeight());
+        desktop.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                backgroundPanel.setBounds(0, 0, desktop.getWidth(), desktop.getHeight());
+            }
+        });
+
         Taskbar taskbar = new Taskbar(windowManager);
         frame.add(taskbar, BorderLayout.SOUTH);
         windowManager.setTaskbar(taskbar);
@@ -54,7 +63,6 @@ public class Main {
         windowManager.registerExecutableFileType("png", "imageviewer");
         windowManager.registerExecutableFileType("jpg", "imageviewer");
 
-        desktop.setBackground(new Color(0, 78, 152));
         frame.add(desktop, BorderLayout.CENTER); // Ensure desktop is added to the frame
 
         frame.setVisible(true);
