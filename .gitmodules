@@ -1,0 +1,3 @@
+[submodule "JMASM"]
+	path = JMASM
+	url = https://github.com/Fy-nite/JMASM
