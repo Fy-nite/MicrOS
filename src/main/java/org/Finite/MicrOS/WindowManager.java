@@ -255,7 +255,7 @@ public class WindowManager {
         if (frame != null) {
             Console console = (Console) frame.getClientProperty("console");
             if (console != null) {
-                console.appendText(text + "\n");
+                console.appendText(text + "\n", Color.WHITE);  // Add Color parameter
             }
         }
     }

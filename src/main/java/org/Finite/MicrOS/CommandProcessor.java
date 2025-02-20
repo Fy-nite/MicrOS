@@ -18,6 +18,13 @@ public class CommandProcessor {
         String[] parts = command.trim().split("\\s+");
         if (parts.length == 0) return;
 
+        // Check for ./ execution
+        if (parts[0].startsWith("./")) {
+            String path = parts[0].substring(2); // Remove ./
+            executeFile(path, parts);
+            return;
+        }
+
         switch (parts[0].toLowerCase()) {
             case "ls":
                 listFiles(parts);
@@ -47,7 +54,12 @@ public class CommandProcessor {
                 console.clear();
                 break;
             case "run":
-                runFile(parts);
+                String path = parts.length > 1 ? parts[1] : null;
+                if (path != null) {
+                    executeFile(path, parts);
+                } else {
+                    console.appendText("Usage: run <file>\n", Color.RED);
+                }
                 break;
             default:
                 if (!executeCommand(parts)) {
@@ -147,33 +159,31 @@ public class CommandProcessor {
         }
     }
 
-    private void runFile(String[] parts) {
-        if (parts.length < 2) {
-            console.appendText("Usage: run <file>\n", Color.RED);
-            return;
-        }
-
-        String path = resolvePath(parts[1]);
-        if (!vfs.exists(path)) {
-            console.appendText("File not found: " + parts[1] + "\n", Color.RED);
+    private void executeFile(String path, String[] originalArgs) {
+        String fullPath = resolvePath(path);
+        if (!vfs.exists(fullPath)) {
+            console.appendText("File not found: " + path + "\n", Color.RED);
             return;
         }
 
         try {
-            String shebang = vfs.getShebang(path);
+            String shebang = vfs.getShebang(fullPath);
             if (shebang != null) {
-                String[] shebangParts = shebang.split("\\s+");
+                // Parse the shebang into components
+                String[] shebangParts = parseShebang(shebang);
                 if (shebangParts.length > 0) {
-                    String program = shebangParts[0];
+                    // Convert standard shebangs to internal programs
+                    String program = mapShebangToProgram(shebangParts[0]);
                     
-                    String[] allArgs = new String[shebangParts.length + parts.length - 1];
-                    allArgs[0] = program;
-                    System.arraycopy(shebangParts, 1, allArgs, 1, shebangParts.length - 1);
-                    allArgs[shebangParts.length] = path;
-                    System.arraycopy(parts, 2, allArgs, shebangParts.length + 1, parts.length - 2);
+                    // Build complete argument list, accounting for ./ usage
+                    String[] commandArgs = new String[originalArgs.length];
+                    commandArgs[0] = path;
+                    System.arraycopy(originalArgs, 1, commandArgs, 1, originalArgs.length - 1);
+                    
+                    String[] allArgs = buildArgumentList(program, shebangParts, commandArgs, fullPath);
 
                     if (!vfs.executeProgram(program, allArgs)) {
-                        console.appendText("Unknown interpreter: " + program + "\n", Color.RED);
+                        console.appendText("Unknown interpreter: " + shebangParts[0] + "\n", Color.RED);
                     }
                 }
             } else {
@@ -182,6 +192,53 @@ public class CommandProcessor {
         } catch (IOException e) {
             console.appendText("Error reading file: " + e.getMessage() + "\n", Color.RED);
         }
+    }
+
+    private String[] parseShebang(String shebang) {
+        // Handle both direct commands and env-style shebangs
+        if (shebang.startsWith("/usr/bin/env ")) {
+            return shebang.substring(13).trim().split("\\s+");
+        }
+        return shebang.split("\\s+");
+    }
+
+    private String mapShebangToProgram(String interpreter) {
+        // Map standard shebangs to internal programs
+        return switch (interpreter.toLowerCase()) {
+            case "/usr/bin/asm", "/usr/bin/jmasm", "asm", "jmasm" -> "asm";
+            case "/usr/bin/python", "python", "python3" -> "python";
+            // Add more mappings as needed
+            default -> interpreter;
+        };
+    }
+
+    private String[] buildArgumentList(String program, String[] shebangParts, String[] cmdParts, String filePath) {
+        // Calculate total size needed for combined arguments
+        int totalSize = 1;  // Program name
+        totalSize += shebangParts.length - 1;  // Shebang args (minus program name)
+        totalSize += 1;  // Script path
+        totalSize += Math.max(0, cmdParts.length - 2);  // Additional args from command line
+
+        String[] allArgs = new String[totalSize];
+        int pos = 0;
+
+        // Add program name
+        allArgs[pos++] = program;
+
+        // Add interpreter arguments from shebang (skip the program name)
+        for (int i = 1; i < shebangParts.length; i++) {
+            allArgs[pos++] = shebangParts[i];
+        }
+
+        // Add script path
+        allArgs[pos++] = filePath;
+
+        // Add any additional arguments from command line
+        for (int i = 2; i < cmdParts.length; i++) {
+            allArgs[pos++] = cmdParts[i];
+        }
+
+        return allArgs;
     }
 
     private void showHelp() {
