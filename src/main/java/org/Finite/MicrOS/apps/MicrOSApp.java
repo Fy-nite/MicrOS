@@ -1,8 +1,9 @@
 package org.Finite.MicrOS.apps;
 
 import javax.swing.*;
-import org.Finite.MicrOS.VirtualFileSystem;
-import org.Finite.MicrOS.WindowManager;
+
+import org.Finite.MicrOS.core.VirtualFileSystem;
+import org.Finite.MicrOS.core.WindowManager;
 
 public abstract class MicrOSApp {
     protected WindowManager windowManager;

@@ -2,7 +2,7 @@ package org.Finite.MicrOS.Desktop;
 
 import javax.swing.*;
 
-import org.Finite.MicrOS.VirtualFileSystem;
+import org.Finite.MicrOS.core.VirtualFileSystem;
 
 import java.awt.*;
 import java.io.*;

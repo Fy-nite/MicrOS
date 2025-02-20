@@ -3,8 +3,13 @@ package org.Finite.MicrOS;
 import java.awt.*;
 import javax.swing.*;
 
+import org.Finite.MicrOS.Desktop.BackgroundPanel;
 import org.Finite.MicrOS.Desktop.Settings;
 import org.Finite.MicrOS.Desktop.Taskbar;
+import org.Finite.MicrOS.core.VirtualFileSystem;
+import org.Finite.MicrOS.core.WindowManager;
+import org.Finite.MicrOS.ui.Console;
+import org.Finite.MicrOS.util.AsmRunner;
 import org.finite.ModuleManager.ModuleInit;
 
 import java.io.IOException;

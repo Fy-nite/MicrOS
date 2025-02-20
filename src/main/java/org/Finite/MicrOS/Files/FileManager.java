@@ -10,6 +10,10 @@ import java.util.Set;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import org.Finite.MicrOS.*;
+import org.Finite.MicrOS.core.VirtualFileSystem;
+import org.Finite.MicrOS.core.WindowManager;
+import org.Finite.MicrOS.util.AsmRunner;
+import org.Finite.MicrOS.Files.*;
 import org.Finite.MicrOS.apps.ApplicationLauncher;
 
 public class FileManager extends JPanel {

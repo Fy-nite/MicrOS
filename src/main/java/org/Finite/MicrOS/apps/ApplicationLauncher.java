@@ -6,10 +6,10 @@ import java.io.File;
 import java.io.IOException;
 import javax.swing.*;
 
-import org.Finite.MicrOS.Console;
-import org.Finite.MicrOS.ProcessManager;
-import org.Finite.MicrOS.VirtualFileSystem;
-import org.Finite.MicrOS.WindowManager;
+import org.Finite.MicrOS.core.ProcessManager;
+import org.Finite.MicrOS.core.VirtualFileSystem;
+import org.Finite.MicrOS.core.WindowManager;
+import org.Finite.MicrOS.ui.Console;
 
 public class ApplicationLauncher {
 
@@ -56,10 +56,11 @@ public class ApplicationLauncher {
         JInternalFrame frame = windowManager.createWindow(
             windowId,
             "Text Editor - " + title,
-            "texteditor"
+            true
         );
         String content = new String(vfs.readFile(vfs.getVirtualPath(file.toPath())));
-        windowManager.setEditorText(windowId, content);
+        JTextArea textArea = new JTextArea(content);
+        frame.add(new JScrollPane(textArea));
         frame.setVisible(true);
     }
 

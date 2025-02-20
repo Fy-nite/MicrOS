@@ -1,0 +1,54 @@
+MicrOS/
+├── src/
+│   └── main/
+│       ├── java/
+│       │   └── org/
+│       │       └── Finite/
+│       │           └── MicrOS/
+│       │               ├── apps/
+│       │               │   ├── AppLoader.java
+│       │               │   ├── AppManifest.java
+│       │               │   ├── ApplicationLauncher.java
+│       │               │   └── MicrOSApp.java
+│       │               ├── core/
+│       │               │   ├── ProcessManager.java
+│       │               │   ├── VirtualFileSystem.java
+│       │               │   └── WindowManager.java
+│       │               ├── desktop/
+│       │               │   ├── BackgroundPanel.java
+│       │               │   ├── Settings.java
+│       │               │   ├── StartMenu.java
+│       │               │   └── Taskbar.java
+│       │               ├── files/
+│       │               │   └── FileManager.java
+│       │               ├── ui/
+│       │               │   ├── Console.java
+│       │               │   ├── LineNumberComponent.java
+│       │               │   ├── SyntaxHighlighter.java
+│       │               │   ├── TextEditor.java
+│       │               │   ├── WebViewer.java
+│       │               │   └── WrapLayout.java
+│       │               ├── util/
+│       │               │   ├── AsmRunner.java
+│       │               │   └── CommandProcessor.java
+│       │               └── Main.java
+│       └── resources/
+│           ├── default_configs/
+│           │   └── system/
+│           │       └── texteditor/
+│           │           └── syntax/
+│           │               ├── asm.json
+│           │               └── java.json
+│           └── images/
+│               ├── background.png
+│               └── icons/
+├── filesystem/
+│   ├── apps/
+│   ├── bin/
+│   ├── docs/
+│   ├── home/
+│   ├── images/
+│   └── system/
+├── pom.xml
+├── README.md
+└── start.sh

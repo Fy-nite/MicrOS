@@ -4,12 +4,12 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.metal.MetalButtonUI;
 
-import org.Finite.MicrOS.ClockPanel;
-import org.Finite.MicrOS.StartMenu;
-import org.Finite.MicrOS.SystemTray;
-import org.Finite.MicrOS.TaskButton;
-import org.Finite.MicrOS.WindowManager;
-import org.Finite.MicrOS.WrapLayout;
+import org.Finite.MicrOS.core.WindowManager;
+import org.Finite.MicrOS.ui.ClockPanel;
+import org.Finite.MicrOS.ui.StartMenu;
+import org.Finite.MicrOS.ui.SystemTray;
+import org.Finite.MicrOS.ui.TaskButton;
+import org.Finite.MicrOS.ui.WrapLayout;
 
 import java.awt.*;
 import java.awt.event.*;

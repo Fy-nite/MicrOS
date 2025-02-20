@@ -5,7 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 import java.util.List;
-import org.Finite.MicrOS.VirtualFileSystem;
+
+import org.Finite.MicrOS.core.VirtualFileSystem;
 public class FileMetadata {
     private final String name;
     private final String virtualPath;

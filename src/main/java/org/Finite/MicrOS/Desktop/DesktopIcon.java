@@ -2,7 +2,7 @@ package org.Finite.MicrOS.Desktop;
 
 import javax.swing.*;
 
-import org.Finite.MicrOS.WindowManager;
+import org.Finite.MicrOS.core.WindowManager;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
