@@ -416,6 +416,7 @@ public class WindowManager {
                     String content = new String(vfs.readFile(virtualPath));
                     MicrOSApp app = (MicrOSApp) frame.getClientProperty("app");
                     if (app != null) {
+                        app.getClass().getMethod("setText", String.class).invoke(app, content);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
