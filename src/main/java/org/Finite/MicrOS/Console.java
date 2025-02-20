@@ -15,6 +15,7 @@ public class Console extends JTextPane {
     private final CommandProcessor commandProcessor;
     private final StyleContext styleContext;
     private final DefaultStyledDocument doc;
+    private String currentPrompt = "$ ";
 
     public Console() {
         styleContext = StyleContext.getDefaultStyleContext();
@@ -26,7 +27,7 @@ public class Console extends JTextPane {
         setCaretColor(Color.GREEN);
         setFont(new Font("Monospace", Font.PLAIN, 12));
 
-        commandProcessor = new CommandProcessor(this);
+        commandProcessor = new CommandProcessor(this, VirtualFileSystem.getInstance());
 
         // Initialize with prompt
         SwingUtilities.invokeLater(() -> {
@@ -43,6 +44,10 @@ public class Console extends JTextPane {
                 }
             }
         );
+    }
+
+    public void setPrompt(String newPrompt) {
+        this.currentPrompt = newPrompt;
     }
 
     private void handleKeyPress(KeyEvent e) {
@@ -79,9 +84,10 @@ public class Console extends JTextPane {
 
             appendText("\n", Color.GREEN);
             commandProcessor.processCommand(command);
-            appendText("\n" + prompt, Color.GREEN);
+            // Get updated prompt from command processor
+            appendText("\n" + commandProcessor.getPrompt(), Color.CYAN);
         } else {
-            appendText("\n" + prompt, Color.GREEN);
+            appendText("\n" + commandProcessor.getPrompt(), Color.CYAN);
         }
     }
 
@@ -102,7 +108,7 @@ public class Console extends JTextPane {
         return (
             getDocument().getLength() -
             getCurrentLine().length() +
-            prompt.length()
+            commandProcessor.getPrompt().length()
         );
     }
 
@@ -161,5 +167,14 @@ public class Console extends JTextPane {
 
     public void appendText(String text) {
         appendText(text, Color.GREEN);
+    }
+
+    public void clear() {
+        try {
+            doc.remove(0, doc.getLength());
+            appendText(prompt, Color.GREEN);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
     }
 }

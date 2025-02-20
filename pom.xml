@@ -64,14 +64,11 @@
             <version>2.0</version>
         </dependency>
 
-        <dependency>
-            <!-- local dep jar file -->
-            <groupId>org.finite</groupId>
-            <artifactId>finite</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/jmasm.jar</systemPath>
-        </dependency>
+<dependency>
+    <groupId>org.Finite</groupId>
+    <artifactId>MASM</artifactId>
+    <version>0.01</version>
+</dependency>
 
         <dependency>
             <groupId>com.beust</groupId>

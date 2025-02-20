@@ -94,6 +94,14 @@ public class WindowManager {
             frame.setLayout(new BorderLayout());
             return frame;
         });
+
+        // Add file manager factory
+        registerWindowFactory("filemanager", (windowId, title) -> {
+            JInternalFrame frame = createBaseFrame(title);
+            FileManager fileManager = new FileManager(this);
+            frame.add(fileManager);
+            return frame;
+        });
     }
 
     /**
@@ -121,7 +129,7 @@ public class WindowManager {
      * @param title Title of the window
      * @return Configured JInternalFrame
      */
-    private JInternalFrame createBaseFrame(String title) {
+    public JInternalFrame createBaseFrame(String title) {
         JInternalFrame frame = new JInternalFrame(
             title,
             true,

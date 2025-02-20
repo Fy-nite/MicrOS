@@ -1,302 +1,371 @@
 package org.Finite.MicrOS;
 
 import javax.swing.*;
-import javax.swing.undo.*;
+import javax.swing.event.*;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.io.IOException;
-import org.Finite.MicrOS.VirtualFileSystem;
+import java.util.*;
+import java.util.regex.*;
 
-/**
- * A simple text editor component with basic file operations and undo/redo support.
- */
 public class TextEditor extends JPanel {
-    protected JTextArea textArea;
-    protected UndoManager undoManager;
-    protected JToolBar toolBar;
-    protected String currentFilePath;
-    protected boolean hasUnsavedChanges;
-    protected final VirtualFileSystem vfs;
+    private final JTextPane textArea;
+    private final VirtualFileSystem vfs;
+    private final JLabel statusBar;
+    private final LineNumberComponent lineNumbers;
+    private boolean darkMode = true;
+    private final SyntaxHighlighter syntaxHighlighter;
+    private String currentFilePath = null;
+    private boolean hasUnsavedChanges = false;
+    
+    private static final Color DARK_BG = new Color(30, 30, 30);
+    private static final Color DARK_FG = new Color(220, 220, 220);
+    private static final Color LIGHT_BG = new Color(250, 250, 250);
+    private static final Color LIGHT_FG = new Color(20, 20, 20);
 
-    /**
-     * Constructs a new TextEditor with the specified VirtualFileSystem.
-     *
-     * @param vfs The VirtualFileSystem instance
-     */
     public TextEditor(VirtualFileSystem vfs) {
         this.vfs = vfs;
         setLayout(new BorderLayout());
+
+        // Create text area with custom StyledDocument
+        textArea = new JTextPane();
+        syntaxHighlighter = new SyntaxHighlighter(textArea);
+        textArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+
+        // Create scroll pane first
+        JScrollPane scrollPane = new JScrollPane(textArea);
         
-        // Initialize text area with undo support
-        textArea = new JTextArea();
-        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        undoManager = new UndoManager();
-        textArea.getDocument().addUndoableEditListener(e -> {
-            undoManager.addEdit(e.getEdit());
-            hasUnsavedChanges = true;
-            updateTitle();
-        });
-
+        // Create line numbers with scroll pane reference
+        lineNumbers = new LineNumberComponent(textArea, scrollPane);
+        
+        // Create status bar
+        statusBar = new JLabel(" Line: 1, Column: 1");
+        
         // Create toolbar
-        toolBar = new JToolBar();
-        initializeToolbar();
+        JToolBar toolbar = createToolbar();
 
-        // Add components
-        add(toolBar, BorderLayout.NORTH);
-        add(new JScrollPane(textArea), BorderLayout.CENTER);
+        // Layout components
+        JPanel editorPanel = new JPanel(new BorderLayout());
+        editorPanel.add(lineNumbers, BorderLayout.WEST);
+        editorPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        add(toolbar, BorderLayout.NORTH);
+        add(editorPanel, BorderLayout.CENTER);
+        add(statusBar, BorderLayout.SOUTH);
+
+        // Add listeners
+        setupListeners();
+        
+        // Initial appearance
+        setDarkMode(darkMode);
+    }
+
+    private JToolBar createToolbar() {
+        JToolBar toolbar = new JToolBar();
+        toolbar.setFloatable(false);
+
+        // File management buttons
+        JButton openBtn = new JButton("Open");
+        JButton saveBtn = new JButton("Save");
+        JButton saveAsBtn = new JButton("Save As");
+        JButton newBtn = new JButton("New");
+
+        // Add file management actions
+        openBtn.addActionListener(e -> openFile());
+        saveBtn.addActionListener(e -> saveFile());
+        saveAsBtn.addActionListener(e -> saveFileAs());
+        newBtn.addActionListener(e -> newFile());
+
+        // Add file management buttons
+        toolbar.add(newBtn);
+        toolbar.add(openBtn);
+        toolbar.add(saveBtn);
+        toolbar.add(saveAsBtn);
+        toolbar.addSeparator();
+
+        // Dark mode toggle
+        JToggleButton darkModeBtn = new JToggleButton("Dark Mode");
+        darkModeBtn.setSelected(darkMode);
+        darkModeBtn.addActionListener(e -> setDarkMode(darkModeBtn.isSelected()));
+
+        // Find/Replace
+        JButton findBtn = new JButton("Find");
+        findBtn.addActionListener(e -> showFindDialog());
+
+        // Auto-indent
+        JButton indentBtn = new JButton("Auto-indent");
+        indentBtn.addActionListener(e -> autoIndent());
+
+        toolbar.add(darkModeBtn);
+        toolbar.add(findBtn);
+        toolbar.add(indentBtn);
+        return toolbar;
+    }
+
+    private void setupListeners() {
+        // Update status bar and syntax highlighting
+        textArea.addCaretListener(e -> {
+            updateStatusBar();
+            syntaxHighlighter.highlightSyntax();
+        });
 
         // Add key bindings
-        addKeyBindings();
-    }
-
-    /**
-     * Initializes the toolbar with file and edit operation buttons.
-     */
-    private void initializeToolbar() {
-        // File operations
-        JButton newButton = new JButton("New");
-        JButton openButton = new JButton("Open");
-        JButton saveButton = new JButton("Save");
-        JButton saveAsButton = new JButton("Save As");
-
-        // Edit operations
-        JButton undoButton = new JButton("Undo");
-        JButton redoButton = new JButton("Redo");
-        JButton cutButton = new JButton("Cut");
-        JButton copyButton = new JButton("Copy");
-        JButton pasteButton = new JButton("Paste");
-
-        // Add file operation listeners
-        newButton.addActionListener(e -> newFile());
-        openButton.addActionListener(e -> openFile());
-        saveButton.addActionListener(e -> saveFile());
-        saveAsButton.addActionListener(e -> saveFileAs());
-
-        // Add edit operation listeners
-        undoButton.addActionListener(e -> undo());
-        redoButton.addActionListener(e -> redo());
-        cutButton.addActionListener(e -> textArea.cut());
-        copyButton.addActionListener(e -> textArea.copy());
-        pasteButton.addActionListener(e -> textArea.paste());
-
-        // Add buttons to toolbar
-        toolBar.add(newButton);
-        toolBar.add(openButton);
-        toolBar.add(saveButton);
-        toolBar.add(saveAsButton);
-        toolBar.addSeparator();
-        toolBar.add(undoButton);
-        toolBar.add(redoButton);
-        toolBar.addSeparator();
-        toolBar.add(cutButton);
-        toolBar.add(copyButton);
-        toolBar.add(pasteButton);
-    }
-
-    /**
-     * Adds key bindings for undo, redo, and save operations.
-     */
-    private void addKeyBindings() {
-        InputMap inputMap = textArea.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        InputMap inputMap = textArea.getInputMap();
         ActionMap actionMap = textArea.getActionMap();
 
-        // Undo/Redo bindings
-        KeyStroke undoKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
-        KeyStroke redoKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
-
-        inputMap.put(undoKeyStroke, "Undo");
-        inputMap.put(redoKeyStroke, "Redo");
-
-        actionMap.put("Undo", new AbstractAction() {
-            public void actionPerformed(ActionEvent evt) {
-                undo();
-            }
-        });
-        actionMap.put("Redo", new AbstractAction() {
-            public void actionPerformed(ActionEvent evt) {
-                redo();
+        // Ctrl+F for find
+        KeyStroke findKey = KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK);
+        inputMap.put(findKey, "find");
+        actionMap.put("find", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showFindDialog();
             }
         });
 
-        // Add save key binding
-        KeyStroke saveKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
-        textArea.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(saveKeyStroke, "Save");
-        textArea.getActionMap().put("Save", new AbstractAction() {
-            public void actionPerformed(ActionEvent evt) {
-                saveFile();
+        // Tab key for indentation
+        textArea.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    e.consume();
+                    insertTab();
+                }
             }
+        });
+
+        // Add document change listener
+        textArea.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { documentChanged(); }
+            public void removeUpdate(DocumentEvent e) { documentChanged(); }
+            public void changedUpdate(DocumentEvent e) { documentChanged(); }
         });
     }
 
-    /**
-     * Creates a new file, prompting the user to save changes if there are unsaved changes.
-     */
-    private void newFile() {
-        if (hasUnsavedChanges) {
-            int result = JOptionPane.showConfirmDialog(this,
-                "Do you want to save changes?",
-                "Unsaved Changes",
-                JOptionPane.YES_NO_CANCEL_OPTION);
-            
-            if (result == JOptionPane.YES_OPTION) {
-                if (!saveFile()) return;
-            } else if (result == JOptionPane.CANCEL_OPTION) {
-                return;
+    private void updateStatusBar() {
+        try {
+            int pos = textArea.getCaretPosition();
+            int line = textArea.getDocument().getDefaultRootElement()
+                    .getElementIndex(pos) + 1;
+            int column = pos - textArea.getDocument().getDefaultRootElement()
+                    .getElement(line - 1).getStartOffset() + 1;
+            statusBar.setText(String.format(" Line: %d, Column: %d", line, column));
+        } catch (Exception e) {
+            statusBar.setText(" Error getting position");
+        }
+    }
+
+    private void setDarkMode(boolean dark) {
+        darkMode = dark;
+        Color bgColor = dark ? DARK_BG : LIGHT_BG;
+        Color fgColor = dark ? DARK_FG : LIGHT_FG;
+        Color lineNumBg = dark ? new Color(40, 40, 40) : new Color(230, 230, 230);
+        Color lineNumFg = dark ? new Color(180, 180, 180) : new Color(90, 90, 90);
+        Color borderColor = dark ? new Color(60, 60, 60) : new Color(200, 200, 200);
+
+        textArea.setBackground(bgColor);
+        textArea.setForeground(fgColor);
+        textArea.setCaretColor(fgColor);
+        
+        lineNumbers.setBackground(lineNumBg);
+        lineNumbers.setForeground(lineNumFg);
+        lineNumbers.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, borderColor));
+        
+        statusBar.setBackground(bgColor);
+        statusBar.setForeground(fgColor);
+        syntaxHighlighter.updateColors();
+    }
+
+    private void showFindDialog() {
+        JDialog dialog = new JDialog((Frame)null, "Find/Replace", true);
+        dialog.setLayout(new BorderLayout());
+        
+        JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5));
+        JTextField findField = new JTextField();
+        JTextField replaceField = new JTextField();
+        JCheckBox matchCase = new JCheckBox("Match case");
+        
+        panel.add(new JLabel("Find:"));
+        panel.add(findField);
+        panel.add(new JLabel("Replace with:"));
+        panel.add(replaceField);
+        panel.add(matchCase);
+        
+        JPanel buttons = new JPanel();
+        JButton findNext = new JButton("Find Next");
+        JButton replace = new JButton("Replace");
+        JButton replaceAll = new JButton("Replace All");
+        
+        findNext.addActionListener(e -> findText(findField.getText(), matchCase.isSelected()));
+        replace.addActionListener(e -> replaceText(findField.getText(), 
+                                                 replaceField.getText(), 
+                                                 matchCase.isSelected()));
+        replaceAll.addActionListener(e -> replaceAllText(findField.getText(), 
+                                                       replaceField.getText(), 
+                                                       matchCase.isSelected()));
+        
+        buttons.add(findNext);
+        buttons.add(replace);
+        buttons.add(replaceAll);
+        
+        dialog.add(panel, BorderLayout.CENTER);
+        dialog.add(buttons, BorderLayout.SOUTH);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
+    private void findText(String text, boolean matchCase) {
+        String content = textArea.getText();
+        String searchText = matchCase ? text : text.toLowerCase();
+        if (!matchCase) content = content.toLowerCase();
+        
+        int start = textArea.getCaretPosition();
+        int index = content.indexOf(searchText, start);
+        
+        if (index >= 0) {
+            textArea.setCaretPosition(index);
+            textArea.moveCaretPosition(index + text.length());
+            textArea.requestFocusInWindow();
+        } else {
+            JOptionPane.showMessageDialog(this, "Text not found");
+        }
+    }
+
+    private void replaceText(String find, String replace, boolean matchCase) {
+        if (textArea.getSelectedText() != null) {
+            String selection = textArea.getSelectedText();
+            if (matchCase ? selection.equals(find) : selection.equalsIgnoreCase(find)) {
+                textArea.replaceSelection(replace);
+            }
+        }
+        findText(find, matchCase);
+    }
+
+    private void replaceAllText(String find, String replace, boolean matchCase) {
+        String content = textArea.getText();
+        String result;
+        if (matchCase) {
+            result = content.replace(find, replace);
+        } else {
+            result = content.replaceAll("(?i)" + Pattern.quote(find), replace);
+        }
+        textArea.setText(result.toString());
+    }
+
+    private void autoIndent() {
+        String[] lines = textArea.getText().split("\n");
+        StringBuilder result = new StringBuilder();
+        int indent = 0;
+        
+        for (String line : lines) {
+            String trimmed = line.trim();
+            if (trimmed.endsWith("{")) {
+                result.append("    ".repeat(indent)).append(trimmed).append("\n");
+                indent++;
+            } else if (trimmed.startsWith("}")) {
+                indent = Math.max(0, indent - 1);
+                result.append("    ".repeat(indent)).append(trimmed).append("\n");
+            } else {
+                result.append("    ".repeat(indent)).append(trimmed).append("\n");
             }
         }
         
-        textArea.setText("");
-        currentFilePath = null;
-        hasUnsavedChanges = false;
-        undoManager.discardAllEdits();
-        updateTitle();
+        textArea.setText(result.toString());
     }
 
-    /**
-     * Opens a file, prompting the user to enter the file path.
-     */
+    private void insertTab() {
+        try {
+            Document doc = textArea.getDocument();
+            doc.insertString(textArea.getCaretPosition(), "    ", null);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setText(String text) {
+        textArea.setText(text);
+        syntaxHighlighter.highlightSyntax();
+    }
+
+    public String getText() {
+        return textArea.getText();
+    }
+
     private void openFile() {
-        // Create custom file chooser dialog
-        String fileName = JOptionPane.showInputDialog(this, 
-            "Enter file path to open (e.g., /docs/file.txt):", 
-            "Open File", 
-            JOptionPane.QUESTION_MESSAGE);
-            
-        if (fileName != null && !fileName.trim().isEmpty()) {
+        JFileChooser fileChooser = new JFileChooser(vfs.getRootPath().toFile());
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
             try {
-                byte[] content = vfs.readFile(fileName);
-                textArea.setText(new String(content));
-                currentFilePath = fileName;
+                String virtualPath = vfs.getVirtualPath(file.toPath());
+                byte[] content = vfs.readFile(virtualPath);
+                setText(new String(content));
+                currentFilePath = virtualPath;
                 hasUnsavedChanges = false;
-                undoManager.discardAllEdits();
-                updateTitle();
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(this,
-                    "Error opening file: " + e.getMessage(),
-                    "Error",
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, 
+                    "Error opening file: " + ex.getMessage(), 
+                    "Error", 
                     JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 
-    /**
-     * Saves the current file. If the file has not been saved before, prompts the user to enter a file path.
-     *
-     * @return true if the file was saved successfully, false otherwise
-     */
-    private boolean saveFile() {
+    private void saveFile() {
         if (currentFilePath == null) {
-            return saveFileAs();
-        }
-        
-        try {
-            vfs.createFile(currentFilePath, textArea.getText().getBytes());
-            hasUnsavedChanges = false;
-            updateTitle();
-            return true;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                "Error saving file: " + e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-            return false;
+            saveFileAs();
+        } else {
+            try {
+                vfs.createFile(currentFilePath, getText().getBytes());
+                hasUnsavedChanges = false;
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, 
+                    "Error saving file: " + ex.getMessage(), 
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
-    /**
-     * Prompts the user to enter a file path and saves the file.
-     *
-     * @return true if the file was saved successfully, false otherwise
-     */
-    private boolean saveFileAs() {
-        // Create custom file save dialog
-        String fileName = JOptionPane.showInputDialog(this,
-            "Enter file path to save (e.g., /docs/file.txt):",
-            "Save File As",
-            JOptionPane.QUESTION_MESSAGE);
+    private void saveFileAs() {
+        JFileChooser fileChooser = new JFileChooser(vfs.getRootPath().toFile());
+        if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try {
+                String virtualPath = vfs.getVirtualPath(file.toPath());
+                vfs.createFile(virtualPath, getText().getBytes());
+                currentFilePath = virtualPath;
+                hasUnsavedChanges = false;
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, 
+                    "Error saving file: " + ex.getMessage(), 
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void newFile() {
+        if (hasUnsavedChanges) {
+            int response = JOptionPane.showConfirmDialog(this,
+                "Do you want to save changes?",
+                "Unsaved Changes",
+                JOptionPane.YES_NO_CANCEL_OPTION);
             
-        if (fileName != null && !fileName.trim().isEmpty()) {
-            currentFilePath = fileName;
-            return saveFile();
+            if (response == JOptionPane.YES_OPTION) {
+                saveFile();
+            } else if (response == JOptionPane.CANCEL_OPTION) {
+                return;
+            }
         }
-        return false;
+        setText("");
+        currentFilePath = null;
+        hasUnsavedChanges = false;
     }
 
-    /**
-     * Updates the title of the parent JInternalFrame to reflect the current file path and unsaved changes.
-     */
-    private void updateTitle() {
-        if (getParent() instanceof JInternalFrame) {
-            String title = currentFilePath != null ? 
-                currentFilePath : "Untitled";
-            if (hasUnsavedChanges) title += "*";
-            ((JInternalFrame) getParent()).setTitle(title);
-        }
-    }
-
-    /**
-     * Sets the text content of the text editor.
-     *
-     * @param text The text content to set
-     */
-    public void setText(String text) {
-        textArea.setText(text);
-        undoManager.discardAllEdits();
-    }
-
-    /**
-     * Gets the text content of the text editor.
-     *
-     * @return The text content
-     */
-    public String getText() {
-        return textArea.getText();
-    }
-
-    /**
-     * Undoes the last edit operation.
-     */
-    public void undo() {
-        if (undoManager.canUndo()) {
-            undoManager.undo();
-        }
-    }
-
-    /**
-     * Redoes the last undone edit operation.
-     */
-    public void redo() {
-        if (undoManager.canRedo()) {
-            undoManager.redo();
-        }
-    }
-
-    /**
-     * Checks if there are unsaved changes in the text editor.
-     *
-     * @return true if there are unsaved changes, false otherwise
-     */
-    public boolean hasUnsavedChanges() {
-        return hasUnsavedChanges;
-    }
-
-    /**
-     * Loads a file from the virtual file system into the text editor.
-     *
-     * @param virtualPath Path to the file in the virtual file system
-     */
-    public void loadFile(String virtualPath) {
-        try {
-            byte[] content = vfs.readFile(virtualPath);
-            setText(new String(content));
-            currentFilePath = virtualPath;
-            hasUnsavedChanges = false;
-            updateTitle();
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this,
-                "Error loading file: " + e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-        }
+    private void documentChanged() {
+        hasUnsavedChanges = true;
     }
 }

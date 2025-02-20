@@ -38,7 +38,11 @@ public class FileManager extends JPanel {
     }
 
     private void openFile(File file) {
-        appLauncher.openApplication(file);
+        if (file.isDirectory() && file.getName().endsWith(".app")) {
+            runApp(file);
+        } else {
+            appLauncher.openApplication(file);
+        }
     }
 
     private void createToolbar() {
@@ -84,26 +88,57 @@ public class FileManager extends JPanel {
         fileTable.setShowGrid(false);
         fileTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Double click listener
-        fileTable.addMouseListener(
-            new java.awt.event.MouseAdapter() {
-                public void mouseClicked(java.awt.event.MouseEvent evt) {
-                    if (evt.getClickCount() == 2) {
-                        int row = fileTable.rowAtPoint(evt.getPoint());
-                        String fileName = (String) tableModel.getValueAt(
-                            row,
-                            0
-                        );
+        // Add popup menu
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem runItem = new JMenuItem("Run");
+        runItem.addActionListener(e -> {
+            int row = fileTable.getSelectedRow();
+            if (row != -1) {
+                String fileName = (String) tableModel.getValueAt(row, 0);
+                File selected = new File(currentDirectory, fileName);
+                runFile(selected);
+            }
+        });
+        popupMenu.add(runItem);
+
+        // Mouse listener for both double-click and right-click
+        fileTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    int row = fileTable.rowAtPoint(evt.getPoint());
+                    String fileName = (String) tableModel.getValueAt(row, 0);
+                    File selected = new File(currentDirectory, fileName);
+                    if (selected.isDirectory()) {
+                        navigateTo(selected);
+                    } else {
+                        openFile(selected);
+                    }
+                }
+            }
+
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                showPopupIfNeeded(evt);
+            }
+
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                showPopupIfNeeded(evt);
+            }
+
+            private void showPopupIfNeeded(java.awt.event.MouseEvent evt) {
+                if (evt.isPopupTrigger()) {
+                    int row = fileTable.rowAtPoint(evt.getPoint());
+                    if (row >= 0) {
+                        fileTable.setRowSelectionInterval(row, row);
+                        String fileName = (String) tableModel.getValueAt(row, 0);
                         File selected = new File(currentDirectory, fileName);
-                        if (selected.isDirectory()) {
-                            navigateTo(selected);
-                        } else {
-                            openFile(selected);
+                        // Only show popup if the file has a registered runner
+                        if (vfs.hasExtensionRunner(selected.getName())) {
+                            popupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
                         }
                     }
                 }
             }
-        );
+        });
 
         JScrollPane scrollPane = new JScrollPane(fileTable);
         add(scrollPane, BorderLayout.CENTER);
@@ -175,5 +210,31 @@ public class FileManager extends JPanel {
             return "File";
         }
         return name.substring(lastIndexOf + 1).toUpperCase();
+    }
+
+    private void runApp(File appDirectory) {
+        File mainFile = new File(appDirectory, "main.masm");
+        if (mainFile.exists()) {
+            Path masmfile = mainFile.toPath();
+            try {
+                String filepath = vfs.getVirtualPath(masmfile);
+                AsmRunner.RunASMFromFile(filepath);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Error reading main.masm: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "main.masm not found in " + appDirectory.getName(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void runFile(File file) {
+        if (file.exists() && !file.isDirectory()) {
+            String ext = vfs.getFileExtension(file.getName());
+            if (ext.equals("masm")) {
+                runApp(file.getParentFile());
+            } else {
+                vfs.runFile(file);
+            }
+        }
     }
 }

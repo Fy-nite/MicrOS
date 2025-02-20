@@ -3,6 +3,10 @@ package org.Finite.MicrOS;
 import java.awt.*;
 import javax.swing.*;
 
+import org.finite.ModuleManager.ModuleInit;
+
+import java.io.IOException;
+
 /**
  * Main class for launching the MicrOS desktop environment.
  */
@@ -17,7 +21,9 @@ public class Main {
      */
     public static void main(String[] args) {
         try {
+            ModuleInit.initallmodules();
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -37,8 +43,28 @@ public class Main {
         VirtualFileSystem vfs = VirtualFileSystem.getInstance();
         windowManager = new WindowManager(desktop, vfs);
 
+        // Register ASM interpreter as a virtual program
+        vfs.registerProgram("asm", args -> {
+            if (args.length > 1) {
+                try {
+                    // Convert virtual path to absolute path
+                    String absolutePath = vfs.resolveVirtualPath(args[1]).toAbsolutePath().toString();
+                    String output = AsmRunner.RunASMFromFile(absolutePath);
+                    JInternalFrame mainConsole = windowManager.getWindow("main");
+                    if (mainConsole != null) {
+                        Console console = (Console) mainConsole.getClientProperty("console");
+                        if (console != null) {
+                            console.appendText(output, Color.WHITE);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         // Add background panel
-        BackgroundPanel backgroundPanel = new BackgroundPanel("/images/image.png");
+        BackgroundPanel backgroundPanel = new BackgroundPanel("/images/background.png");
         backgroundPanel.setLayout(new BorderLayout());
         desktop.add(backgroundPanel, JLayeredPane.FRAME_CONTENT_LAYER);
         desktop.setLayer(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
@@ -62,6 +88,12 @@ public class Main {
         windowManager.registerExecutableFileType("txt", "texteditor");
         windowManager.registerExecutableFileType("png", "imageviewer");
         windowManager.registerExecutableFileType("jpg", "imageviewer");
+        windowManager.registerExecutableFileType("jpeg", "imageviewer");
+        windowManager.registerExecutableFileType("gif", "imageviewer");
+        windowManager.registerExecutableFileType("html", "webviewer");
+        windowManager.registerExecutableFileType("htm", "webviewer");
+        windowManager.registerExecutableFileType("masm", "texteditor");
+        windowManager.registerExecutableFileType("asm", "texteditor");
 
         frame.add(desktop, BorderLayout.CENTER); // Ensure desktop is added to the frame
 
@@ -71,16 +103,17 @@ public class Main {
         windowManager.createWindow("main", "Main Console", true);
         windowManager.writeToConsole("main", "MicroAssembly Interpreter v1.0");
         
+
         // Create and demonstrate text editor
         JInternalFrame editorFrame = windowManager.createWindow("editor1", "Text Editor Demo", "texteditor");
-        windowManager.setEditorText("editor1", "Hello World!\n\nThis is a demo of the text editor.");
+        // windowManager.setEditorText("editor1", "Hello World!\n\nThis is a demo of the text editor.");
         
         // After 2 seconds, read and display the content in console
-        new Timer(2000, e -> {
-            String content = windowManager.getEditorText("editor1");
-            windowManager.writeToConsole("main", "\nText Editor content:\n" + content);
-            ((Timer)e.getSource()).stop();
-        }).start();
+        // new Timer(2000, e -> {
+        //     String content = windowManager.getEditorText("editor1");
+        //     windowManager.writeToConsole("main", "\nText Editor content:\n" + content);
+        //     ((Timer)e.getSource()).stop();
+        // }).start();
     }
 
     /**

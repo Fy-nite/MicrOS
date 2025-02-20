@@ -3,19 +3,22 @@ package org.Finite.MicrOS;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import org.Finite.MicrOS.VirtualFileSystem;
 
 public class BackgroundPanel extends JPanel {
     private BufferedImage backgroundImage;
-
     public BackgroundPanel(String imagePath) {
         try {
-            backgroundImage = ImageIO.read(getClass().getResourceAsStream(imagePath));
+            byte[] imageData = VirtualFileSystem.getInstance().readFile(imagePath);
+            backgroundImage = ImageIO.read(new ByteArrayInputStream(imageData));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+    
 
     @Override
     protected void paintComponent(Graphics g) {

@@ -18,8 +18,20 @@ public class VirtualFileSystem {
     private static VirtualFileSystem instance;
     private final Map<String, String> mimeTypes;
     private final Map<String, Icon> fileIcons;
+    private final Map<String, FileRunner> extensionRunners;
+    private final Map<String, ProgramExecutor> programRegistry = new HashMap<>();
     
     private static final int THUMBNAIL_SIZE = 64;
+
+    @FunctionalInterface
+    public interface FileRunner {
+        void run(File file) throws IOException;
+    }
+
+    @FunctionalInterface
+    public interface ProgramExecutor {
+        void execute(String[] args) throws IOException;
+    }
 
     /**
      * Private constructor to initialize the virtual file system.
@@ -42,8 +54,10 @@ public class VirtualFileSystem {
         this.rootDirectory = jarLocation.resolve("filesystem");
         this.mimeTypes = new HashMap<>();
         this.fileIcons = new HashMap<>();
+        this.extensionRunners = new HashMap<>();
         initializeFileSystem();
         initializeMimeTypes();
+        registerDefaultRunners();
     }
 
     /**
@@ -77,6 +91,7 @@ public class VirtualFileSystem {
      */
     private void initializeFileSystem() {
         try {
+            // Only create the directory structure if root doesn't exist
             if (!Files.exists(rootDirectory)) {
                 Files.createDirectory(rootDirectory);
                 
@@ -86,13 +101,10 @@ public class VirtualFileSystem {
                 createDirectory("/apps");
                 createDirectory("/docs");
                 createDirectory("/images");
+                createDirectory("/bin");
 
-                // Create welcome files
-                createTextFile("/docs/welcome.txt", "Welcome to MicrOS!\n");
-                createTextFile("/docs/readme.md", "# MicrOS Documentation\n\nWelcome to MicrOS!");
-                
-                // Copy sample images if they exist
-                copyResourceFile("/sample.png", "/images/sample.png");
+                // Copy the background image
+                copyResourceFile("/images/bg.png", "/images/background.png");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -383,5 +395,71 @@ public class VirtualFileSystem {
      */
     public Path getRootPath() {
         return rootDirectory;
+    }
+
+    private void registerDefaultRunners() {
+        // Register .masm file runner
+        registerExtensionRunner("masm", file -> {
+            Path asmCode = resolveVirtualPath(file.getPath());
+            AsmRunner.RunASMFromFile(asmCode.toString());
+        });
+    }
+
+    public void registerExtensionRunner(String extension, FileRunner runner) {
+        extensionRunners.put(extension.toLowerCase(), runner);
+    }
+
+    public boolean hasExtensionRunner(String fileName) {
+        String ext = getFileExtension(fileName).toLowerCase();
+        return extensionRunners.containsKey(ext);
+    }
+
+    public void runFile(File file) {
+        String ext = getFileExtension(file.getName()).toLowerCase();
+        FileRunner runner = extensionRunners.get(ext);
+        if (runner != null) {
+            try {
+                runner.run(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+                // You might want to show an error dialog here
+            }
+        }
+    }
+
+    public void registerProgram(String name, ProgramExecutor executor) {
+        programRegistry.put(name, executor);
+    }
+
+    public boolean executeProgram(String name, String[] args) {
+        ProgramExecutor executor = programRegistry.get(name);
+        if (executor != null) {
+            try {
+                executor.execute(args);
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public String getShebang(String virtualPath) throws IOException {
+        byte[] content = readFile(virtualPath);
+        if (content.length > 2 && content[0] == '#' && content[1] == '!') {
+            // Read first line
+            int newline = -1;
+            for (int i = 2; i < content.length; i++) {
+                if (content[i] == '\n') {
+                    newline = i;
+                    break;
+                }
+            }
+            if (newline != -1) {
+                return new String(content, 2, newline - 2).trim();
+            }
+        }
+        return null;
     }
 }
