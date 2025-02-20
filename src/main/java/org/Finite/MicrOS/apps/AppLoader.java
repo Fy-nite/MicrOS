@@ -39,9 +39,9 @@ public class AppLoader {
 
         File contentsDir = new File(appBundle, "Contents");
         File manifestFile = new File(contentsDir, "manifest.json");
-        File libDir = new File(contentsDir, "lib");
+        File resourcesDir = new File(contentsDir, "Resources");
 
-        if (!manifestFile.exists() || !libDir.exists()) {
+        if (!manifestFile.exists() || !resourcesDir.exists()) {
             throw new Exception("Invalid app bundle structure: " + appBundle.getName());
         }
 
@@ -51,9 +51,9 @@ public class AppLoader {
         
         AppManifest manifest = parseManifest(json);
         
-        // Create class loader for all JARs in lib directory
+        // Create class loader for all JARs in Resources directory
         List<URL> urls = new ArrayList<>();
-        File[] jarFiles = libDir.listFiles((dir, name) -> name.endsWith(".jar"));
+        File[] jarFiles = resourcesDir.listFiles((dir, name) -> name.endsWith(".jar"));
         if (jarFiles != null) {
             for (File jar : jarFiles) {
                 urls.add(jar.toURI().toURL());
@@ -68,6 +68,9 @@ public class AppLoader {
         // Store app info
         loadedApps.put(manifest.getIdentifier(), manifest);
         appClassLoaders.put(manifest.getIdentifier(), classLoader);
+        
+        System.out.println("Loaded app: " + manifest.getIdentifier() + 
+                         " with main class: " + manifest.getMainClass());
     }
 
     private AppManifest parseManifest(JSONObject json) {

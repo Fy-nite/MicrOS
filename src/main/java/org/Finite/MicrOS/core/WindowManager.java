@@ -84,7 +84,7 @@ public class WindowManager {
             return frame;
         });
 
-        // Update text editor factory to use app
+        // Update text editor factory to use correct app identifier
         registerWindowFactory("texteditor", (windowId, title) -> {
             JInternalFrame frame = createBaseFrame(title);
             try {

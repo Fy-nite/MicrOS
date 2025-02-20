@@ -6,6 +6,7 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 
 import org.Finite.MicrOS.core.VirtualFileSystem;
+import org.finite.texteditor.syntax.SyntaxHighlighter;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -29,7 +30,7 @@ public class TextEditorPanel extends JPanel {
     private static final Color LIGHT_BG = new Color(250, 250, 250);
     private static final Color LIGHT_FG = new Color(20, 20, 20);
 
-    public TextEditor(VirtualFileSystem vfs) {
+    public TextEditorPanel(VirtualFileSystem vfs) {  // Changed from TextEditor to TextEditorPanel
         this.vfs = vfs;
         setLayout(new BorderLayout());
 
