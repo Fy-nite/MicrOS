@@ -3,6 +3,8 @@ package org.Finite.MicrOS;
 import java.awt.*;
 import javax.swing.*;
 
+import org.Finite.MicrOS.Desktop.Settings;
+import org.Finite.MicrOS.Desktop.Taskbar;
 import org.finite.ModuleManager.ModuleInit;
 
 import java.io.IOException;

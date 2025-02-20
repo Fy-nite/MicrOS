@@ -9,6 +9,7 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.Finite.MicrOS.apps.AppLoader;
 
 /**
  * A virtual file system for managing files and directories within the MicrOS environment.
@@ -32,6 +33,8 @@ public class VirtualFileSystem {
     public interface ProgramExecutor {
         void execute(String[] args) throws IOException;
     }
+
+    private AppLoader appLoader;
 
     /**
      * Private constructor to initialize the virtual file system.
@@ -113,6 +116,12 @@ public class VirtualFileSystem {
                 copyResourceFile("/default_configs/system/texteditor/syntax/java.json", 
                                 "/system/texteditor/syntax/java.json");
             }
+
+            // Initialize app directory
+            createDirectory("/apps");
+            appLoader = new AppLoader(resolveVirtualPath("/apps").toString());
+            appLoader.loadApps();
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -468,5 +477,9 @@ public class VirtualFileSystem {
             }
         }
         return null;
+    }
+
+    public AppLoader getAppLoader() {
+        return appLoader;
     }
 }

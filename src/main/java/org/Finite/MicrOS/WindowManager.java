@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import javax.swing.*;
 import org.Finite.MicrOS.VirtualFileSystem;
+import org.Finite.MicrOS.Desktop.Taskbar;
+import org.Finite.MicrOS.Files.FileManager;
 
 /**
  * Core window management class for MicrOS desktop environment.

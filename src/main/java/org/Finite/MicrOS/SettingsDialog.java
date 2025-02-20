@@ -1,6 +1,9 @@
 package org.Finite.MicrOS;
 
 import javax.swing.*;
+
+import org.Finite.MicrOS.Desktop.Settings;
+
 import java.awt.*;
 import java.io.File;
 
