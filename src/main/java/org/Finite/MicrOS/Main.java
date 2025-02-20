@@ -6,6 +6,7 @@ import javax.swing.*;
 import org.finite.ModuleManager.ModuleInit;
 
 import java.io.IOException;
+import javafx.application.Platform;
 
 /**
  * Main class for launching the MicrOS desktop environment.
@@ -21,8 +22,14 @@ public class Main {
      */
     public static void main(String[] args) {
         try {
+            // Initialize JavaFX platform
+            Platform.startup(() -> {});
+            
             ModuleInit.initallmodules();
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            
+            // Initialize settings and apply look and feel
+            Settings settings = Settings.getInstance();
+            UIManager.setLookAndFeel(settings.getLookAndFeel());
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,8 +70,9 @@ public class Main {
             }
         });
 
-        // Add background panel
-        BackgroundPanel backgroundPanel = new BackgroundPanel("/images/background.png");
+        // Use background from settings
+        Settings settings = Settings.getInstance();
+        BackgroundPanel backgroundPanel = new BackgroundPanel(settings.getBackground());
         backgroundPanel.setLayout(new BorderLayout());
         desktop.add(backgroundPanel, JLayeredPane.FRAME_CONTENT_LAYER);
         desktop.setLayer(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
@@ -105,7 +113,7 @@ public class Main {
         
 
         // Create and demonstrate text editor
-        JInternalFrame editorFrame = windowManager.createWindow("editor1", "Text Editor Demo", "texteditor");
+        JInternalFrame editorFrame = windowManager.createWindow("editor1", "Text Editor", "texteditor");
         // windowManager.setEditorText("editor1", "Hello World!\n\nThis is a demo of the text editor.");
         
         // After 2 seconds, read and display the content in console

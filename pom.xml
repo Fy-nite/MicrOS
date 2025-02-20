@@ -64,11 +64,11 @@
             <version>2.0</version>
         </dependency>
 
-<dependency>
-    <groupId>org.Finite</groupId>
-    <artifactId>MASM</artifactId>
-    <version>0.01</version>
-</dependency>
+        <dependency>
+            <groupId>org.Finite</groupId>
+            <artifactId>MASM</artifactId>
+            <version>0.01</version>
+        </dependency>
 
         <dependency>
             <groupId>com.beust</groupId>
@@ -93,7 +93,26 @@
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>17</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>17</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>17</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20210307</version>
+        </dependency>
 
     </dependencies>
 </project>

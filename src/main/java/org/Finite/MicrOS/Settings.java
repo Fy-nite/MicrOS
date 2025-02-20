@@ -1,0 +1,81 @@
+package org.Finite.MicrOS;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
+import java.util.Properties;
+
+public class Settings {
+    private static Settings instance;
+    private final Properties properties;
+    private final String settingsPath;
+    private final VirtualFileSystem vfs;
+
+    private Settings() {
+        this.vfs = VirtualFileSystem.getInstance();
+        this.properties = new Properties();
+        this.settingsPath = "/system/settings.properties";
+        loadSettings();
+    }
+
+    public static Settings getInstance() {
+        if (instance == null) {
+            instance = new Settings();
+        }
+        return instance;
+    }
+
+    private void loadSettings() {
+        try {
+            if (vfs.exists(settingsPath)) {
+                byte[] data = vfs.readFile(settingsPath);
+                properties.load(new ByteArrayInputStream(data));
+            } else {
+                // Set defaults
+                properties.setProperty("lookAndFeel", UIManager.getSystemLookAndFeelClassName());
+                properties.setProperty("background", "#000000");  // Default black background
+                properties.setProperty("theme", "dark");
+                saveSettings();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveSettings() {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            properties.store(out, "MicrOS Settings");
+            vfs.createFile(settingsPath, out.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getLookAndFeel() {
+        return properties.getProperty("lookAndFeel", UIManager.getSystemLookAndFeelClassName());
+    }
+
+    public void setLookAndFeel(String className) {
+        properties.setProperty("lookAndFeel", className);
+        saveSettings();
+    }
+
+    public String getBackground() {
+        return properties.getProperty("background", "/images/background.png");
+    }
+
+    public void setBackground(String path) {
+        properties.setProperty("background", path);
+        saveSettings();
+    }
+
+    public String getTheme() {
+        return properties.getProperty("theme", "dark");
+    }
+
+    public void setTheme(String theme) {
+        properties.setProperty("theme", theme);
+        saveSettings();
+    }
+}

@@ -313,6 +313,18 @@ public class TextEditor extends JPanel {
         }
     }
 
+    public void openFile(String virtualPath) {
+        try {
+            String content = new String(vfs.readFile(virtualPath));
+            setText(content);
+            syntaxHighlighter.setFileType(virtualPath);
+            currentFilePath = virtualPath;
+            hasUnsavedChanges = false;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void saveFile() {
         if (currentFilePath == null) {
             saveFileAs();

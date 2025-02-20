@@ -3,57 +3,93 @@ package org.Finite.MicrOS;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
+import java.util.*;
 import java.util.regex.*;
-
+import org.json.*;
+import java.io.*;
+import java.util.List;
 public class SyntaxHighlighter {
     private final JTextPane textPane;
     private final StyleContext styleContext;
-    private final AttributeSet keywordStyle;
-    private final AttributeSet stringStyle;
-    private final AttributeSet commentStyle;
-    private final AttributeSet numberStyle;
-    private final AttributeSet registerStyle;
-
-    private static final String[] KEYWORDS = {
-        "mov", "add", "sub", "mul", "div", "mod", "inc", "dec",
-        "and", "or", "xor", "not", "shl", "shr", "push", "pop",
-        "cmp", "jmp", "je", "jne", "jg", "jge", "jl", "jle",
-        "call", "ret", "int", "iret", "hlt"
-    };
+    private final Map<String, SyntaxConfig> syntaxConfigs;
+    private final VirtualFileSystem vfs;
+    private SyntaxConfig currentConfig;
 
     public SyntaxHighlighter(JTextPane textPane) {
         this.textPane = textPane;
         this.styleContext = StyleContext.getDefaultStyleContext();
+        this.vfs = VirtualFileSystem.getInstance();
+        this.syntaxConfigs = new HashMap<>();
         
-        // Initialize styles
-        this.keywordStyle = styleContext.addAttribute(
-            SimpleAttributeSet.EMPTY, 
-            StyleConstants.Foreground, 
-            new Color(86, 156, 214)
-        );
-        this.stringStyle = styleContext.addAttribute(
-            SimpleAttributeSet.EMPTY, 
-            StyleConstants.Foreground, 
-            new Color(206, 145, 120)
-        );
-        this.commentStyle = styleContext.addAttribute(
-            SimpleAttributeSet.EMPTY, 
-            StyleConstants.Foreground, 
-            new Color(87, 166, 74)
-        );
-        this.numberStyle = styleContext.addAttribute(
-            SimpleAttributeSet.EMPTY, 
-            StyleConstants.Foreground, 
-            new Color(181, 206, 168)
-        );
-        this.registerStyle = styleContext.addAttribute(
-            SimpleAttributeSet.EMPTY, 
-            StyleConstants.Foreground, 
-            new Color(220, 220, 170)
-        );
+        // Load syntax configurations
+        loadSyntaxConfigs();
+    }
+
+    private void loadSyntaxConfigs() {
+        try {
+            // Create settings directory if it doesn't exist
+            vfs.createDirectory("/system/texteditor/syntax");
+            
+            // Load all .json files from syntax directory
+            File[] files = vfs.listFiles("/system/texteditor/syntax");
+            if (files != null) {
+                for (File file : files) {
+                    if (file.getName().endsWith(".json")) {
+                        loadSyntaxConfig(file);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadSyntaxConfig(File file) {
+        try {
+            String content = new String(vfs.readFile(vfs.getVirtualPath(file.toPath())));
+            JSONObject json = new JSONObject(content);
+            
+            SyntaxConfig config = new SyntaxConfig();
+            config.fileExtensions = new ArrayList<>();
+            JSONArray extensions = json.getJSONArray("extensions");
+            for (int i = 0; i < extensions.length(); i++) {
+                config.fileExtensions.add(extensions.getString(i));
+            }
+            
+            // Load syntax patterns
+            JSONObject patterns = json.getJSONObject("patterns");
+            config.patterns = new HashMap<>();
+            
+            for (String key : patterns.keySet()) {
+                JSONObject pattern = patterns.getJSONObject(key);
+                String regex = pattern.getString("regex");
+                Color color = Color.decode(pattern.getString("color"));
+                config.patterns.put(regex, styleContext.addAttribute(
+                    SimpleAttributeSet.EMPTY,
+                    StyleConstants.Foreground,
+                    color
+                ));
+            }
+            
+            // Add config for each extension
+            for (String ext : config.fileExtensions) {
+                syntaxConfigs.put(ext, config);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setFileType(String filename) {
+        String ext = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
+        currentConfig = syntaxConfigs.getOrDefault(ext, null);
+        highlightSyntax();
     }
 
     public void highlightSyntax() {
+        if (currentConfig == null) return;
+        
         SwingUtilities.invokeLater(() -> {
             String text = textPane.getText();
             StyledDocument doc = textPane.getStyledDocument();
@@ -62,40 +98,26 @@ public class SyntaxHighlighter {
             doc.setCharacterAttributes(0, text.length(), 
                 SimpleAttributeSet.EMPTY, true);
     
-            // Highlight patterns
-            highlightPattern(doc, text, "//.*$", commentStyle);
-            highlightPattern(doc, text, "\"[^\"]*\"", stringStyle);
-            highlightPattern(doc, text, "\\b\\d+\\b", numberStyle);
-            
-            // Add register pattern - common x86 registers
-            highlightPattern(doc, text, "\\b(ax|bx|cx|dx|si|di|sp|bp|" +
-                "al|ah|bl|bh|cl|ch|dl|dh|" +
-                "RAX|RBX|RCX|RDX|RSI|RDI|RSP|RBP|" +
-                "r\\d+[bdw]?)\\b", registerStyle);
-            
-            // Highlight keywords
-            for (String keyword : KEYWORDS) {
-                highlightPattern(doc, text, "\\b" + keyword + "\\b", keywordStyle);
+            // Apply patterns
+            for (Map.Entry<String, AttributeSet> entry : currentConfig.patterns.entrySet()) {
+                Pattern pattern = Pattern.compile(entry.getKey(), 
+                    Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(text);
+                
+                while (matcher.find()) {
+                    doc.setCharacterAttributes(
+                        matcher.start(),
+                        matcher.end() - matcher.start(),
+                        entry.getValue(),
+                        true
+                    );
+                }
             }
         });
     }
 
-    private void highlightPattern(StyledDocument doc, String text, 
-                                String patternStr, AttributeSet style) {
-        Pattern pattern = Pattern.compile(patternStr, 
-            Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(text);
-        while (matcher.find()) {
-            doc.setCharacterAttributes(
-                matcher.start(), 
-                matcher.end() - matcher.start(), 
-                style, 
-                true
-            );
-        }
-    }
-
-    public void updateColors() {
-        highlightSyntax();
+    private static class SyntaxConfig {
+        List<String> fileExtensions;
+        Map<String, AttributeSet> patterns;
     }
 }

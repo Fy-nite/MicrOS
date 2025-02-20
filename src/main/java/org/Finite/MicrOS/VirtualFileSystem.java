@@ -105,6 +105,13 @@ public class VirtualFileSystem {
 
                 // Copy the background image
                 copyResourceFile("/images/bg.png", "/images/background.png");
+
+                // Create TextEditor configuration directory and copy default configs
+                createDirectory("/system/texteditor/syntax");
+                copyResourceFile("/default_configs/system/texteditor/syntax/asm.json", 
+                                "/system/texteditor/syntax/asm.json");
+                copyResourceFile("/default_configs/system/texteditor/syntax/java.json", 
+                                "/system/texteditor/syntax/java.json");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -285,7 +292,7 @@ public class VirtualFileSystem {
         }
         return rootDirectory.resolve(normalizedPath);
     }
-
+    
     /**
      * Gets the virtual path from an actual filesystem path.
      *

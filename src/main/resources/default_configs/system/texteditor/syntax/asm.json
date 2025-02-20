@@ -1,0 +1,25 @@
+{
+    "extensions": ["asm", "masm"],
+    "patterns": {
+        "keywords": {
+            "regex": "\\b(mov|add|sub|mul|div|push|pop|jmp|call|ret|hlt)\\b",
+            "color": "#569CD6"
+        },
+        "registers": {
+            "regex": "\\b(RAX|RBX|RCX|RDX|RSI|RDI|RSP|RBP|r\\d+[bdw]?)\\b",
+            "color": "#DCDCAA"
+        },
+        "numbers": {
+            "regex": "\\b\\d+\\b",
+            "color": "#B5CE68"
+        },
+        "comments": {
+            "regex": ";.*$",
+            "color": "#57A64A"
+        },
+        "strings": {
+            "regex": "\"[^\"]*\"",
+            "color": "#CE9178"
+        }
+    }
+}

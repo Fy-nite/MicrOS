@@ -7,7 +7,9 @@ package org.Finite.MicrOS;
 import java.awt.*;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import javax.swing.*;
 import org.Finite.MicrOS.VirtualFileSystem;
@@ -34,6 +36,9 @@ public class WindowManager {
 
     /** Map of executable file types to window types */
     private final Map<String, String> executableFileTypes = new HashMap<>();
+
+    /** Map of file extensions to associated window types */
+    private final Map<String, Set<String>> fileTypeAssociations = new HashMap<>();
 
     /**
      * Creates a new WindowManager for the given desktop pane and VFS.
@@ -88,10 +93,12 @@ public class WindowManager {
             return frame;
         });
 
-        // Add web viewer factory
+        // Update web viewer factory
         registerWindowFactory("webviewer", (windowId, title) -> {
             JInternalFrame frame = createBaseFrame(title);
-            frame.setLayout(new BorderLayout());
+            WebViewer webViewer = new WebViewer(vfs);
+            frame.add(webViewer);
+            frame.putClientProperty("webviewer", webViewer);
             return frame;
         });
 
@@ -102,6 +109,25 @@ public class WindowManager {
             frame.add(fileManager);
             return frame;
         });
+
+        // Register default file associations
+        registerFileAssociation("txt", "texteditor");
+        registerFileAssociation("md", "texteditor");
+        registerFileAssociation("java", "texteditor");
+        registerFileAssociation("masm", "texteditor");
+        registerFileAssociation("asm", "texteditor");
+        
+        registerFileAssociation("png", "imageviewer");
+        registerFileAssociation("jpg", "imageviewer");
+        registerFileAssociation("jpeg", "imageviewer");
+        registerFileAssociation("gif", "imageviewer");
+        
+        registerFileAssociation("html", "webviewer");
+        registerFileAssociation("htm", "webviewer");
+        
+        // Allow text files to be opened in webviewer too
+        registerFileAssociation("html", "texteditor");
+        registerFileAssociation("htm", "texteditor");
     }
 
     /**
@@ -351,6 +377,89 @@ public class WindowManager {
         } else {
             System.out.println("No registered executable for file type: " + extension);
         }
+    }
+
+    /**
+     * Sets the URL for a web viewer window
+     */
+    public void setWebViewerUrl(String windowId, String url) {
+        JInternalFrame frame = windows.get(windowId);
+        if (frame != null) {
+            WebViewer webViewer = (WebViewer) frame.getClientProperty("webviewer");
+            if (webViewer != null) {
+                webViewer.loadUrl(url);
+            }
+        }
+    }
+
+    /**
+     * Registers a new file association for a specific file extension and window type.
+     *
+     * @param extension File extension
+     * @param windowType Window type identifier
+     */
+    public void registerFileAssociation(String extension, String windowType) {
+        fileTypeAssociations.computeIfAbsent(extension, k -> new HashSet<>()).add(windowType);
+    }
+
+    /**
+     * Retrieves the set of window types associated with a specific file extension.
+     *
+     * @param extension File extension
+     * @return Set of associated window types
+     */
+    public Set<String> getFileAssociations(String extension) {
+        return fileTypeAssociations.getOrDefault(extension, new HashSet<>());
+    }
+
+    /**
+     * Opens a file with a specific window type.
+     *
+     * @param virtualPath Path to the file in the VFS
+     * @param windowType Window type identifier
+     */
+    public void openFileWith(String virtualPath, String windowType) {
+        String windowId = windowType + "-" + virtualPath.hashCode();
+        JInternalFrame frame = createWindow(windowId, virtualPath, windowType);
+        
+        switch (windowType) {
+            case "texteditor":
+                try {
+                    String content = new String(vfs.readFile(virtualPath));
+                    TextEditor editor = (TextEditor) frame.getContentPane().getComponent(0);
+                    editor.setText(content);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+                
+            case "webviewer":
+                WebViewer webViewer = (WebViewer) frame.getClientProperty("webviewer");
+                if (webViewer != null) {
+                    webViewer.loadUrl(virtualPath);
+                }
+                break;
+                
+            case "imageviewer":
+                // TODO: Implement image viewer loading
+                break;
+        }
+    }
+
+    /**
+     * Updates the Look and Feel for all windows
+     */
+    public void updateLookAndFeel() {
+        for (JInternalFrame frame : desktop.getAllFrames()) {
+            SwingUtilities.updateComponentTreeUI(frame);
+            // Revalidate and repaint to ensure proper rendering
+            frame.revalidate();
+            frame.repaint();
+        }
+        // Update the desktop pane itself
+        SwingUtilities.updateComponentTreeUI(desktop);
+        desktop.revalidate();
+        desktop.repaint();
     }
 
     /**

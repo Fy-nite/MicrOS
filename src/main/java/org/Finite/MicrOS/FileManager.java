@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
@@ -20,10 +21,12 @@ public class FileManager extends JPanel {
         "yyyy-MM-dd HH:mm:ss"
     );
     private final VirtualFileSystem vfs;
+    private final WindowManager windowManager;
 
     public FileManager(WindowManager windowManager) {
         this.appLauncher = new ApplicationLauncher(windowManager);
         this.vfs = VirtualFileSystem.getInstance();
+        this.windowManager = windowManager;
         setLayout(new BorderLayout());
         currentDirectory = vfs.getRootPath().toFile();
 
@@ -38,10 +41,13 @@ public class FileManager extends JPanel {
     }
 
     private void openFile(File file) {
-        if (file.isDirectory() && file.getName().endsWith(".app")) {
-            runApp(file);
-        } else {
-            appLauncher.openApplication(file);
+        String extension = vfs.getFileExtension(file.getName()).toLowerCase();
+        Set<String> associations = windowManager.getFileAssociations(extension);
+        
+        if (!associations.isEmpty()) {
+            // Use the first association as default
+            String defaultApp = associations.iterator().next();
+            windowManager.openFileWith(vfs.getVirtualPath(file.toPath()), defaultApp);
         }
     }
 
@@ -89,19 +95,6 @@ public class FileManager extends JPanel {
         fileTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         // Add popup menu
-        JPopupMenu popupMenu = new JPopupMenu();
-        JMenuItem runItem = new JMenuItem("Run");
-        runItem.addActionListener(e -> {
-            int row = fileTable.getSelectedRow();
-            if (row != -1) {
-                String fileName = (String) tableModel.getValueAt(row, 0);
-                File selected = new File(currentDirectory, fileName);
-                runFile(selected);
-            }
-        });
-        popupMenu.add(runItem);
-
-        // Mouse listener for both double-click and right-click
         fileTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if (evt.getClickCount() == 2) {
@@ -117,31 +110,72 @@ public class FileManager extends JPanel {
             }
 
             public void mousePressed(java.awt.event.MouseEvent evt) {
-                showPopupIfNeeded(evt);
+                showContextMenu(evt);
             }
 
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                showPopupIfNeeded(evt);
-            }
-
-            private void showPopupIfNeeded(java.awt.event.MouseEvent evt) {
-                if (evt.isPopupTrigger()) {
-                    int row = fileTable.rowAtPoint(evt.getPoint());
-                    if (row >= 0) {
-                        fileTable.setRowSelectionInterval(row, row);
-                        String fileName = (String) tableModel.getValueAt(row, 0);
-                        File selected = new File(currentDirectory, fileName);
-                        // Only show popup if the file has a registered runner
-                        if (vfs.hasExtensionRunner(selected.getName())) {
-                            popupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
-                        }
-                    }
-                }
+                showContextMenu(evt);
             }
         });
 
         JScrollPane scrollPane = new JScrollPane(fileTable);
         add(scrollPane, BorderLayout.CENTER);
+    }
+
+    private void showContextMenu(java.awt.event.MouseEvent evt) {
+        if (evt.isPopupTrigger()) {
+            int row = fileTable.rowAtPoint(evt.getPoint());
+            if (row >= 0) {
+                fileTable.setRowSelectionInterval(row, row);
+                String fileName = (String) tableModel.getValueAt(row, 0);
+                File selected = new File(currentDirectory, fileName);
+                
+                if (!selected.isDirectory()) {
+                    JPopupMenu contextMenu = createFileContextMenu(selected);
+                    contextMenu.show(evt.getComponent(), evt.getX(), evt.getY());
+                }
+            }
+        }
+    }
+
+    private JPopupMenu createFileContextMenu(File file) {
+        JPopupMenu menu = new JPopupMenu();
+        String extension = vfs.getFileExtension(file.getName()).toLowerCase();
+        String virtualPath = vfs.getVirtualPath(file.toPath());
+        
+        // Get all registered applications for this file type
+        Set<String> associations = windowManager.getFileAssociations(extension);
+        
+        // Add "Open" item that uses default application
+        JMenuItem openItem = new JMenuItem("Open");
+        openItem.addActionListener(e -> openFile(file));
+        menu.add(openItem);
+        
+        // Add "Open With" submenu
+        if (!associations.isEmpty()) {
+            JMenu openWithMenu = new JMenu("Open With");
+            
+            // Add all associated applications
+            for (String appType : associations) {
+                String appName = getAppDisplayName(appType);
+                JMenuItem appItem = new JMenuItem(appName);
+                appItem.addActionListener(e -> windowManager.openFileWith(virtualPath, appType));
+                openWithMenu.add(appItem);
+            }
+            
+            menu.add(openWithMenu);
+        }
+        
+        return menu;
+    }
+
+    private String getAppDisplayName(String appType) {
+        switch (appType) {
+            case "texteditor": return "Text Editor";
+            case "webviewer": return "Web Viewer";
+            case "imageviewer": return "Image Viewer";
+            default: return appType;
+        }
     }
 
     private void loadDirectory(File directory) {
