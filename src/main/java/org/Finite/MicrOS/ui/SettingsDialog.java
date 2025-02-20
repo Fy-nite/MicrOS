@@ -1,23 +1,23 @@
 package org.Finite.MicrOS.ui;
 
 import javax.swing.*;
-
 import org.Finite.MicrOS.Desktop.BackgroundPanel;
 import org.Finite.MicrOS.Desktop.Settings;
 import org.Finite.MicrOS.core.VirtualFileSystem;
-
+import org.Finite.MicrOS.core.WindowManager;
 import java.awt.*;
 import java.io.File;
 
-public class SettingsDialog extends JDialog {
+public class SettingsDialog extends JPanel {
     private final Settings settings;
     private final JComboBox<String> lookAndFeelCombo;
     private final JComboBox<String> themeCombo;
     private JTextField backgroundField;
     private final VirtualFileSystem vfs;
+    private final WindowManager windowManager;
 
-    public SettingsDialog(Frame owner) {
-        super(owner, "Settings", true);
+    public SettingsDialog(WindowManager windowManager) {
+        this.windowManager = windowManager;
         this.settings = Settings.getInstance();
         this.vfs = VirtualFileSystem.getInstance();
 
@@ -63,15 +63,12 @@ public class SettingsDialog extends JDialog {
         JButton saveButton = new JButton("Save");
         saveButton.addActionListener(e -> saveSettings());
         JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(e -> dispose());
+        cancelButton.addActionListener(e -> windowManager.closeWindow("settings"));
         buttonPanel.add(saveButton);
         buttonPanel.add(cancelButton);
 
         add(panel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
-
-        pack();
-        setLocationRelativeTo(owner);
     }
 
     private void setupBackgroundControls(JPanel panel, GridBagConstraints gbc) {
@@ -135,53 +132,14 @@ public class SettingsDialog extends JDialog {
         // Apply look and feel
         try {
             UIManager.setLookAndFeel(settings.getLookAndFeel());
+            windowManager.updateLookAndFeel();
             
-            // Update the main frame
-            SwingUtilities.updateComponentTreeUI(getOwner());
-            
-            // Update all internal frames
-            if (getOwner() instanceof JFrame) {
-                JFrame frame = (JFrame) getOwner();
-                for (Component comp : frame.getContentPane().getComponents()) {
-                    if (comp instanceof JDesktopPane) {
-                        JDesktopPane desktop = (JDesktopPane) comp;
-                        // Update each internal frame
-                        for (JInternalFrame internalFrame : desktop.getAllFrames()) {
-                            SwingUtilities.updateComponentTreeUI(internalFrame);
-                            // Refresh the frame to prevent visual artifacts
-                            internalFrame.repaint();
-                        }
-                        // Update the desktop itself
-                        SwingUtilities.updateComponentTreeUI(desktop);
-                    }
-                }
-            }
+            // Update background
+            windowManager.updateBackground(settings.getBackground());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        // Update background
-        if (getOwner() instanceof JFrame) {
-            JFrame frame = (JFrame) getOwner();
-            for (Component comp : frame.getContentPane().getComponents()) {
-                if (comp instanceof JDesktopPane) {
-                    JDesktopPane desktop = (JDesktopPane) comp;
-                    for (Component bg : desktop.getComponents()) {
-                        if (bg instanceof BackgroundPanel) {
-                            desktop.remove(bg);
-                            BackgroundPanel newBg = new BackgroundPanel(settings.getBackground());
-                            desktop.add(newBg, JLayeredPane.FRAME_CONTENT_LAYER);
-                            desktop.setLayer(newBg, JLayeredPane.DEFAULT_LAYER);
-                            newBg.setBounds(0, 0, desktop.getWidth(), desktop.getHeight());
-                            desktop.revalidate();
-                            desktop.repaint();
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        dispose();
+        windowManager.closeWindow("settings");
     }
 }

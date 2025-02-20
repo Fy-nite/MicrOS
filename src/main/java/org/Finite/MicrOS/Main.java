@@ -14,6 +14,12 @@ import org.finite.ModuleManager.ModuleInit;
 
 import java.io.IOException;
 import javafx.application.Platform;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 
 /**
  * Main class for launching the MicrOS desktop environment.
@@ -49,7 +55,25 @@ public class Main {
      */
     public static void Desktopenviroment() {
         JFrame frame = new JFrame("MicrOS");
-        frame.setSize(800, 600);
+        
+        // Set undecorated for borderless
+        frame.setUndecorated(true);
+        
+        // Get the screen size
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice gd = ge.getDefaultScreenDevice();
+        
+        // Make sure the frame is using the screen's display mode
+        if (gd.isFullScreenSupported()) {
+            gd.setFullScreenWindow(frame);
+        } else {
+            // Fallback if full screen is not supported
+            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            // Set bounds to screen size
+            Rectangle bounds = ge.getMaximumWindowBounds();
+            frame.setBounds(bounds);
+        }
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
@@ -113,6 +137,22 @@ public class Main {
         frame.add(desktop, BorderLayout.CENTER); // Ensure desktop is added to the frame
 
         frame.setVisible(true);
+
+        // Add escape key listener to exit fullscreen
+        KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
+        Action escapeAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (gd.getFullScreenWindow() != null) {
+                    gd.setFullScreenWindow(null);
+                    frame.dispose();
+                    System.exit(0);
+                }
+            }
+        };
+        frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+            .put(escapeKeyStroke, "ESCAPE");
+        frame.getRootPane().getActionMap().put("ESCAPE", escapeAction);
 
         // Create initial windows
         windowManager.createWindow("main", "Main Console", true);

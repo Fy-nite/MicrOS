@@ -188,8 +188,7 @@ public class Console extends JTextPane {
                 StyleConstants.setForeground(styleContext.getStyle(StyleContext.DEFAULT_STYLE), 
                         new Color(255, 200, 100));
                 
-                // Add more syntax highlighting rules here
-                
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

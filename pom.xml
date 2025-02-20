@@ -115,4 +115,7 @@
         </dependency>
 
     </dependencies>
+    <name>MicrOS</name>
+    <description>Welcome to MicrOS!
+a welcoming enviroment to MicroAssembly Programming inside java</description>
 </project>

@@ -83,7 +83,7 @@ public class ApplicationLauncher {
             "Web Viewer - " + title,
             false
         );
-        // You could implement a basic web viewer here using JEditorPane
+
         JEditorPane webPane = new JEditorPane();
         webPane.setEditable(false);
         try {

@@ -440,7 +440,7 @@ public class VirtualFileSystem {
                 runner.run(file);
             } catch (IOException e) {
                 e.printStackTrace();
-                // You might want to show an error dialog here
+                //TODO: You might want to show an error dialog here
             }
         }
     }

@@ -13,11 +13,12 @@ import java.util.Set;
 import java.util.function.Consumer;
 import javax.swing.*;
 
+import org.Finite.MicrOS.Desktop.BackgroundPanel;
 import org.Finite.MicrOS.Desktop.Taskbar;
 import org.Finite.MicrOS.Files.FileManager;
 import org.Finite.MicrOS.apps.MicrOSApp;
-import org.Finite.MicrOS.core.VirtualFileSystem;
 import org.Finite.MicrOS.ui.Console;
+import org.Finite.MicrOS.ui.SettingsDialog;
 import org.Finite.MicrOS.ui.WebViewer;
 
 /**
@@ -120,6 +121,14 @@ public class WindowManager {
             JInternalFrame frame = createBaseFrame(title);
             FileManager fileManager = new FileManager(this);
             frame.add(fileManager);
+            return frame;
+        });
+
+        // Add settings window factory
+        registerWindowFactory("settings", (windowId, title) -> {
+            JInternalFrame frame = createBaseFrame(title);
+            frame.setResizable(false);
+            frame.add(new SettingsDialog(this));
             return frame;
         });
 
@@ -407,7 +416,6 @@ public class WindowManager {
                     String content = new String(vfs.readFile(virtualPath));
                     MicrOSApp app = (MicrOSApp) frame.getClientProperty("app");
                     if (app != null) {
-                        app.getClass().getMethod("setText", String.class).invoke(app, content);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -459,6 +467,24 @@ public class WindowManager {
         
         // Create new window
         return createWindow(windowId, title, type);
+    }
+
+    /**
+     * Updates the desktop background
+     */
+    public void updateBackground(String background) {
+        for (Component comp : desktop.getComponents()) {
+            if (comp instanceof BackgroundPanel) {
+                desktop.remove(comp);
+                BackgroundPanel newBg = new BackgroundPanel(background);
+                desktop.add(newBg, JLayeredPane.FRAME_CONTENT_LAYER);
+                desktop.setLayer(newBg, JLayeredPane.DEFAULT_LAYER);
+                newBg.setBounds(0, 0, desktop.getWidth(), desktop.getHeight());
+                desktop.revalidate();
+                desktop.repaint();
+                break;
+            }
+        }
     }
 
     /**
