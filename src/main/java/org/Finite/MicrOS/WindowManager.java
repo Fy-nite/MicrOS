@@ -463,6 +463,24 @@ public class WindowManager {
     }
 
     /**
+     * Recreates a window with the same type and properties
+     */
+    public JInternalFrame recreateWindow(String windowId, String title) {
+        // Get the original window to determine its type
+        JInternalFrame oldFrame = windows.get(windowId);
+        if (oldFrame == null) return null;
+
+        // Determine window type from client properties
+        String type = "default";
+        if (oldFrame.getClientProperty("console") != null) type = "console";
+        else if (oldFrame.getClientProperty("editor") != null) type = "texteditor";
+        else if (oldFrame.getClientProperty("webviewer") != null) type = "webviewer";
+        
+        // Create new window
+        return createWindow(windowId, title, type);
+    }
+
+    /**
      * Factory interface for creating window instances.
      */
     @FunctionalInterface

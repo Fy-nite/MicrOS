@@ -116,6 +116,16 @@ public class SyntaxHighlighter {
         });
     }
 
+    public void updateColors() {
+        // Reload current syntax configuration to refresh colors
+        if (currentConfig != null) {
+            String text = textPane.getText();
+            textPane.setText(""); // Clear text to force refresh
+            textPane.setText(text);
+            highlightSyntax();
+        }
+    }
+
     private static class SyntaxConfig {
         List<String> fileExtensions;
         Map<String, AttributeSet> patterns;
