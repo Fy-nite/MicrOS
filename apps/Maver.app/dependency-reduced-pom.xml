@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.finite.micros.template</groupId>
-  <artifactId>demo-app</artifactId>
+  <groupId>org.finite.MicrOS.Maver</groupId>
+  <artifactId>Maver</artifactId>
   <version>1.0-SNAPSHOT</version>
   <build>
     <sourceDirectory>Contents/src</sourceDirectory>
@@ -47,11 +47,29 @@
           <archive>
             <manifestEntries>
               <MicrOS-App>true</MicrOS-App>
-              <App-ID>org.finite.texteditor</App-ID>
-              <Main-Class>org.finite.texteditor.TextEditorApp</Main-Class>
+              <App-ID>org.finite.MicrOS.Maver</App-ID>
+              <Main-Class>org.finite.MicrOS.Maver</Main-Class>
             </manifestEntries>
           </archive>
         </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+          <execution>
+            <id>purge-local-dependencies</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>purge-local-repository</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>org.Finite:MicrOS</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -61,6 +79,7 @@
       <artifactId>MicrOS</artifactId>
       <version>1.0-SNAPSHOT</version>
       <scope>provided</scope>
+      <optional>true</optional>
     </dependency>
   </dependencies>
   <properties>

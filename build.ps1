@@ -19,45 +19,64 @@ function Build-MavenProject {
     }
 }
 
-# Ensure filesystem directory exists
-if (-not (Test-Path "filesystem")) {
-    New-Item -ItemType Directory -Path "filesystem"
+# Function to find compression tool
+function Get-CompressionTool {
+    if ($IsWindows) {
+        $7zPath = "C:\Program Files\7-Zip\7z.exe"
+        if (Test-Path $7zPath) {
+            return $7zPath
+        }
+    }
+    else {
+        # Check for 7z on Linux
+        $7zLinux = Get-Command "7z" -ErrorAction SilentlyContinue
+        if ($7zLinux) {
+            return $7zLinux.Source
+        }
+        
+        # Check for tar and bzip2 on Linux
+        $tar = Get-Command "tar" -ErrorAction SilentlyContinue
+        $bzip2 = Get-Command "bzip2" -ErrorAction SilentlyContinue
+        if ($tar -and $bzip2) {
+            return "tar"
+        }
+    }
+    return $null
 }
 
-if (-not (Test-Path "filesystem/apps")) {
-    New-Item -ItemType Directory -Path "filesystem/apps"
+# Check for compression tools
+$compressionTool = Get-CompressionTool
+if (-not $compressionTool) {
+    Write-Host "No compression tools found. Please install 7-Zip (Windows) or tar/bzip2 (Linux)" -ForegroundColor Red
+    Write-Host "Windows: https://7-zip.org/" -ForegroundColor Yellow
+    Write-Host "Linux: sudo apt-get install p7zip-full tar bzip2" -ForegroundColor Yellow
+    exit 1
 }
 
-# Build main MicrOS project
-Write-Host "Building MicrOS..." -ForegroundColor Green
-Build-MavenProject "."
+# Create distribution archives
+Write-Host "Creating distribution packages..." -ForegroundColor Green
+$baseArchiveName = "MicrOS-dist"
 
-# Build TextEditor app
-Write-Host "Building TextEditor app..." -ForegroundColor Green
-Build-MavenProject "apps/TextEditor.app"
-
-# Copy the built jar to current directory
-Copy-Item "target/MicrOS-1.0-SNAPSHOT-jar-with-dependencies.jar" "MicrOS.jar" -Force
-
-# Initialize MicrOS
-Write-Host "Initializing MicrOS..." -ForegroundColor Green
-java -jar MicrOS.jar --init
-
-# Copy TextEditor.app to filesystem/apps
-Write-Host "Installing TextEditor app..." -ForegroundColor Green
-if (Test-Path "filesystem/apps/TextEditor.app") {
-    Remove-Item "filesystem/apps/TextEditor.app" -Recurse -Force
+# Create archives based on platform
+if ($compressionTool -eq "tar") {
+    # Use native tar/bzip2 on Linux
+    Write-Host "Creating .tar.bz2 archive using tar..." -ForegroundColor Green
+    & tar -cjf "$baseArchiveName.tar.bz2" "MicrOS.jar" "filesystem"
 }
-Copy-Item "apps/TextEditor.app" "filesystem/apps" -Recurse
+else {
+    # Use 7-Zip on either platform
+    Write-Host "Creating .tar.bz2 archive using 7z..." -ForegroundColor Green
+    & $compressionTool a -ttar "$baseArchiveName.tar" "MicrOS.jar" "filesystem"
+    & $compressionTool a -tbzip2 "$baseArchiveName.tar.bz2" "$baseArchiveName.tar"
+    Remove-Item "$baseArchiveName.tar" -Force
 
-# Create distribution zip
-Write-Host "Creating distribution package..." -ForegroundColor Green
-$zipName = "MicrOS-dist.zip"
-if (Test-Path $zipName) {
-    Remove-Item $zipName -Force
+    Write-Host "Creating .7z archive..." -ForegroundColor Green
+    & $compressionTool a -t7z "$baseArchiveName.7z" "MicrOS.jar" "filesystem" -mx=9
 }
-
-Compress-Archive -Path @("MicrOS.jar", "filesystem") -DestinationPath $zipName
 
 Write-Host "Build completed successfully!" -ForegroundColor Green
-Write-Host "Distribution package created: $zipName" -ForegroundColor Green
+Write-Host "Distribution packages created:" -ForegroundColor Green
+Write-Host "- $baseArchiveName.tar.bz2" -ForegroundColor Green
+if ($compressionTool -ne "tar") {
+    Write-Host "- $baseArchiveName.7z (highest compression)" -ForegroundColor Green
+}

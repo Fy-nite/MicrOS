@@ -124,11 +124,23 @@ public class WindowManager {
             return frame;
         });
 
-        // Add settings window factory
+        // Update settings window factory
         registerWindowFactory("settings", (windowId, title) -> {
-            JInternalFrame frame = createBaseFrame(title);
+            JInternalFrame frame = createBaseFrame("Settings");
             frame.setResizable(false);
-            frame.add(new SettingsDialog(this));
+            frame.setSize(800, 600);
+            
+            try {
+                MicrOSApp app = vfs.getAppLoader().createAppInstance("org.finite.micros.maver.MaverSettings");
+                app.initialize(this, vfs);
+                JComponent ui = app.createUI();
+                frame.add(ui);
+                frame.putClientProperty("app", app);
+            } catch (Exception e) {
+                e.printStackTrace();
+                frame.add(new JLabel("Error loading Settings app"));
+            }
+            
             return frame;
         });
 
@@ -265,6 +277,12 @@ public class WindowManager {
     public JInternalFrame getWindow(String windowId) {
         return windows.get(windowId);
     }
+
+
+
+    // get window manager
+
+    
 
     /**
      * Writes text to a console window.
@@ -486,6 +504,42 @@ public class WindowManager {
                 break;
             }
         }
+    }
+
+    /**
+     * Launches a MicrOS application in a new window.
+     *
+     * @param app The MicrOSApp instance to launch
+     * @return The created internal frame
+     */
+    public JInternalFrame launchApp(MicrOSApp app) {
+        String windowId = "app-" + System.currentTimeMillis();
+        String title = app.getManifest() != null ? app.getManifest().getName() : "Application";
+        JInternalFrame frame = createBaseFrame(title);
+        
+        try {
+            app.onStart(); // Call lifecycle method
+            JComponent ui = app.createUI();
+            frame.add(ui);
+            frame.putClientProperty("app", app);
+            
+            // Add frame listener to handle app lifecycle
+            frame.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
+                @Override
+                public void internalFrameClosing(javax.swing.event.InternalFrameEvent e) {
+                    app.onStop(); // Call lifecycle method when window is closing
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            frame.add(new JLabel("Error launching app: " + e.getMessage()));
+        }
+
+        desktop.add(frame);
+        windows.put(windowId, frame);
+        frame.setVisible(true);
+        
+        return frame;
     }
 
     /**
