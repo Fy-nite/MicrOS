@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 import org.Finite.MicrOS.apps.AppLoader;
 import org.Finite.MicrOS.util.AsmRunner;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * A virtual file system for managing files and directories within the MicrOS environment.
@@ -69,26 +71,26 @@ public class VirtualFileSystem {
      * Initializes the MIME types for different file extensions.
      */
     private void initializeMimeTypes() {
-        // Text files
-        mimeTypes.put("txt", "text/plain");
-        mimeTypes.put("md", "text/markdown");
-        mimeTypes.put("java", "text/x-java-source");
-        mimeTypes.put("json", "application/json");
-        mimeTypes.put("xml", "application/xml");
-        mimeTypes.put("html", "text/html");
-        mimeTypes.put("css", "text/css");
-        mimeTypes.put("js", "text/javascript");
+        try {
+            // Load MIME types from config
+            String configJson = new String(getClass().getResourceAsStream("/config/filesystem.json").readAllBytes());
+            JSONObject config = new JSONObject(configJson);
+            JSONObject mimeTypesConfig = config.getJSONObject("mimeTypes");
 
-        // Image files
-        mimeTypes.put("png", "image/png");
-        mimeTypes.put("jpg", "image/jpeg");
-        mimeTypes.put("jpeg", "image/jpeg");
-        mimeTypes.put("gif", "image/gif");
-        mimeTypes.put("bmp", "image/bmp");
-
-        // Other common types
-        mimeTypes.put("pdf", "application/pdf");
-        mimeTypes.put("zip", "application/zip");
+            // Process each category
+            for (String category : mimeTypesConfig.keySet()) {
+                JSONObject types = mimeTypesConfig.getJSONObject(category);
+                for (String extension : types.keySet()) {
+                    mimeTypes.put(extension, types.getString(extension));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Fallback to basic MIME types if config fails to load
+            mimeTypes.put("txt", "text/plain");
+            mimeTypes.put("jpg", "image/jpeg");
+            mimeTypes.put("png", "image/png");
+        }
     }
 
     /**
@@ -96,31 +98,30 @@ public class VirtualFileSystem {
      */
     private void initializeFileSystem() {
         try {
-            // Only create the directory structure if root doesn't exist
+            // Load filesystem configuration
+            String configJson = new String(getClass().getResourceAsStream("/config/filesystem.json").readAllBytes());
+            JSONObject config = new JSONObject(configJson);
+
+            // Create root if it doesn't exist
             if (!Files.exists(rootDirectory)) {
                 Files.createDirectory(rootDirectory);
                 
-                // Create default directories
-                createDirectory("/home");
-                createDirectory("/system");
-                createDirectory("/apps");
-                createDirectory("/docs");
-                createDirectory("/images");
-                createDirectory("/bin");
+                // Create directories defined in config
+                JSONArray directories = config.getJSONArray("directories");
+                for (int i = 0; i < directories.length(); i++) {
+                    createDirectory(directories.getString(i));
+                }
 
-                // Copy the background image
-                copyResourceFile("/images/bg.png", "/images/background.png");
-
-                // Create TextEditor configuration directory and copy default configs
-                createDirectory("/system/texteditor/syntax");
-                copyResourceFile("/default_configs/system/texteditor/syntax/asm.json", 
-                                "/system/texteditor/syntax/asm.json");
-                copyResourceFile("/default_configs/system/texteditor/syntax/java.json", 
-                                "/system/texteditor/syntax/java.json");
+                // Copy resource files defined in config
+                JSONArray resources = config.getJSONArray("resources");
+                for (int i = 0; i < resources.length(); i++) {
+                    JSONObject resource = resources.getJSONObject(i);
+                    copyResourceFile(resource.getString("source"), 
+                                  resource.getString("target"));
+                }
             }
 
             // Initialize app directory
-            createDirectory("/apps");
             appLoader = new AppLoader(resolveVirtualPath("/apps").toString());
             appLoader.loadApps();
             

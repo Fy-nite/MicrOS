@@ -21,12 +21,16 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
+import com.beust.jcommander.JCommander;
+import org.Finite.MicrOS.cli.CommandLineArgs;
+
 /**
  * Main class for launching the MicrOS desktop environment.
  */
 public class Main {
 
     private static WindowManager windowManager;
+    private static final String VERSION = "1.0.0";
 
     /**
      * Main method to set the look and feel and launch the desktop environment.
@@ -34,7 +38,42 @@ public class Main {
      * @param args Command-line arguments
      */
     public static void main(String[] args) {
+        CommandLineArgs cliArgs = new CommandLineArgs();
+        JCommander commander = JCommander.newBuilder()
+            .addObject(cliArgs)
+            .build();
+        
+        commander.setProgramName("MicrOS");
+
         try {
+            commander.parse(args);
+
+            if (cliArgs.isHelp()) {
+                commander.usage();
+                return;
+            }
+
+            if (cliArgs.isVersion()) {
+                System.out.println("MicrOS version " + VERSION);
+                return;
+            }
+
+            if (cliArgs.isDebug()) {
+                // TODO: Enable debug logging
+                System.setProperty("debug", "true");
+            }
+
+            if (cliArgs.isInit()) {
+                initializeFilesystem(cliArgs.getConfigPath());
+                return;
+            }
+
+            if (cliArgs.isConsoleOnly()) {
+                startConsoleMode();
+                return;
+            }
+
+            // Normal startup
             // Initialize JavaFX platform
             Platform.startup(() -> {});
             
@@ -45,9 +84,30 @@ public class Main {
             UIManager.setLookAndFeel(settings.getLookAndFeel());
             
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
+            commander.usage();
+            System.exit(1);
         }
         SwingUtilities.invokeLater(Main::Desktopenviroment);
+    }
+
+    private static void initializeFilesystem(String configPath) {
+        try {
+            VirtualFileSystem vfs = VirtualFileSystem.getInstance();
+            if (configPath != null) {
+                // TODO: Load custom config
+                System.out.println("Initializing filesystem with config: " + configPath);
+            }
+            System.out.println("Filesystem initialized successfully");
+        } catch (Exception e) {
+            System.err.println("Failed to initialize filesystem: " + e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    private static void startConsoleMode() {
+        // TODO: Implement console-only mode
+        System.out.println("Console mode not yet implemented");
     }
 
     /**

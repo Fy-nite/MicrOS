@@ -11,7 +11,14 @@ public class ProcessManager {
 
     private final Console console;
     private final Map<Integer, Process> activeProcesses;
+    // misc process manager stuff
+
     private int nextProcessId = 1;
+
+    // Add new fields for thread management
+    private final Map<Integer, Thread> appThreads = new HashMap<>();
+    private final Map<Integer, String> threadNames = new HashMap<>();
+    private int nextThreadId = 1;
 
     public ProcessManager(Console console) {
         this.console = console;
@@ -146,5 +153,111 @@ public class ProcessManager {
                 );
             }
         }
+    }
+
+    public void killAllProcesses() {
+        for (Process process : activeProcesses.values()) {
+            process.destroyForcibly();
+        }
+        killAllAppThreads();
+        console.appendText("All processes and threads terminated\n", Color.YELLOW);
+    }
+
+    /**
+     * Starts a new application thread with the given Runnable and name
+     * @param runnable The Runnable to execute
+     * @param name Name of the thread/application
+     * @return The thread ID
+     */
+    public int startAppThread(Runnable runnable, String name) {
+        int threadId = nextThreadId++;
+        Thread thread = new Thread(() -> {
+            try {
+                console.appendText("[Thread " + threadId + "] Starting: " + name + "\n", Color.YELLOW);
+                runnable.run();
+                console.appendText("[Thread " + threadId + "] Completed: " + name + "\n", Color.GREEN);
+            } catch (Exception e) {
+                console.appendText("[Thread " + threadId + "] Error: " + e.getMessage() + "\n", Color.RED);
+            } finally {
+                appThreads.remove(threadId);
+                threadNames.remove(threadId);
+            }
+        });
+        
+        appThreads.put(threadId, thread);
+        threadNames.put(threadId, name);
+        thread.start();
+        return threadId;
+    }
+
+    /**
+     * Kills a specific application thread
+     * @param threadId The ID of the thread to kill
+     * @return true if thread was killed, false if thread not found
+     */
+    public boolean killAppThread(int threadId) {
+        Thread thread = appThreads.get(threadId);
+        if (thread != null) {
+            thread.interrupt();
+            console.appendText("[Thread " + threadId + "] Terminated: " + threadNames.get(threadId) + "\n", Color.YELLOW);
+            appThreads.remove(threadId);
+            threadNames.remove(threadId);
+            return true;
+        }
+        console.appendText("No thread found with ID: " + threadId + "\n", Color.RED);
+        return false;
+    }
+
+    /**
+     * Lists all running application threads
+     */
+    public void listAppThreads() {
+        if (appThreads.isEmpty()) {
+            console.appendText("No active application threads\n", Color.YELLOW);
+        } else {
+            console.appendText("Active application threads:\n", Color.CYAN);
+            for (Map.Entry<Integer, Thread> entry : appThreads.entrySet()) {
+                int threadId = entry.getKey();
+                String name = threadNames.get(threadId);
+                console.appendText(
+                    String.format("TID: %d - %s (%s)\n", 
+                        threadId, 
+                        name, 
+                        entry.getValue().isAlive() ? "Running" : "Stopped"),
+                    Color.WHITE
+                );
+            }
+        }
+    }
+
+    /**
+     * Kills all application threads
+     */
+    public void killAllAppThreads() {
+        for (Thread thread : appThreads.values()) {
+            thread.interrupt();
+        }
+        console.appendText("All application threads terminated\n", Color.YELLOW);
+        appThreads.clear();
+        threadNames.clear();
+    }
+
+    /**
+     * Checks if a specific thread ID is still running
+     * @param threadId The thread ID to check
+     * @return true if thread is running, false otherwise
+     */
+    public boolean isThreadRunning(int threadId) {
+        Thread thread = appThreads.get(threadId);
+        return thread != null && thread.isAlive();
+    }
+
+    /**
+     * Gets the name of a running thread
+     * @param threadId The thread ID
+     * @return The thread name or null if not found
+     */
+    public String getThreadName(int threadId) {
+        return threadNames.get(threadId);
     }
 }

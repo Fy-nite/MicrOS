@@ -1,0 +1,56 @@
+{
+    "directories": [
+        "/home",
+        "/system",
+        "/apps",
+        "/docs",
+        "/images",
+        "/bin",
+        "/system/texteditor/syntax"
+    ],
+    "resources": [
+        {
+            "source": "/images/bg.png",
+            "target": "/images/background.png"
+        },
+        {
+            "source": "/default_configs/system/texteditor/syntax/asm.json",
+            "target": "/system/texteditor/syntax/asm.json"
+        },
+        {
+            "source": "/default_configs/system/texteditor/syntax/java.json",
+            "target": "/system/texteditor/syntax/java.json"
+        },
+        {
+            "source": "/default_configs/system/texteditor/syntax/markdown.json",
+            "target": "/system/texteditor/syntax/markdown.json"
+        },
+        {
+            "source": "/default_configs/system/texteditor/themes.json",
+            "target": "/system/texteditor/themes.json"
+        }
+    ],
+    "mimeTypes": {
+        "text": {
+            "txt": "text/plain",
+            "md": "text/markdown",
+            "java": "text/x-java-source",
+            "json": "application/json",
+            "xml": "application/xml",
+            "html": "text/html",
+            "css": "text/css",
+            "js": "text/javascript"
+        },
+        "image": {
+            "png": "image/png", 
+            "jpg": "image/jpeg",
+            "jpeg": "image/jpeg",
+            "gif": "image/gif",
+            "bmp": "image/bmp"
+        },
+        "other": {
+            "pdf": "application/pdf",
+            "zip": "application/zip"
+        }
+    }
+}

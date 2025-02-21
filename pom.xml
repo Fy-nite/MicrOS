@@ -113,6 +113,13 @@
             <artifactId>json</artifactId>
             <version>20210307</version>
         </dependency>
+        
+        <!-- JCommander for CLI argument parsing -->
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.82</version>
+        </dependency>
 
     </dependencies>
     <name>MicrOS</name>

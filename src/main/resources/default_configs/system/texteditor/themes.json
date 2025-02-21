@@ -1,0 +1,48 @@
+{
+    "dark": {
+        "background": "#1E1E1E",
+        "foreground": "#DCDCDC",
+        "lineNumbers": {
+            "background": "#282828",
+            "foreground": "#858585",
+            "border": "#3C3C3C"
+        },
+        "selection": "#264F78",
+        "currentLine": "#282828",
+        "statusBar": {
+            "background": "#007ACC",
+            "foreground": "#FFFFFF"
+        },
+        "syntax": {
+            "keywords": "#569CD6",
+            "strings": "#CE9178",
+            "comments": "#57A64A",
+            "numbers": "#B5CE68",
+            "functions": "#DCDCAA",
+            "types": "#4EC9B0"
+        }
+    },
+    "light": {
+        "background": "#FFFFFF",
+        "foreground": "#000000",
+        "lineNumbers": {
+            "background": "#F0F0F0",
+            "foreground": "#858585",
+            "border": "#E0E0E0"
+        },
+        "selection": "#ADD6FF",
+        "currentLine": "#F8F8F8",
+        "statusBar": {
+            "background": "#0078D4",
+            "foreground": "#FFFFFF"
+        },
+        "syntax": {
+            "keywords": "#0000FF",
+            "strings": "#A31515",
+            "comments": "#008000",
+            "numbers": "#098658",
+            "functions": "#795E26",
+            "types": "#267F99"
+        }
+    }
+}
