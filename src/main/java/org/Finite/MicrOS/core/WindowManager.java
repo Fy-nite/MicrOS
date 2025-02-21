@@ -20,6 +20,8 @@ import org.Finite.MicrOS.apps.MicrOSApp;
 import org.Finite.MicrOS.ui.Console;
 import org.Finite.MicrOS.ui.SettingsDialog;
 import org.Finite.MicrOS.ui.WebViewer;
+import org.Finite.MicrOS.util.AsmRunner;
+import org.Finite.MicrOS.apps.AppManifest;
 
 /**
  * Core window management class for MicrOS desktop environment.
@@ -84,19 +86,14 @@ public class WindowManager {
             return frame;
         });
 
-        // Update text editor factory to use correct app identifier
+        // Text editor factory
         registerWindowFactory("texteditor", (windowId, title) -> {
             JInternalFrame frame = createBaseFrame(title);
-            try {
-                MicrOSApp app = vfs.getAppLoader().createAppInstance("org.finite.texteditor");
-                app.initialize(this, vfs);
-                JComponent ui = app.createUI();
-                frame.add(ui);
-                frame.putClientProperty("app", app);
-            } catch (Exception e) {
-                e.printStackTrace();
-                frame.add(new JLabel("Error loading Text Editor app"));
-            }
+            JTextArea textArea = new JTextArea();
+            textArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            frame.add(scrollPane);
+            frame.putClientProperty("editor", textArea);
             return frame;
         });
 
@@ -540,6 +537,55 @@ public class WindowManager {
         frame.setVisible(true);
         
         return frame;
+    }
+
+    /**
+     * Launches an app by its identifier
+     */
+    public JInternalFrame launchAppById(String identifier) {
+        try {
+            if (identifier == null || identifier.isEmpty()) {
+                System.err.println("Invalid app identifier");
+                return null;
+            }
+            
+            // Check if app is already running
+            for (JInternalFrame frame : windows.values()) {
+                MicrOSApp existingApp = (MicrOSApp) frame.getClientProperty("app");
+                if (existingApp != null && 
+                    existingApp.getManifest() != null && 
+                    identifier.equals(existingApp.getManifest().getIdentifier())) {
+                    frame.toFront();
+                    return frame;
+                }
+            }
+            
+            // Launch new instance
+            MicrOSApp instance = vfs.getAppLoader().createAppInstance(identifier);
+            if (instance == null) {
+                System.err.println("Failed to create app instance: " + identifier);
+                return null;
+            }
+            
+            // Set manifest before initialization
+            AppManifest manifest = vfs.getAppLoader().getLoadedApps()
+                .stream()
+                .filter(m -> identifier.equals(m.getIdentifier()))
+                .findFirst()
+                .orElse(null);
+                
+            if (manifest != null) {
+                instance.setManifest(manifest);
+            }
+            
+            instance.initialize(this, vfs);
+            return launchApp(instance);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error launching app: " + identifier + " - " + e.getMessage());
+            return null;
+        }
     }
 
     /**

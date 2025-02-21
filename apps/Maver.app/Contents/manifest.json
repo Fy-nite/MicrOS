@@ -6,6 +6,8 @@
     "description": "Application launcher for MicrOS",
     "category": "System",
     "icon": "resources/icon.png",
+    "appType": "custom",
+    "pinToTaskbar": true,
     "authors": [
         "MicrOS Team"
     ],

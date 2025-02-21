@@ -12,7 +12,9 @@ public class AppManifest {
     private String[] supportedFileTypes;
     private String minimumOSVersion;
     private AppPermissions permissions;
-    
+    private AppType appType = AppType.CUSTOM;
+    private boolean pinToTaskbar = false;
+
     public static class AppPermissions {
         public boolean fileSystemAccess;
         public boolean networkAccess;
@@ -50,4 +52,19 @@ public class AppManifest {
     public void setMinimumOSVersion(String version) { this.minimumOSVersion = version; }
     public AppPermissions getPermissions() { return permissions; }
     public void setPermissions(AppPermissions permissions) { this.permissions = permissions; }
+    public AppType getAppType() {
+        return appType;
+    }
+
+    public void setAppType(AppType appType) {
+        this.appType = appType;
+    }
+
+    public boolean isPinnedToTaskbar() {
+        return pinToTaskbar;
+    }
+
+    public void setPinToTaskbar(boolean pinToTaskbar) {
+        this.pinToTaskbar = pinToTaskbar;
+    }
 }

@@ -8,6 +8,8 @@ import org.Finite.MicrOS.Desktop.Settings;
 import org.Finite.MicrOS.Desktop.Taskbar;
 import org.Finite.MicrOS.core.VirtualFileSystem;
 import org.Finite.MicrOS.core.WindowManager;
+import org.Finite.MicrOS.apps.AppManifest;  // Add this import
+import org.Finite.MicrOS.apps.AppType;      // Add this import
 import org.Finite.MicrOS.ui.Console;
 import org.Finite.MicrOS.util.AsmRunner;
 import org.finite.ModuleManager.ModuleInit;
@@ -178,57 +180,47 @@ public class Main {
         frame.add(taskbar, BorderLayout.SOUTH);
         windowManager.setTaskbar(taskbar);
 
-        // Register apps
-        taskbar.addApp("Text Editor", "texteditor");
-        taskbar.addApp("Image Viewer", "imageviewer");
-        taskbar.addApp("Web Viewer", "webviewer");
+        // Register standard apps
+        for (AppType appType : AppType.values()) {
+            if (appType != AppType.CUSTOM && appType != AppType.DEFAULT) {
+                AppManifest manifest = new AppManifest();
+                manifest.setName(appType.getDisplayName());
+                manifest.setAppType(appType);
+                manifest.setPinToTaskbar(true);
+                taskbar.addAppFromManifest(manifest);
+            }
+        }
 
         // Register executable file types
-        windowManager.registerExecutableFileType("txt", "texteditor");
-        windowManager.registerExecutableFileType("png", "imageviewer");
-        windowManager.registerExecutableFileType("jpg", "imageviewer");
-        windowManager.registerExecutableFileType("jpeg", "imageviewer");
-        windowManager.registerExecutableFileType("gif", "imageviewer");
-        windowManager.registerExecutableFileType("html", "webviewer");
-        windowManager.registerExecutableFileType("htm", "webviewer");
-        windowManager.registerExecutableFileType("masm", "texteditor");
-        windowManager.registerExecutableFileType("asm", "texteditor");
+        windowManager.registerExecutableFileType("txt", AppType.TEXT_EDITOR.getIdentifier());
+        windowManager.registerExecutableFileType("png", AppType.IMAGE_VIEWER.getIdentifier());
+        windowManager.registerExecutableFileType("jpg", AppType.IMAGE_VIEWER.getIdentifier());
+        windowManager.registerExecutableFileType("html", AppType.WEB_VIEWER.getIdentifier());
 
         frame.add(desktop, BorderLayout.CENTER); // Ensure desktop is added to the frame
 
         frame.setVisible(true);
 
-        // Add escape key listener to exit fullscreen
-        KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
-        Action escapeAction = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (gd.getFullScreenWindow() != null) {
-                    gd.setFullScreenWindow(null);
-                    frame.dispose();
-                    System.exit(0);
-                }
-            }
-        };
-        frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-            .put(escapeKeyStroke, "ESCAPE");
-        frame.getRootPane().getActionMap().put("ESCAPE", escapeAction);
 
         // Create initial windows
         windowManager.createWindow("main", "Main Console", true);
         windowManager.writeToConsole("main", "MicroAssembly Interpreter v1.0");
-        
 
-        // Create and demonstrate text editor
-        JInternalFrame editorFrame = windowManager.createWindow("editor1", "Text Editor", "texteditor");
-        // windowManager.setEditorText("editor1", "Hello World!\n\nThis is a demo of the text editor.");
-        
-        // After 2 seconds, read and display the content in console
-        // new Timer(2000, e -> {
-        //     String content = windowManager.getEditorText("editor1");
-        //     windowManager.writeToConsole("main", "\nText Editor content:\n" + content);
-        //     ((Timer)e.getSource()).stop();
-        // }).start();
+        // Auto-start registered apps
+        SwingUtilities.invokeLater(() -> {
+            try {
+                // Launch Maver
+                JInternalFrame maverFrame = windowManager.launchAppById("org.finite.micros.maver.launcher");
+                if (maverFrame == null) {
+                    System.err.println("Failed to launch Maver App Launcher");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        // Remove auto-start of text editor
+        // JInternalFrame editorFrame = windowManager.createWindow("editor1", "Text Editor", "texteditor");
     }
 
     /**

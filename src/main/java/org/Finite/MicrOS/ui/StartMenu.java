@@ -38,6 +38,7 @@ public class StartMenu extends JPopupMenu {
         
         // System section
         add(createSection("System"));
+        add(createMenuItem("App Launcher", e -> windowManager.launchAppById("org.finite.micros.maver.launcher"), "🚀"));
         add(createMenuItem("Settings", "settings", "settings", "⚙️"));
         addSeparator();
         
