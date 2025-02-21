@@ -22,6 +22,8 @@ import org.Finite.MicrOS.ui.SettingsDialog;
 import org.Finite.MicrOS.ui.WebViewer;
 import org.Finite.MicrOS.util.AsmRunner;
 import org.Finite.MicrOS.apps.AppManifest;
+import org.Finite.MicrOS.ui.ErrorDialog;
+
 
 /**
  * Core window management class for MicrOS desktop environment.
@@ -141,6 +143,8 @@ public class WindowManager {
             return frame;
         });
 
+  
+
         // Register default file associations
         registerFileAssociation("txt", "texteditor");
         registerFileAssociation("md", "texteditor");
@@ -217,36 +221,43 @@ public class WindowManager {
         String title,
         String type
     ) {
-        System.out.println("Creating window: " + windowId + ", Title: " + title + ", Type: " + type);
-        WindowFactory factory = windowFactories.get(type);
-        if (factory == null) {
-            throw new IllegalArgumentException("Unknown window type: " + type);
-        }
+        try {
+            System.out.println("Creating window: " + windowId + ", Title: " + title + ", Type: " + type);
+            WindowFactory factory = windowFactories.get(type);
+            if (factory == null) {
+                ErrorDialog.showError(desktop, "Unknown window type: " + type,
+                    new IllegalArgumentException("No factory registered for window type: " + type));
+                return null;
+            }
 
-        JInternalFrame frame = factory.createWindow(windowId, title);
+            JInternalFrame frame = factory.createWindow(windowId, title);
 
-        frame.addInternalFrameListener(
-            new javax.swing.event.InternalFrameAdapter() {
-                @Override
-                public void internalFrameClosed(
-                    javax.swing.event.InternalFrameEvent e
-                ) {
-                    if (taskbar != null) {
-                        taskbar.removeWindow(windowId);
+            frame.addInternalFrameListener(
+                new javax.swing.event.InternalFrameAdapter() {
+                    @Override
+                    public void internalFrameClosed(
+                        javax.swing.event.InternalFrameEvent e
+                    ) {
+                        if (taskbar != null) {
+                            taskbar.removeWindow(windowId);
+                        }
                     }
                 }
+            );
+
+            if (taskbar != null) {
+                taskbar.addWindow(windowId, frame);
             }
-        );
 
-        if (taskbar != null) {
-            taskbar.addWindow(windowId, frame);
+            desktop.add(frame);
+            windows.put(windowId, frame);
+            frame.setVisible(true); // Ensure the frame is visible
+            System.out.println("Window created and added to desktop: " + windowId);
+            return frame;
+        } catch (Exception e) {
+            ErrorDialog.showError(desktop, "Error creating window", e);
+            return null;
         }
-
-        desktop.add(frame);
-        windows.put(windowId, frame);
-        frame.setVisible(true); // Ensure the frame is visible
-        System.out.println("Window created and added to desktop: " + windowId);
-        return frame;
     }
 
     /**
@@ -545,7 +556,8 @@ public class WindowManager {
     public JInternalFrame launchAppById(String identifier) {
         try {
             if (identifier == null || identifier.isEmpty()) {
-                System.err.println("Invalid app identifier");
+                ErrorDialog.showError(desktop, "Invalid app identifier", 
+                    new IllegalArgumentException("App identifier cannot be null or empty"));
                 return null;
             }
             
@@ -563,7 +575,8 @@ public class WindowManager {
             // Launch new instance
             MicrOSApp instance = vfs.getAppLoader().createAppInstance(identifier);
             if (instance == null) {
-                System.err.println("Failed to create app instance: " + identifier);
+                ErrorDialog.showError(desktop, "Failed to create app instance", 
+                    new RuntimeException("Could not create instance of app: " + identifier));
                 return null;
             }
             
@@ -582,8 +595,19 @@ public class WindowManager {
             return launchApp(instance);
             
         } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Error launching app: " + identifier + " - " + e.getMessage());
+            ErrorDialog.showError(desktop, "Failed to launch application", e);
+            return null;
+        }
+    }
+
+    // Add method to launch native apps
+    public JInternalFrame launchNativeApp(String command) {
+        try {
+            String windowId = "native-" + System.currentTimeMillis();
+            String title = "Native App: " + command;
+            return createWindow(windowId, title, "native");
+        } catch (Exception e) {
+            ErrorDialog.showError(desktop, "Failed to launch native application", e);
             return null;
         }
     }
@@ -601,5 +625,13 @@ public class WindowManager {
          * @return Created window frame
          */
         JInternalFrame createWindow(String windowId, String title);
+    }
+
+    /**
+     * Gets the desktop pane managed by this WindowManager
+     * @return JDesktopPane instance
+     */
+    public JDesktopPane getDesktop() {
+        return desktop;
     }
 }

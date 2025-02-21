@@ -8,6 +8,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.jar.*;
+import org.Finite.MicrOS.ui.ErrorDialog;
 
 public class AppLoader {
     private final Map<String, AppManifest> loadedApps = new HashMap<>();
@@ -26,8 +27,7 @@ public class AppLoader {
             try {
                 loadApp(file);
             } catch (Exception e) {
-                System.err.println("Failed to load app: " + file.getName());
-                e.printStackTrace();
+                ErrorDialog.showError(null, "Failed to load app: " + file.getName(), e);
             }
         }
     }

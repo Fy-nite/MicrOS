@@ -27,63 +27,58 @@ public class ProcessManager {
 
     public int startProcess(String command) {
         int processId = nextProcessId++;
-
-        new Thread(() -> {
-            try {
-                ProcessBuilder pb = new ProcessBuilder();
-
-                // Handle different OS shells
-                if (
-                    System.getProperty("os.name")
-                        .toLowerCase()
-                        .contains("windows")
-                ) {
-                    pb.command("cmd.exe", "/c", command);
-                } else {
-                    pb.command("sh", "-c", command);
-                }
-
-                console.appendText(
-                    "[" + processId + "] Starting: " + command + "\n",
-                    Color.YELLOW
-                );
-
-                Process process = pb.start();
-                activeProcesses.put(processId, process);
-
-                // Handle process output in separate threads
-                startOutputReader(
-                    process.getInputStream(),
-                    Color.WHITE,
-                    processId
-                );
-                startOutputReader(
-                    process.getErrorStream(),
-                    Color.RED,
-                    processId
-                );
-
-                // Wait for process to complete
-                int exitCode = process.waitFor();
-                activeProcesses.remove(processId);
-
-                console.appendText(
-                    "[" +
-                    processId +
-                    "] Process completed with exit code: " +
-                    exitCode +
-                    "\n",
-                    exitCode == 0 ? Color.GREEN : Color.RED
-                );
-            } catch (IOException | InterruptedException e) {
-                console.appendText(
-                    "[" + processId + "] Error: " + e.getMessage() + "\n",
-                    Color.RED
-                );
+        
+        try {
+            ProcessBuilder pb = new ProcessBuilder();
+            
+            // Handle different OS shells and native binaries
+            if (command.startsWith("./") || command.startsWith("/")) {
+                // Direct binary execution
+                pb.command(command.split("\\s+"));
+            } else if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+                pb.command("cmd.exe", "/c", command);
+            } else {
+                pb.command("sh", "-c", command);
             }
-        }).start();
-
-        return processId;
+            
+            // Set working directory
+            pb.directory(new File(System.getProperty("user.dir")));
+            
+            // Redirect error stream
+            pb.redirectErrorStream(true);
+            
+            console.appendText("[" + processId + "] Starting: " + command + "\n", Color.YELLOW);
+            
+            Process process = pb.start();
+            activeProcesses.put(processId, process);
+            
+            // Handle process output
+            startOutputReader(process.getInputStream(), Color.WHITE, processId);
+            
+            // Monitor process completion
+            new Thread(() -> {
+                try {
+                    int exitCode = process.waitFor();
+                    SwingUtilities.invokeLater(() -> {
+                        console.appendText(
+                            "[" + processId + "] Process exited with code " + exitCode + "\n",
+                            exitCode == 0 ? Color.GREEN : Color.RED
+                        );
+                    });
+                    activeProcesses.remove(processId);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+            
+            return processId;
+        } catch (IOException e) {
+            console.appendText(
+                "[" + processId + "] Failed to start process: " + e.getMessage() + "\n",
+                Color.RED
+            );
+            return -1;
+        }
     }
 
     private void startOutputReader(
@@ -100,7 +95,7 @@ public class ProcessManager {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     final String output = line;
-                    SwingUtilities.invokeLater(() ->
+                    SwingUtilities.invokeLater(() -> 
                         console.appendText(
                             "[" + processId + "] " + output + "\n",
                             color
@@ -108,13 +103,9 @@ public class ProcessManager {
                     );
                 }
             } catch (IOException e) {
-                SwingUtilities.invokeLater(() ->
+                SwingUtilities.invokeLater(() -> 
                     console.appendText(
-                        "[" +
-                        processId +
-                        "] Error reading output: " +
-                        e.getMessage() +
-                        "\n",
+                        "[" + processId + "] Error reading output: " + e.getMessage() + "\n",
                         Color.RED
                     )
                 );
@@ -259,5 +250,9 @@ public class ProcessManager {
      */
     public String getThreadName(int threadId) {
         return threadNames.get(threadId);
+    }
+
+    public void cleanup() {
+        killAllProcesses();
     }
 }

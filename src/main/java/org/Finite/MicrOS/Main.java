@@ -13,6 +13,8 @@ import org.Finite.MicrOS.apps.AppType;      // Add this import
 import org.Finite.MicrOS.ui.Console;
 import org.Finite.MicrOS.util.AsmRunner;
 import org.finite.ModuleManager.ModuleInit;
+import org.Finite.MicrOS.ui.FontLoader;
+import org.Finite.MicrOS.ui.ErrorDialog;
 
 import java.io.IOException;
 import javafx.application.Platform;
@@ -49,6 +51,19 @@ public class Main {
 
         try {
             commander.parse(args);
+            
+            // Load system fonts
+            FontLoader.loadResourceFont("SegoeUI", "/fonts/SegoeUI.ttf");
+            FontLoader.loadResourceFont("SegoeUI-Bold", "/fonts/SegoeUI-Bold.ttf");
+            FontLoader.loadResourceFont("JetBrainsMono", "/fonts/JetBrainsMono-Regular.ttf");
+            
+            // Set default UI font
+            UIManager.put("Button.font", FontLoader.getFont("SegoeUI", Font.PLAIN, 12));
+            UIManager.put("Label.font", FontLoader.getFont("SegoeUI", Font.PLAIN, 12));
+            UIManager.put("MenuItem.font", FontLoader.getFont("SegoeUI", Font.PLAIN, 12));
+            UIManager.put("Menu.font", FontLoader.getFont("SegoeUI", Font.PLAIN, 12));
+            UIManager.put("TextArea.font", FontLoader.getFont("JetBrainsMono", Font.PLAIN, 13));
+            UIManager.put("TextField.font", FontLoader.getFont("SegoeUI", Font.PLAIN, 12));
 
             if (cliArgs.isHelp()) {
                 commander.usage();
@@ -102,7 +117,10 @@ public class Main {
             }
             System.out.println("Filesystem initialized successfully");
         } catch (Exception e) {
-            System.err.println("Failed to initialize filesystem: " + e.getMessage());
+            JOptionPane.showMessageDialog(null,
+                "Failed to initialize filesystem: " + e.getMessage(),
+                "Initialization Error",
+                JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         }
     }
@@ -199,8 +217,31 @@ public class Main {
 
         frame.add(desktop, BorderLayout.CENTER); // Ensure desktop is added to the frame
 
-        frame.setVisible(true);
+        try {
+            // Auto-start registered apps
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    JInternalFrame maverFrame = windowManager.launchAppById("org.finite.micros.maver.launcher");
+                    if (maverFrame == null) {
+                        ErrorDialog.showError(desktop, "Failed to launch Maver App Launcher", 
+                            new RuntimeException("App launcher initialization failed"));
+                    }
+                } catch (Exception e) {
+                    ErrorDialog.showError(desktop, "Error during startup", e);
+                }
+            });
 
+            frame.setVisible(true);
+            
+        } catch (Exception e) {
+            // Show error dialog for initialization errors
+            JOptionPane.showMessageDialog(null,
+                "Critical error during initialization: " + e.getMessage(),
+                "Startup Error",
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            System.exit(1);
+        }
 
         // Create initial windows
         windowManager.createWindow("main", "Main Console", true);

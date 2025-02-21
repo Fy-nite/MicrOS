@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import org.Finite.MicrOS.apps.AppManifest;
+import org.Finite.MicrOS.apps.AppType;
 
 public class StartMenu extends JPopupMenu {
     private final WindowManager windowManager;
@@ -30,16 +32,25 @@ public class StartMenu extends JPopupMenu {
     private void setupMenu() {
         // Applications section
         add(createSection("Applications"));
-        add(createMenuItem("Text Editor", "texteditor", "start-texteditor", "📝"));
-        add(createMenuItem("Web Browser", "webviewer", "start-webviewer", "🌐"));
-        add(createMenuItem("File Manager", "filemanager", "start-filemanager", "📁"));
-        add(createMenuItem("Image Viewer", "imageviewer", "start-imageviewer", "🖼️"));
+        add(createAppMenuItem("Text Editor", AppType.TEXT_EDITOR));
+        add(createAppMenuItem("Web Browser", AppType.WEB_VIEWER));
+        add(createAppMenuItem("File Manager", AppType.FILE_MANAGER));
+        add(createAppMenuItem("Image Viewer", AppType.IMAGE_VIEWER));
         createStyledSeparator();
         
         // System section
         add(createSection("System"));
-        add(createMenuItem("App Launcher", e -> windowManager.launchAppById("org.finite.micros.maver.launcher"), "🚀"));
-        add(createMenuItem("Settings", "settings", "settings", "⚙️"));
+        add(createAppMenuItem("App Launcher", "org.finite.micros.maver.launcher", "🚀"));
+        add(createAppMenuItem("Settings", AppType.SETTINGS));
+        add(createAppMenuItem("Terminal", AppType.CONSOLE));
+
+
+        // hook up the button to the action listener
+        add(createMenuItem("TestnativeApp", e -> {
+            setVisible(false);
+            windowManager.launchNativeApp("env WINEPREFIX=\"/home/charlie/.wine\" wine-stable C:\\\\\\\\users\\\\\\\\Public\\\\\\\\Desktop\\\\\\\\CraftOS-PC.lnk");
+        }, "🚀"));
+
         addSeparator();
         
         // Power section
@@ -55,10 +66,21 @@ public class StartMenu extends JPopupMenu {
         return label;
     }
 
-    private JMenuItem createMenuItem(String text, String windowType, String windowId, String icon) {
+    private JMenuItem createAppMenuItem(String text, AppType appType) {
+        AppManifest manifest = new AppManifest();
+        manifest.setName(text);
+        manifest.setAppType(appType);
+        manifest.setIdentifier(appType.getIdentifier());
+        return createAppMenuItem(text, manifest.getIdentifier(), appType.getIdentifier().startsWith("org.") ? "📦" : "🔧");
+    }
+
+    private JMenuItem createAppMenuItem(String text, String identifier, String icon) {
         JMenuItem item = new JMenuItem(icon + "  " + text);
         styleMenuItem(item);
-        item.addActionListener(e -> windowManager.createWindow(windowId, text, windowType));
+        item.addActionListener(e -> {
+            setVisible(false);
+            windowManager.launchAppById(identifier);
+        });
         return item;
     }
 

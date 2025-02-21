@@ -100,18 +100,19 @@ public class ApplicationLauncher {
         String windowId,
         String title
     ) throws IOException {
-        // Create a console window to show the application output
-        JInternalFrame frame = windowManager.createWindow(
-            windowId,
-            "Application - " + title,
-            "console"
-        );
-        Console console = (Console) frame.getClientProperty("console");
-        frame.setVisible(true);
-
-        // Create a process manager for this specific console
-        ProcessManager processManager = new ProcessManager(console);
-        processManager.startProcess(file.getAbsolutePath());
+        if (!file.canExecute()) {
+            // Try to make executable if possible
+            file.setExecutable(true);
+        }
+        
+        if (file.canExecute()) {
+            windowManager.launchNativeApp(file.getAbsolutePath());
+        } else {
+            JOptionPane.showMessageDialog(null,
+                "Cannot execute file: " + file.getName() + "\nFile is not executable.",
+                "Execution Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private String getFileExtension(File file) {
@@ -146,5 +147,14 @@ public class ApplicationLauncher {
 
     private boolean isWebFile(String extension) {
         return extension.equals("html") || extension.equals("htm");
+    }
+
+    private boolean isNativeExecutable(File file) {
+        String name = file.getName().toLowerCase();
+        return file.canExecute() || 
+               name.endsWith(".exe") || 
+               name.endsWith(".sh") ||
+               name.endsWith(".app") ||
+               !name.contains(".");  // Unix executables often have no extension
     }
 }

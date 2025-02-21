@@ -38,6 +38,8 @@ public class Settings {
                 properties.setProperty("lookAndFeel", UIManager.getSystemLookAndFeelClassName());
                 properties.setProperty("background", "#000000");  // Default black background
                 properties.setProperty("theme", "dark");
+                properties.setProperty("isFirstRun", "true");
+                properties.setProperty("isfullscreen", "false");
                 saveSettings();
             }
         } catch (IOException e) {
@@ -70,6 +72,33 @@ public class Settings {
 
     public void setBackground(String path) {
         properties.setProperty("background", path);
+        saveSettings();
+    }
+
+    public String getWallpaper() {
+        return properties.getProperty("wallpaper", "/images/wallpaper.png");
+    }
+
+    public void setWallpaper(String path) {
+        properties.setProperty("wallpaper", path);
+        saveSettings();
+    }
+
+    public String getIsFirstRun() {
+        return properties.getProperty("isFirstRun", "true");
+    }
+
+    public void setIsFirstRun(String isFirstRun) {
+        properties.setProperty("isFirstRun", isFirstRun);
+        saveSettings();
+    }
+
+    public Boolean getIsfullscreen() {
+        return Boolean.parseBoolean(properties.getProperty("isfullscreen", "false"));
+    }
+
+    public void setIsfullscreen(String isfullscreen) {
+        properties.setProperty("isfullscreen", isfullscreen);
         saveSettings();
     }
 
