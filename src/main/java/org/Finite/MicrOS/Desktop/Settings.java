@@ -97,8 +97,8 @@ public class Settings {
         return Boolean.parseBoolean(properties.getProperty("isfullscreen", "false"));
     }
 
-    public void setIsfullscreen(String isfullscreen) {
-        properties.setProperty("isfullscreen", isfullscreen);
+    public void setIsfullscreen(boolean isfullscreen) {
+        properties.setProperty("isfullscreen", Boolean.toString(isfullscreen));
         saveSettings();
     }
 

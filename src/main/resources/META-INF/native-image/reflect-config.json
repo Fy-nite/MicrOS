@@ -1,0 +1,42 @@
+[
+  {
+    "name": "sun.java2d.Disposer",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []},
+      {"name": "addRecord", "parameterTypes": ["java.lang.Object", "long", "long"]}
+    ],
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "sun.font.FontDesignMetrics$KeyReference",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []}
+    ]
+  },
+  {
+    "name": "sun.font.T2KFontScaler",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []},
+      {"name": "initNativeScaler", "parameterTypes": ["long", "int", "int", "int", "boolean"]}
+    ]
+  },
+  {
+    "name": "java.awt.EventQueue",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []}
+    ]
+  },
+  {
+    "name": "java.awt.Toolkit",
+    "methods": [
+      {"name": "getDefaultToolkit", "parameterTypes": []}
+    ]
+  },
+  {
+    "name": "sun.awt.AWTAutoShutdown",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []}
+    ]
+  }
+]

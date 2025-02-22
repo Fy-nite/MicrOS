@@ -1,0 +1,5363 @@
+{
+  "reflection": [
+    {
+      "type": "[B"
+    },
+    {
+      "type": "[C"
+    },
+    {
+      "type": "[Ljava.awt.event.MouseMotionListener;"
+    },
+    {
+      "type": "ch.qos.logback.classic.encoder.PatternLayoutEncoder",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.joran.SerializedModelConfigurator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.DateConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.LevelConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.LineSeparatorConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.LoggerConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.MessageConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.ThreadConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.spi.LogbackServiceProvider"
+    },
+    {
+      "type": "ch.qos.logback.classic.util.DefaultJoranConfigurator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.core.ConsoleAppender",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.core.OutputStreamAppender",
+      "methods": [
+        {
+          "name": "setEncoder",
+          "parameterTypes": [
+            "ch.qos.logback.core.encoder.Encoder"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.core.encoder.Encoder"
+    },
+    {
+      "type": "ch.qos.logback.core.encoder.LayoutWrappingEncoder",
+      "methods": [
+        {
+          "name": "setParent",
+          "parameterTypes": [
+            "ch.qos.logback.core.spi.ContextAware"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.core.pattern.PatternLayoutEncoderBase",
+      "methods": [
+        {
+          "name": "setPattern",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.core.spi.ContextAware"
+    },
+    {
+      "type": "com.sun.crypto.provider.AESCipher$General",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.ARCFOURCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.ChaCha20Cipher$ChaCha20Poly1305",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DESCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DESedeCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DHParameters",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.GaloisCounterMode$AESGCM",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.HmacCore$HmacSHA384",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.TlsMasterSecretGenerator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.gtk.GtkPlatformFactory",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.javafx.font.freetype.FTFactory",
+      "methods": [
+        {
+          "name": "getFactory",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.javafx.logging.PrintLogger",
+      "methods": [
+        {
+          "name": "createInstance",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.javafx.logging.jfr.JFRPulseLogger",
+      "methods": [
+        {
+          "name": "createInstance",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.javafx.scene.control.skin.Utils",
+      "methods": [
+        {
+          "name": "getResource",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.javafx.stage.EmbeddedWindow"
+    },
+    {
+      "type": "com.sun.javafx.tk.quantum.QuantumToolkit",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.javafx.webkit.theme.ScrollBarWidget"
+    },
+    {
+      "type": "com.sun.media.jfxmediaimpl.platform.gstreamer.GSTPlatform",
+      "methods": [
+        {
+          "name": "getPlatformInstance",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.GraphicsPipeline",
+      "methods": [
+        {
+          "name": "getFontFactory",
+          "parameterTypes": []
+        },
+        {
+          "name": "getPipeline",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.es2.ES2Pipeline",
+      "methods": [
+        {
+          "name": "getInstance",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.es2.X11GLFactory",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.shader.FillPgram_Color_Loader",
+      "methods": [
+        {
+          "name": "loadShader",
+          "parameterTypes": [
+            "com.sun.prism.ps.ShaderFactory",
+            "java.io.InputStream"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.shader.FillPgram_ImagePattern_Loader",
+      "methods": [
+        {
+          "name": "loadShader",
+          "parameterTypes": [
+            "com.sun.prism.ps.ShaderFactory",
+            "java.io.InputStream"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.shader.FillPgram_LinearGradient_PAD_Loader",
+      "methods": [
+        {
+          "name": "loadShader",
+          "parameterTypes": [
+            "com.sun.prism.ps.ShaderFactory",
+            "java.io.InputStream"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.shader.FillPgram_RadialGradient_PAD_Loader",
+      "methods": [
+        {
+          "name": "loadShader",
+          "parameterTypes": [
+            "com.sun.prism.ps.ShaderFactory",
+            "java.io.InputStream"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.shader.FillRoundRect_Color_Loader",
+      "methods": [
+        {
+          "name": "loadShader",
+          "parameterTypes": [
+            "com.sun.prism.ps.ShaderFactory",
+            "java.io.InputStream"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.shader.Mask_TextureRGB_Loader",
+      "methods": [
+        {
+          "name": "loadShader",
+          "parameterTypes": [
+            "com.sun.prism.ps.ShaderFactory",
+            "java.io.InputStream"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.shader.Solid_Color_Loader",
+      "methods": [
+        {
+          "name": "loadShader",
+          "parameterTypes": [
+            "com.sun.prism.ps.ShaderFactory",
+            "java.io.InputStream"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.shader.Solid_TextureFirstPassLCD_Loader",
+      "methods": [
+        {
+          "name": "loadShader",
+          "parameterTypes": [
+            "com.sun.prism.ps.ShaderFactory",
+            "java.io.InputStream"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.shader.Solid_TextureRGB_Loader",
+      "methods": [
+        {
+          "name": "loadShader",
+          "parameterTypes": [
+            "com.sun.prism.ps.ShaderFactory",
+            "java.io.InputStream"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.shader.Solid_TextureSecondPassLCD_Loader",
+      "methods": [
+        {
+          "name": "loadShader",
+          "parameterTypes": [
+            "com.sun.prism.ps.ShaderFactory",
+            "java.io.InputStream"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.shader.Texture_Color_Loader",
+      "methods": [
+        {
+          "name": "loadShader",
+          "parameterTypes": [
+            "com.sun.prism.ps.ShaderFactory",
+            "java.io.InputStream"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.prism.shader.Texture_LinearGradient_PAD_Loader",
+      "methods": [
+        {
+          "name": "loadShader",
+          "parameterTypes": [
+            "com.sun.prism.ps.ShaderFactory",
+            "java.io.InputStream"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.scenario.effect.impl.es2.ES2ShaderSource",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.scenario.effect.impl.prism.PrRenderer",
+      "methods": [
+        {
+          "name": "createRenderer",
+          "parameterTypes": [
+            "com.sun.scenario.effect.FilterContext"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.scenario.effect.impl.prism.ps.PPSLinearConvolveShadowPeer",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "com.sun.scenario.effect.FilterContext",
+            "com.sun.scenario.effect.impl.Renderer",
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.scenario.effect.impl.prism.ps.PPSRenderer",
+      "methods": [
+        {
+          "name": "createRenderer",
+          "parameterTypes": [
+            "com.sun.scenario.effect.FilterContext"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.awt.EventQueue",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.awt.Image"
+    },
+    {
+      "type": "java.awt.SequencedEvent"
+    },
+    {
+      "type": "java.awt.Toolkit",
+      "methods": [
+        {
+          "name": "getDefaultToolkit",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.awt.event.KeyEvent",
+      "fields": [
+        {
+          "name": "VK_A"
+        },
+        {
+          "name": "VK_BACK_SLASH"
+        },
+        {
+          "name": "VK_BACK_SPACE"
+        },
+        {
+          "name": "VK_C"
+        },
+        {
+          "name": "VK_CONTEXT_MENU"
+        },
+        {
+          "name": "VK_COPY"
+        },
+        {
+          "name": "VK_CUT"
+        },
+        {
+          "name": "VK_DELETE"
+        },
+        {
+          "name": "VK_DOWN"
+        },
+        {
+          "name": "VK_END"
+        },
+        {
+          "name": "VK_ENTER"
+        },
+        {
+          "name": "VK_ESCAPE"
+        },
+        {
+          "name": "VK_F10"
+        },
+        {
+          "name": "VK_F12"
+        },
+        {
+          "name": "VK_F2"
+        },
+        {
+          "name": "VK_F4"
+        },
+        {
+          "name": "VK_F5"
+        },
+        {
+          "name": "VK_F6"
+        },
+        {
+          "name": "VK_F7"
+        },
+        {
+          "name": "VK_F8"
+        },
+        {
+          "name": "VK_F9"
+        },
+        {
+          "name": "VK_H"
+        },
+        {
+          "name": "VK_HOME"
+        },
+        {
+          "name": "VK_INSERT"
+        },
+        {
+          "name": "VK_KP_DOWN"
+        },
+        {
+          "name": "VK_KP_LEFT"
+        },
+        {
+          "name": "VK_KP_RIGHT"
+        },
+        {
+          "name": "VK_KP_UP"
+        },
+        {
+          "name": "VK_LEFT"
+        },
+        {
+          "name": "VK_O"
+        },
+        {
+          "name": "VK_PAGE_DOWN"
+        },
+        {
+          "name": "VK_PAGE_UP"
+        },
+        {
+          "name": "VK_PASTE"
+        },
+        {
+          "name": "VK_RIGHT"
+        },
+        {
+          "name": "VK_SLASH"
+        },
+        {
+          "name": "VK_SPACE"
+        },
+        {
+          "name": "VK_T"
+        },
+        {
+          "name": "VK_TAB"
+        },
+        {
+          "name": "VK_UP"
+        },
+        {
+          "name": "VK_V"
+        },
+        {
+          "name": "VK_X"
+        }
+      ]
+    },
+    {
+      "type": "java.io.FilePermission"
+    },
+    {
+      "type": "java.io.InputStream"
+    },
+    {
+      "type": "java.io.Reader"
+    },
+    {
+      "type": "java.lang.Character",
+      "methods": [
+        {
+          "name": "isIdeographic",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.RuntimePermission"
+    },
+    {
+      "type": "java.lang.String"
+    },
+    {
+      "type": "java.lang.Thread",
+      "fields": [
+        {
+          "name": "threadLocalRandomProbe"
+        }
+      ]
+    },
+    {
+      "type": "java.net.NetPermission"
+    },
+    {
+      "type": "java.net.SocketPermission"
+    },
+    {
+      "type": "java.net.URLPermission",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.nio.ByteBuffer",
+      "methods": [
+        {
+          "name": "order",
+          "parameterTypes": [
+            "java.nio.ByteOrder"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.nio.ByteOrder",
+      "methods": [
+        {
+          "name": "nativeOrder",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.nio.CharBuffer"
+    },
+    {
+      "type": "java.security.AlgorithmParametersSpi"
+    },
+    {
+      "type": "java.security.AllPermission"
+    },
+    {
+      "type": "java.security.KeyStoreSpi"
+    },
+    {
+      "type": "java.security.SecurityPermission"
+    },
+    {
+      "type": "java.security.interfaces.ECPrivateKey"
+    },
+    {
+      "type": "java.security.interfaces.ECPublicKey"
+    },
+    {
+      "type": "java.security.interfaces.RSAPrivateKey"
+    },
+    {
+      "type": "java.security.interfaces.RSAPublicKey"
+    },
+    {
+      "type": "java.util.List"
+    },
+    {
+      "type": "java.util.PropertyPermission"
+    },
+    {
+      "type": "java.util.concurrent.ForkJoinTask",
+      "fields": [
+        {
+          "name": "aux"
+        },
+        {
+          "name": "status"
+        }
+      ]
+    },
+    {
+      "type": "java.util.concurrent.atomic.AtomicBoolean",
+      "fields": [
+        {
+          "name": "value"
+        }
+      ]
+    },
+    {
+      "type": "java.util.concurrent.atomic.Striped64",
+      "fields": [
+        {
+          "name": "base"
+        },
+        {
+          "name": "cellsBusy"
+        }
+      ]
+    },
+    {
+      "type": "java.util.concurrent.atomic.Striped64$Cell",
+      "fields": [
+        {
+          "name": "value"
+        }
+      ]
+    },
+    {
+      "type": "javafx.embed.swing.JFXPanel"
+    },
+    {
+      "type": "javafx.embed.swing.SwingNode"
+    },
+    {
+      "type": "javafx.scene.Camera"
+    },
+    {
+      "type": "javafx.scene.Group"
+    },
+    {
+      "type": "javafx.scene.Node"
+    },
+    {
+      "type": "javafx.scene.ParallelCamera"
+    },
+    {
+      "type": "javafx.scene.Parent"
+    },
+    {
+      "type": "javafx.scene.Scene"
+    },
+    {
+      "type": "javafx.scene.control.Control"
+    },
+    {
+      "type": "javafx.scene.effect.Effect"
+    },
+    {
+      "type": "javafx.scene.image.Image"
+    },
+    {
+      "type": "javafx.scene.layout.Pane"
+    },
+    {
+      "type": "javafx.scene.layout.Region"
+    },
+    {
+      "type": "javafx.scene.shape.LineTo"
+    },
+    {
+      "type": "javafx.scene.shape.MoveTo"
+    },
+    {
+      "type": "javafx.scene.shape.Path"
+    },
+    {
+      "type": "javafx.scene.shape.PathElement"
+    },
+    {
+      "type": "javafx.scene.shape.Rectangle"
+    },
+    {
+      "type": "javafx.scene.shape.SVGPath"
+    },
+    {
+      "type": "javafx.scene.shape.Shape"
+    },
+    {
+      "type": "javafx.scene.text.Font"
+    },
+    {
+      "type": "javafx.scene.text.Text"
+    },
+    {
+      "type": "javafx.scene.transform.Transform"
+    },
+    {
+      "type": "javafx.scene.web.WebView"
+    },
+    {
+      "type": "javafx.stage.PopupWindow"
+    },
+    {
+      "type": "javafx.stage.Window"
+    },
+    {
+      "type": "javax.smartcardio.CardPermission"
+    },
+    {
+      "type": "javax.swing.plaf.basic.BasicDesktopPaneUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.basic.BasicInternalFrameUI",
+      "methods": [
+        {
+          "name": "loadActionMap",
+          "parameterTypes": [
+            "javax.swing.plaf.basic.LazyActionMap"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.basic.BasicMenuItemUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        },
+        {
+          "name": "loadActionMap",
+          "parameterTypes": [
+            "javax.swing.plaf.basic.LazyActionMap"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.basic.BasicOptionPaneUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        },
+        {
+          "name": "loadActionMap",
+          "parameterTypes": [
+            "javax.swing.plaf.basic.LazyActionMap"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.basic.BasicPanelUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.basic.BasicPopupMenuUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        },
+        {
+          "name": "loadActionMap",
+          "parameterTypes": [
+            "javax.swing.plaf.basic.LazyActionMap"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.basic.BasicTableHeaderUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.basic.BasicTableUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.basic.BasicTextAreaUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.basic.BasicTextPaneUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.basic.BasicViewportUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.metal.MetalButtonUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.metal.MetalDesktopIconUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.metal.MetalInternalFrameUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.metal.MetalLabelUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.metal.MetalPopupMenuSeparatorUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.metal.MetalProgressBarUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.metal.MetalRootPaneUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.metal.MetalScrollBarUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.metal.MetalScrollPaneUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.metal.MetalTextFieldUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.metal.MetalToggleButtonUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "javax.swing.plaf.metal.MetalToolBarUI",
+      "methods": [
+        {
+          "name": "createUI",
+          "parameterTypes": [
+            "javax.swing.JComponent"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "jdk.internal.misc.Unsafe"
+    },
+    {
+      "type": "org.Finite.MicrOS.Desktop.BackgroundPanel"
+    },
+    {
+      "type": "org.Finite.MicrOS.Desktop.Taskbar"
+    },
+    {
+      "type": "org.Finite.MicrOS.Desktop.Taskbar$3"
+    },
+    {
+      "type": "org.Finite.MicrOS.Files.FileManager"
+    },
+    {
+      "type": "org.Finite.MicrOS.Main$1"
+    },
+    {
+      "type": "org.Finite.MicrOS.ui.ClockPanel"
+    },
+    {
+      "type": "org.Finite.MicrOS.ui.Console"
+    },
+    {
+      "type": "org.Finite.MicrOS.ui.SplashScreen"
+    },
+    {
+      "type": "org.Finite.MicrOS.ui.StartMenu"
+    },
+    {
+      "type": "org.Finite.MicrOS.ui.SystemTray"
+    },
+    {
+      "type": "org.Finite.MicrOS.ui.TaskButton"
+    },
+    {
+      "type": "org.Finite.MicrOS.ui.WebViewer"
+    },
+    {
+      "type": "org.eclipse.swt.internal.gtk.OS"
+    },
+    {
+      "type": "org.finite.ModuleManager.examples.MathModule"
+    },
+    {
+      "type": "org.finite.ModuleManager.examples.WindowModule"
+    },
+    {
+      "type": "org.finite.Modules.extentions.StringOperations"
+    },
+    {
+      "type": "org.finite.micros.maver.MaverLauncher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.AWTAutoShutdown",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.font.FontDesignMetrics$KeyReference",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.font.HBShaper",
+      "methods": [
+        {
+          "name": "getFontTableData",
+          "parameterTypes": [
+            "sun.font.Font2D",
+            "int",
+            "java.lang.foreign.MemorySegment"
+          ]
+        },
+        {
+          "name": "get_glyph_contour_point",
+          "parameterTypes": [
+            "java.lang.foreign.MemorySegment",
+            "java.lang.foreign.MemorySegment",
+            "int",
+            "int",
+            "java.lang.foreign.MemorySegment",
+            "java.lang.foreign.MemorySegment",
+            "java.lang.foreign.MemorySegment"
+          ]
+        },
+        {
+          "name": "get_glyph_h_advance",
+          "parameterTypes": [
+            "java.lang.foreign.MemorySegment",
+            "java.lang.foreign.MemorySegment",
+            "int",
+            "java.lang.foreign.MemorySegment"
+          ]
+        },
+        {
+          "name": "get_glyph_v_advance",
+          "parameterTypes": [
+            "java.lang.foreign.MemorySegment",
+            "java.lang.foreign.MemorySegment",
+            "int",
+            "java.lang.foreign.MemorySegment"
+          ]
+        },
+        {
+          "name": "get_nominal_glyph",
+          "parameterTypes": [
+            "java.lang.foreign.MemorySegment",
+            "java.lang.foreign.MemorySegment",
+            "int",
+            "java.lang.foreign.MemorySegment",
+            "java.lang.foreign.MemorySegment"
+          ]
+        },
+        {
+          "name": "get_variation_glyph",
+          "parameterTypes": [
+            "java.lang.foreign.MemorySegment",
+            "java.lang.foreign.MemorySegment",
+            "int",
+            "int",
+            "java.lang.foreign.MemorySegment",
+            "java.lang.foreign.MemorySegment"
+          ]
+        },
+        {
+          "name": "store_layout_results",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "float",
+            "float",
+            "float",
+            "int",
+            "int",
+            "java.lang.foreign.MemorySegment",
+            "java.lang.foreign.MemorySegment"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.font.T2KFontScaler",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        },
+        {
+          "name": "initNativeScaler",
+          "parameterTypes": [
+            "long",
+            "int",
+            "int",
+            "int",
+            "boolean"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.Disposer",
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        },
+        {
+          "name": "addRecord",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long",
+            "long"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.marlin.DMarlinRenderingEngine",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.misc.Unsafe",
+      "fields": [
+        {
+          "name": "theUnsafe"
+        }
+      ]
+    },
+    {
+      "type": "sun.security.pkcs12.PKCS12KeyStore",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.pkcs12.PKCS12KeyStore$DualFormatPKCS12",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.DSA$SHA224withDSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.DSA$SHA256withDSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.JavaKeyStore$DualFormatJKS",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.JavaKeyStore$JKS",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.MD5",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.NativePRNG",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.security.SecureRandomParameters"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA2$SHA224",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA2$SHA256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA5$SHA384",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA5$SHA512",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.X509Factory",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.certpath.PKIXCertPathValidator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.PSSParameters",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSAKeyFactory$Legacy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSAPSSSignature",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSASignature$SHA224withRSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSASignature$SHA256withRSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.ssl.KeyManagerFactoryImpl$SunX509",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.ssl.SSLContextImpl$DefaultSSLContext",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.ssl.TrustManagerFactoryImpl$PKIXFactory",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.AuthorityInfoAccessExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.AuthorityKeyIdentifierExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.BasicConstraintsExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.CRLDistributionPointsExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.CertificatePoliciesExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.ExtendedKeyUsageExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.IssuerAlternativeNameExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.KeyUsageExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.NetscapeCertTypeExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.PrivateKeyUsageExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.SubjectAlternativeNameExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.SubjectKeyIdentifierExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "glob": "META-INF/services/ch.qos.logback.classic.spi.Configurator"
+    },
+    {
+      "glob": "META-INF/services/java.awt.im.spi.InputMethodDescriptor"
+    },
+    {
+      "glob": "META-INF/services/java.lang.System$LoggerFinder"
+    },
+    {
+      "glob": "META-INF/services/java.net.spi.InetAddressResolverProvider"
+    },
+    {
+      "glob": "META-INF/services/java.net.spi.URLStreamHandlerProvider"
+    },
+    {
+      "glob": "META-INF/services/java.nio.channels.spi.SelectorProvider"
+    },
+    {
+      "glob": "META-INF/services/java.time.zone.ZoneRulesProvider"
+    },
+    {
+      "glob": "META-INF/services/java.util.spi.ResourceBundleControlProvider"
+    },
+    {
+      "glob": "META-INF/services/javax.xml.parsers.SAXParserFactory"
+    },
+    {
+      "glob": "META-INF/services/org.slf4j.spi.SLF4JServiceProvider"
+    },
+    {
+      "glob": "com/sun/glass/utils/NativeLibLoader.class"
+    },
+    {
+      "glob": "com/sun/javafx/scene/control/skin/modena/modena.bss"
+    },
+    {
+      "glob": "com/sun/javafx/scene/control/skin/resources/controls.properties"
+    },
+    {
+      "glob": "com/sun/javafx/scene/control/skin/resources/controls_en.properties"
+    },
+    {
+      "glob": "com/sun/javafx/scene/control/skin/resources/controls_en_AU.properties"
+    },
+    {
+      "glob": "com/sun/javafx/tk/quantum/QuantumMessagesBundle.properties"
+    },
+    {
+      "glob": "com/sun/javafx/tk/quantum/QuantumMessagesBundle_en.properties"
+    },
+    {
+      "glob": "com/sun/javafx/tk/quantum/QuantumMessagesBundle_en_AU.properties"
+    },
+    {
+      "glob": "com/sun/javafx/webkit/Cursors.properties"
+    },
+    {
+      "glob": "com/sun/javafx/webkit/Cursors_en.properties"
+    },
+    {
+      "glob": "com/sun/javafx/webkit/Cursors_en_AU.properties"
+    },
+    {
+      "glob": "com/sun/prism/es2/glsl/FillPgram_Color.frag"
+    },
+    {
+      "glob": "com/sun/prism/es2/glsl/FillPgram_ImagePattern.frag"
+    },
+    {
+      "glob": "com/sun/prism/es2/glsl/FillPgram_LinearGradient_PAD.frag"
+    },
+    {
+      "glob": "com/sun/prism/es2/glsl/FillPgram_RadialGradient_PAD.frag"
+    },
+    {
+      "glob": "com/sun/prism/es2/glsl/FillRoundRect_Color.frag"
+    },
+    {
+      "glob": "com/sun/prism/es2/glsl/Mask_TextureRGB.frag"
+    },
+    {
+      "glob": "com/sun/prism/es2/glsl/Solid_Color.frag"
+    },
+    {
+      "glob": "com/sun/prism/es2/glsl/Solid_TextureFirstPassLCD.frag"
+    },
+    {
+      "glob": "com/sun/prism/es2/glsl/Solid_TextureRGB.frag"
+    },
+    {
+      "glob": "com/sun/prism/es2/glsl/Solid_TextureSecondPassLCD.frag"
+    },
+    {
+      "glob": "com/sun/prism/es2/glsl/Texture_Color.frag"
+    },
+    {
+      "glob": "com/sun/prism/es2/glsl/Texture_LinearGradient_PAD.frag"
+    },
+    {
+      "glob": "com/sun/scenario/effect/impl/es2/glsl/LinearConvolveShadow_28.frag"
+    },
+    {
+      "glob": "com/sun/scenario/effect/impl/es2/glsl/LinearConvolveShadow_4.frag"
+    },
+    {
+      "glob": "config/filesystem.json"
+    },
+    {
+      "glob": "default_configs/system/texteditor/syntax/asm.json"
+    },
+    {
+      "glob": "default_configs/system/texteditor/syntax/java.json"
+    },
+    {
+      "glob": "default_configs/system/texteditor/syntax/markdown.json"
+    },
+    {
+      "glob": "default_configs/system/texteditor/themes.json"
+    },
+    {
+      "glob": "fonts/JetBrainsMono-Regular.ttf"
+    },
+    {
+      "glob": "fonts/SegoeUI.ttf"
+    },
+    {
+      "glob": "images/bg.png"
+    },
+    {
+      "glob": "libavplugin-54.so"
+    },
+    {
+      "glob": "libavplugin-56.so"
+    },
+    {
+      "glob": "libavplugin-57.so"
+    },
+    {
+      "glob": "libavplugin-ffmpeg-56.so"
+    },
+    {
+      "glob": "libavplugin-ffmpeg-57.so"
+    },
+    {
+      "glob": "libavplugin-ffmpeg-58.so"
+    },
+    {
+      "glob": "libavplugin.so"
+    },
+    {
+      "glob": "libfxplugins.so"
+    },
+    {
+      "glob": "libglass.so"
+    },
+    {
+      "glob": "libglassgtk3.so"
+    },
+    {
+      "glob": "libgstreamer-lite.so"
+    },
+    {
+      "glob": "libjavafx_font.so"
+    },
+    {
+      "glob": "libjavafx_font_freetype.so"
+    },
+    {
+      "glob": "libjavafx_font_pango.so"
+    },
+    {
+      "glob": "libjavafx_iio.so"
+    },
+    {
+      "glob": "libjfxmedia.so"
+    },
+    {
+      "glob": "libjfxwebkit.so"
+    },
+    {
+      "glob": "libprism_es2.so"
+    },
+    {
+      "glob": "logback-test.scmo"
+    },
+    {
+      "glob": "logback-test.xml"
+    },
+    {
+      "glob": "logback.scmo"
+    },
+    {
+      "glob": "logback.xml"
+    },
+    {
+      "glob": "stdio/io.masm"
+    },
+    {
+      "module": "java.base",
+      "glob": "jdk/internal/icu/impl/data/icudt74b/nfkc.nrm"
+    },
+    {
+      "module": "java.base",
+      "glob": "jdk/internal/icu/impl/data/icudt74b/ubidi.icu"
+    },
+    {
+      "module": "java.base",
+      "glob": "jdk/internal/icu/impl/data/icudt74b/uprops.icu"
+    },
+    {
+      "module": "java.base",
+      "glob": "sun/net/idn/uidna.spp"
+    },
+    {
+      "module": "java.datatransfer",
+      "glob": "sun/datatransfer/resources/flavormap.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "com/sun/swing/internal/plaf/basic/resources/basic_en.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "com/sun/swing/internal/plaf/basic/resources/basic_en_AU.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "com/sun/swing/internal/plaf/metal/resources/metal_en.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "com/sun/swing/internal/plaf/metal/resources/metal_en_AU.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "javax/swing/plaf/metal/icons/ocean/close-pressed.gif"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "javax/swing/plaf/metal/icons/ocean/close.gif"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "javax/swing/plaf/metal/icons/ocean/iconify-pressed.gif"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "javax/swing/plaf/metal/icons/ocean/iconify.gif"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "javax/swing/plaf/metal/icons/ocean/maximize-pressed.gif"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "javax/swing/plaf/metal/icons/ocean/maximize.gif"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "javax/swing/plaf/metal/icons/ocean/menu.gif"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "javax/swing/plaf/metal/icons/ocean/minimize-pressed.gif"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "javax/swing/plaf/metal/icons/ocean/minimize.gif"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "javax/swing/plaf/metal/icons/ocean/paletteClose-pressed.gif"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "javax/swing/plaf/metal/icons/ocean/paletteClose.gif"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "javax/swing/plaf/metal/icons/ocean/question.png"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "javax/swing/text/html/default.css"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "javax/swing/text/html/parser/html32.bdtd"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "sun/awt/resources/awt_en.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "sun/awt/resources/awt_en_AU.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "sun/awt/resources/cursors/CopyDrop32x32.gif"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "sun/awt/resources/cursors/LinkDrop32x32.gif"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "sun/awt/resources/cursors/MoveDrop32x32.gif"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "sun/awt/resources/cursors/cursors.properties"
+    },
+    {
+      "module": "java.desktop",
+      "glob": "sun/awt/resources/cursors/invalid32x32.gif"
+    },
+    {
+      "module": "java.logging",
+      "glob": "sun/util/logging/resources/logging_en.properties"
+    },
+    {
+      "module": "java.logging",
+      "glob": "sun/util/logging/resources/logging_en_AU.properties"
+    },
+    {
+      "module": "java.xml",
+      "glob": "jdk/xml/internal/jdkcatalog/JDKCatalog.xml"
+    }
+  ],
+  "bundles": [
+    {
+      "name": "com.sun.javafx.tk.quantum.QuantumMessagesBundle",
+      "locales": [
+        "en-AU"
+      ]
+    },
+    {
+      "name": "com.sun.javafx.webkit.Cursors",
+      "locales": [
+        "en-AU"
+      ]
+    },
+    {
+      "name": "com.sun.swing.internal.plaf.basic.resources.basic",
+      "locales": [
+        "en-AU"
+      ]
+    },
+    {
+      "name": "com.sun.swing.internal.plaf.metal.resources.metal",
+      "locales": [
+        "en-AU"
+      ]
+    },
+    {
+      "name": "com/sun/javafx/scene/control/skin/resources/controls",
+      "locales": [
+        "en-AU"
+      ]
+    },
+    {
+      "name": "sun.awt.resources.awt",
+      "locales": [
+        "en-AU"
+      ]
+    }
+  ],
+  "jni": [
+    {
+      "type": "[Lcom.sun.glass.ui.Screen;"
+    },
+    {
+      "type": "[Lcom.sun.javafx.font.FontConfigManager$FontConfigFont;"
+    },
+    {
+      "type": "[Lcom.sun.webkit.network.FormDataElement;"
+    },
+    {
+      "type": "[Lsun.font.FontConfigManager$FontConfigFont;"
+    },
+    {
+      "type": "[Lsun.java2d.loops.GraphicsPrimitive;"
+    },
+    {
+      "type": "com.sun.glass.ui.Application",
+      "methods": [
+        {
+          "name": "GetApplication",
+          "parameterTypes": []
+        },
+        {
+          "name": "getName",
+          "parameterTypes": []
+        },
+        {
+          "name": "reportException",
+          "parameterTypes": [
+            "java.lang.Throwable"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.Clipboard",
+      "methods": [
+        {
+          "name": "contentChanged",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.Cursor",
+      "fields": [
+        {
+          "name": "ptr"
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.Pixels",
+      "methods": [
+        {
+          "name": "attachData",
+          "parameterTypes": [
+            "long"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.Screen",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "float",
+            "float",
+            "float",
+            "float"
+          ]
+        },
+        {
+          "name": "notifySettingsChanged",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.Size",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "int",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.View",
+      "fields": [
+        {
+          "name": "ptr"
+        }
+      ],
+      "methods": [
+        {
+          "name": "notifyDragDrop",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "notifyDragEnter",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "notifyDragLeave",
+          "parameterTypes": []
+        },
+        {
+          "name": "notifyDragOver",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "notifyInputMethod",
+          "parameterTypes": [
+            "java.lang.String",
+            "int[]",
+            "int[]",
+            "byte[]",
+            "int",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "notifyKey",
+          "parameterTypes": [
+            "int",
+            "int",
+            "char[]",
+            "int"
+          ]
+        },
+        {
+          "name": "notifyMenu",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int",
+            "boolean"
+          ]
+        },
+        {
+          "name": "notifyMouse",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "boolean",
+            "boolean"
+          ]
+        },
+        {
+          "name": "notifyRepaint",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "notifyResize",
+          "parameterTypes": [
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "notifyScroll",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int",
+            "double",
+            "double",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "double",
+            "double"
+          ]
+        },
+        {
+          "name": "notifyView",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.Window",
+      "fields": [
+        {
+          "name": "ptr"
+        }
+      ],
+      "methods": [
+        {
+          "name": "isEnabled",
+          "parameterTypes": []
+        },
+        {
+          "name": "notifyClose",
+          "parameterTypes": []
+        },
+        {
+          "name": "notifyDelegatePtr",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "notifyDestroy",
+          "parameterTypes": []
+        },
+        {
+          "name": "notifyFocus",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "notifyFocusDisabled",
+          "parameterTypes": []
+        },
+        {
+          "name": "notifyFocusUngrab",
+          "parameterTypes": []
+        },
+        {
+          "name": "notifyLevelChanged",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "notifyMove",
+          "parameterTypes": [
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "notifyMoveToAnotherScreen",
+          "parameterTypes": [
+            "com.sun.glass.ui.Screen"
+          ]
+        },
+        {
+          "name": "notifyResize",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.gtk.GtkApplication",
+      "fields": [
+        {
+          "name": "display"
+        },
+        {
+          "name": "screen"
+        },
+        {
+          "name": "visualID"
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.gtk.GtkPixels",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "int",
+            "int",
+            "java.nio.ByteBuffer"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.gtk.GtkView",
+      "methods": [
+        {
+          "name": "notifyInputMethodCaret",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "notifyInputMethodDraw",
+          "parameterTypes": [
+            "java.lang.String",
+            "int",
+            "int",
+            "int",
+            "byte[]"
+          ]
+        },
+        {
+          "name": "notifyPreeditMode",
+          "parameterTypes": [
+            "boolean"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.glass.ui.gtk.GtkWindow",
+      "methods": [
+        {
+          "name": "notifyStateChanged",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.javafx.font.FontConfigManager$FcCompFont",
+      "fields": [
+        {
+          "name": "allFonts"
+        },
+        {
+          "name": "fcName"
+        },
+        {
+          "name": "firstFont"
+        }
+      ]
+    },
+    {
+      "type": "com.sun.javafx.font.FontConfigManager$FontConfigFont",
+      "fields": [
+        {
+          "name": "familyName"
+        },
+        {
+          "name": "fontFile"
+        },
+        {
+          "name": "fullName"
+        },
+        {
+          "name": "styleStr"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.javafx.font.freetype.FT_Bitmap",
+      "fields": [
+        {
+          "name": "buffer"
+        },
+        {
+          "name": "num_grays"
+        },
+        {
+          "name": "palette"
+        },
+        {
+          "name": "palette_mode"
+        },
+        {
+          "name": "pitch"
+        },
+        {
+          "name": "pixel_mode"
+        },
+        {
+          "name": "rows"
+        },
+        {
+          "name": "width"
+        }
+      ]
+    },
+    {
+      "type": "com.sun.javafx.font.freetype.FT_GlyphSlotRec",
+      "fields": [
+        {
+          "name": "advance_x"
+        },
+        {
+          "name": "advance_y"
+        },
+        {
+          "name": "bitmap"
+        },
+        {
+          "name": "bitmap_left"
+        },
+        {
+          "name": "bitmap_top"
+        },
+        {
+          "name": "format"
+        },
+        {
+          "name": "linearHoriAdvance"
+        },
+        {
+          "name": "linearVertAdvance"
+        },
+        {
+          "name": "metrics"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.javafx.font.freetype.FT_Glyph_Metrics",
+      "fields": [
+        {
+          "name": "height"
+        },
+        {
+          "name": "horiAdvance"
+        },
+        {
+          "name": "horiBearingX"
+        },
+        {
+          "name": "horiBearingY"
+        },
+        {
+          "name": "vertAdvance"
+        },
+        {
+          "name": "vertBearingX"
+        },
+        {
+          "name": "vertBearingY"
+        },
+        {
+          "name": "width"
+        }
+      ]
+    },
+    {
+      "type": "com.sun.javafx.font.freetype.FT_Matrix",
+      "fields": [
+        {
+          "name": "xx"
+        },
+        {
+          "name": "xy"
+        },
+        {
+          "name": "yx"
+        },
+        {
+          "name": "yy"
+        }
+      ]
+    },
+    {
+      "type": "com.sun.javafx.iio.common.ImageLoaderImpl",
+      "methods": [
+        {
+          "name": "emitWarning",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.javafx.iio.jpeg.JPEGImageLoader",
+      "methods": [
+        {
+          "name": "setInputAttributes",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "byte[]"
+          ]
+        },
+        {
+          "name": "setOutputAttributes",
+          "parameterTypes": [
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "updateImageProgress",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.media.jfxmedia.logging.Logger",
+      "methods": [
+        {
+          "name": "logMsg",
+          "parameterTypes": [
+            "int",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "logMsg",
+          "parameterTypes": [
+            "int",
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.BackForwardList",
+      "methods": [
+        {
+          "name": "notifyChanged",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.BackForwardList$Entry",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "long"
+          ]
+        },
+        {
+          "name": "notifyItemChanged",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.CursorManager",
+      "methods": [
+        {
+          "name": "getCursorManager",
+          "parameterTypes": []
+        },
+        {
+          "name": "getPredefinedCursorID",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.FileSystem",
+      "methods": [
+        {
+          "name": "fwkFileExists",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkMakeAllDirectories",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkPathByAppendingComponent",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.MainThread",
+      "methods": [
+        {
+          "name": "fwkScheduleDispatchFunctions",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.PopupMenu",
+      "methods": [
+        {
+          "name": "fwkAppendItem",
+          "parameterTypes": [
+            "java.lang.String",
+            "boolean",
+            "boolean",
+            "boolean",
+            "int",
+            "int",
+            "com.sun.webkit.graphics.WCFont"
+          ]
+        },
+        {
+          "name": "fwkCreatePopupMenu",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "fwkDestroy",
+          "parameterTypes": []
+        },
+        {
+          "name": "fwkSetSelectedItem",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "fwkShow",
+          "parameterTypes": [
+            "com.sun.webkit.WebPage",
+            "int",
+            "int",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.SharedBuffer",
+      "methods": [
+        {
+          "name": "fwkCreate",
+          "parameterTypes": [
+            "long"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.Timer",
+      "methods": [
+        {
+          "name": "fwkSetFireTime",
+          "parameterTypes": [
+            "double"
+          ]
+        },
+        {
+          "name": "fwkStopTimer",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.WCWidget",
+      "methods": [
+        {
+          "name": "fwkDestroy",
+          "parameterTypes": []
+        },
+        {
+          "name": "fwkGetScreenDepth",
+          "parameterTypes": []
+        },
+        {
+          "name": "fwkGetScreenRect",
+          "parameterTypes": [
+            "boolean"
+          ]
+        },
+        {
+          "name": "fwkRequestFocus",
+          "parameterTypes": []
+        },
+        {
+          "name": "fwkSetBounds",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "fwkSetCursor",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "fwkSetVisible",
+          "parameterTypes": [
+            "boolean"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.WebPage",
+      "methods": [
+        {
+          "name": "fwkAddMessageToConsole",
+          "parameterTypes": [
+            "java.lang.String",
+            "int",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkAlert",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkCanRunBeforeUnloadConfirmPanel",
+          "parameterTypes": []
+        },
+        {
+          "name": "fwkChooseFile",
+          "parameterTypes": [
+            "java.lang.String",
+            "boolean",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkCloseWindow",
+          "parameterTypes": []
+        },
+        {
+          "name": "fwkConfirm",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkCreateWindow",
+          "parameterTypes": [
+            "boolean",
+            "boolean",
+            "boolean",
+            "boolean"
+          ]
+        },
+        {
+          "name": "fwkDidClearWindowObject",
+          "parameterTypes": [
+            "long",
+            "long"
+          ]
+        },
+        {
+          "name": "fwkFireLoadEvent",
+          "parameterTypes": [
+            "long",
+            "int",
+            "java.lang.String",
+            "java.lang.String",
+            "double",
+            "int"
+          ]
+        },
+        {
+          "name": "fwkFireResourceLoadEvent",
+          "parameterTypes": [
+            "long",
+            "int",
+            "int",
+            "java.lang.String",
+            "double",
+            "int"
+          ]
+        },
+        {
+          "name": "fwkFrameCreated",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "fwkFrameDestroyed",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "fwkGetDefaultRenderTheme",
+          "parameterTypes": []
+        },
+        {
+          "name": "fwkGetPageBounds",
+          "parameterTypes": []
+        },
+        {
+          "name": "fwkGetWindowBounds",
+          "parameterTypes": []
+        },
+        {
+          "name": "fwkPermitAcceptResourceAction",
+          "parameterTypes": [
+            "long",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkPermitEnableScriptsAction",
+          "parameterTypes": [
+            "long",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkPermitNavigateAction",
+          "parameterTypes": [
+            "long",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkPermitNewWindowAction",
+          "parameterTypes": [
+            "long",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkPermitRedirectAction",
+          "parameterTypes": [
+            "long",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkPermitSubmitDataAction",
+          "parameterTypes": [
+            "long",
+            "java.lang.String",
+            "java.lang.String",
+            "boolean"
+          ]
+        },
+        {
+          "name": "fwkPrompt",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkRemoveRequestURL",
+          "parameterTypes": [
+            "long",
+            "int"
+          ]
+        },
+        {
+          "name": "fwkRepaint",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "fwkRunBeforeUnloadConfirmPanel",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkScreenToWindow",
+          "parameterTypes": [
+            "com.sun.webkit.graphics.WCPoint"
+          ]
+        },
+        {
+          "name": "fwkScroll",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "fwkSetCursor",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "fwkSetFocus",
+          "parameterTypes": [
+            "boolean"
+          ]
+        },
+        {
+          "name": "fwkSetRequestURL",
+          "parameterTypes": [
+            "long",
+            "int",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkSetScrollbarsVisible",
+          "parameterTypes": [
+            "boolean"
+          ]
+        },
+        {
+          "name": "fwkSetStatusbarText",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkSetTooltip",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkSetWindowBounds",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "fwkShowWindow",
+          "parameterTypes": []
+        },
+        {
+          "name": "fwkTransferFocus",
+          "parameterTypes": [
+            "boolean"
+          ]
+        },
+        {
+          "name": "fwkWindowToScreen",
+          "parameterTypes": [
+            "com.sun.webkit.graphics.WCPoint"
+          ]
+        },
+        {
+          "name": "getHostWindow",
+          "parameterTypes": []
+        },
+        {
+          "name": "getPage",
+          "parameterTypes": []
+        },
+        {
+          "name": "getRenderTheme",
+          "parameterTypes": []
+        },
+        {
+          "name": "getScrollBarTheme",
+          "parameterTypes": []
+        },
+        {
+          "name": "setInputMethodState",
+          "parameterTypes": [
+            "boolean"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.graphics.Ref",
+      "methods": [
+        {
+          "name": "deref",
+          "parameterTypes": []
+        },
+        {
+          "name": "getID",
+          "parameterTypes": []
+        },
+        {
+          "name": "ref",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.graphics.RenderTheme",
+      "methods": [
+        {
+          "name": "createWidget",
+          "parameterTypes": [
+            "long",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "java.nio.ByteBuffer"
+          ]
+        },
+        {
+          "name": "getRadioButtonSize",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.graphics.ScrollBarTheme",
+      "methods": [
+        {
+          "name": "createWidget",
+          "parameterTypes": [
+            "long",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "getScrollBarPartRect",
+          "parameterTypes": [
+            "long",
+            "int",
+            "int[]"
+          ]
+        },
+        {
+          "name": "getThickness",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.graphics.WCFont",
+      "methods": [
+        {
+          "name": "equals",
+          "parameterTypes": [
+            "java.lang.Object"
+          ]
+        },
+        {
+          "name": "getAscent",
+          "parameterTypes": []
+        },
+        {
+          "name": "getCapHeight",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDescent",
+          "parameterTypes": []
+        },
+        {
+          "name": "getGlyphBoundingBox",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "getGlyphCodes",
+          "parameterTypes": [
+            "char[]"
+          ]
+        },
+        {
+          "name": "getGlyphWidth",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "getLineGap",
+          "parameterTypes": []
+        },
+        {
+          "name": "getLineSpacing",
+          "parameterTypes": []
+        },
+        {
+          "name": "getTextRuns",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "getXHeight",
+          "parameterTypes": []
+        },
+        {
+          "name": "hasUniformLineMetrics",
+          "parameterTypes": []
+        },
+        {
+          "name": "hashCode",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.graphics.WCFontCustomPlatformData",
+      "methods": [
+        {
+          "name": "createFont",
+          "parameterTypes": [
+            "int",
+            "boolean",
+            "boolean"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.graphics.WCGraphicsManager",
+      "methods": [
+        {
+          "name": "createBufferedContextRQ",
+          "parameterTypes": [
+            "com.sun.webkit.graphics.WCImage"
+          ]
+        },
+        {
+          "name": "createRTImage",
+          "parameterTypes": [
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "createTransform",
+          "parameterTypes": [
+            "double",
+            "double",
+            "double",
+            "double",
+            "double",
+            "double"
+          ]
+        },
+        {
+          "name": "createWCPath",
+          "parameterTypes": []
+        },
+        {
+          "name": "createWCPath",
+          "parameterTypes": [
+            "com.sun.webkit.graphics.WCPath"
+          ]
+        },
+        {
+          "name": "fwkCreateFontCustomPlatformData",
+          "parameterTypes": [
+            "com.sun.webkit.SharedBuffer"
+          ]
+        },
+        {
+          "name": "getGraphicsManager",
+          "parameterTypes": []
+        },
+        {
+          "name": "getImageDecoder",
+          "parameterTypes": []
+        },
+        {
+          "name": "getSupportedMediaTypes",
+          "parameterTypes": []
+        },
+        {
+          "name": "getWCFont",
+          "parameterTypes": [
+            "java.lang.String",
+            "boolean",
+            "boolean",
+            "float"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.graphics.WCImageDecoder",
+      "methods": [
+        {
+          "name": "addImageData",
+          "parameterTypes": [
+            "byte[]"
+          ]
+        },
+        {
+          "name": "destroy",
+          "parameterTypes": []
+        },
+        {
+          "name": "getFrame",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "getFrameCompleteStatus",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "getFrameCount",
+          "parameterTypes": []
+        },
+        {
+          "name": "getFrameDuration",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "getFrameSize",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "getImageSize",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.graphics.WCImageFrame",
+      "methods": [
+        {
+          "name": "getSize",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.graphics.WCMediaPlayer"
+    },
+    {
+      "type": "com.sun.webkit.graphics.WCPath",
+      "methods": [
+        {
+          "name": "addBezierCurveTo",
+          "parameterTypes": [
+            "double",
+            "double",
+            "double",
+            "double",
+            "double",
+            "double"
+          ]
+        },
+        {
+          "name": "addEllipse",
+          "parameterTypes": [
+            "double",
+            "double",
+            "double",
+            "double"
+          ]
+        },
+        {
+          "name": "addLineTo",
+          "parameterTypes": [
+            "double",
+            "double"
+          ]
+        },
+        {
+          "name": "addRect",
+          "parameterTypes": [
+            "double",
+            "double",
+            "double",
+            "double"
+          ]
+        },
+        {
+          "name": "closeSubpath",
+          "parameterTypes": []
+        },
+        {
+          "name": "contains",
+          "parameterTypes": [
+            "int",
+            "double",
+            "double"
+          ]
+        },
+        {
+          "name": "getBounds",
+          "parameterTypes": []
+        },
+        {
+          "name": "getPathIterator",
+          "parameterTypes": []
+        },
+        {
+          "name": "isEmpty",
+          "parameterTypes": []
+        },
+        {
+          "name": "moveTo",
+          "parameterTypes": [
+            "double",
+            "double"
+          ]
+        },
+        {
+          "name": "strokeContains",
+          "parameterTypes": [
+            "double",
+            "double",
+            "double",
+            "double",
+            "int",
+            "int",
+            "double",
+            "double[]"
+          ]
+        },
+        {
+          "name": "transform",
+          "parameterTypes": [
+            "double",
+            "double",
+            "double",
+            "double",
+            "double",
+            "double"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.graphics.WCPathIterator",
+      "methods": [
+        {
+          "name": "currentSegment",
+          "parameterTypes": [
+            "double[]"
+          ]
+        },
+        {
+          "name": "isDone",
+          "parameterTypes": []
+        },
+        {
+          "name": "next",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.graphics.WCPoint",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "float",
+            "float"
+          ]
+        },
+        {
+          "name": "getX",
+          "parameterTypes": []
+        },
+        {
+          "name": "getY",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.graphics.WCRectangle",
+      "fields": [
+        {
+          "name": "h"
+        },
+        {
+          "name": "w"
+        },
+        {
+          "name": "x"
+        },
+        {
+          "name": "y"
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.graphics.WCRenderQueue",
+      "methods": [
+        {
+          "name": "fwkAddBuffer",
+          "parameterTypes": [
+            "java.nio.ByteBuffer"
+          ]
+        },
+        {
+          "name": "fwkDisposeGraphics",
+          "parameterTypes": []
+        },
+        {
+          "name": "fwkFlush",
+          "parameterTypes": []
+        },
+        {
+          "name": "refFloatArr",
+          "parameterTypes": [
+            "float[]"
+          ]
+        },
+        {
+          "name": "refIntArr",
+          "parameterTypes": [
+            "int[]"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.graphics.WCTextRun",
+      "methods": [
+        {
+          "name": "getCharOffset",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "getEnd",
+          "parameterTypes": []
+        },
+        {
+          "name": "getGlyph",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "getGlyphCount",
+          "parameterTypes": []
+        },
+        {
+          "name": "getGlyphPosAndAdvance",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "getStart",
+          "parameterTypes": []
+        },
+        {
+          "name": "isLeftToRight",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.network.CookieJar",
+      "methods": [
+        {
+          "name": "fwkGet",
+          "parameterTypes": [
+            "java.lang.String",
+            "boolean"
+          ]
+        },
+        {
+          "name": "fwkPut",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.network.FormDataElement",
+      "methods": [
+        {
+          "name": "fwkCreateFromByteArray",
+          "parameterTypes": [
+            "byte[]"
+          ]
+        },
+        {
+          "name": "fwkCreateFromFile",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.network.NetworkContext",
+      "methods": [
+        {
+          "name": "canHandleURL",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "fwkGetMaximumHTTPConnectionCountPerHost",
+          "parameterTypes": []
+        },
+        {
+          "name": "fwkLoad",
+          "parameterTypes": [
+            "com.sun.webkit.WebPage",
+            "boolean",
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.String",
+            "com.sun.webkit.network.FormDataElement[]",
+            "long"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.network.URLLoaderBase",
+      "methods": [
+        {
+          "name": "fwkCancel",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.webkit.security.WCMessageDigest",
+      "methods": [
+        {
+          "name": "addBytes",
+          "parameterTypes": [
+            "java.nio.ByteBuffer"
+          ]
+        },
+        {
+          "name": "computeHash",
+          "parameterTypes": []
+        },
+        {
+          "name": "getInstance",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.awt.AlphaComposite",
+      "fields": [
+        {
+          "name": "extraAlpha"
+        },
+        {
+          "name": "rule"
+        }
+      ]
+    },
+    {
+      "type": "java.awt.Color",
+      "methods": [
+        {
+          "name": "getRGB",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.awt.Component",
+      "fields": [
+        {
+          "name": "appContext"
+        },
+        {
+          "name": "background"
+        },
+        {
+          "name": "foreground"
+        },
+        {
+          "name": "graphicsConfig"
+        },
+        {
+          "name": "height"
+        },
+        {
+          "name": "isPacked"
+        },
+        {
+          "name": "name"
+        },
+        {
+          "name": "peer"
+        },
+        {
+          "name": "width"
+        },
+        {
+          "name": "x"
+        },
+        {
+          "name": "y"
+        }
+      ],
+      "methods": [
+        {
+          "name": "getLocationOnScreen_NoTreeLock",
+          "parameterTypes": []
+        },
+        {
+          "name": "getParent_NoClientCode",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.awt.DisplayMode",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.awt.GraphicsEnvironment",
+      "methods": [
+        {
+          "name": "getLocalGraphicsEnvironment",
+          "parameterTypes": []
+        },
+        {
+          "name": "isHeadless",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.awt.Rectangle",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.awt.event.KeyEvent",
+      "fields": [
+        {
+          "name": "isProxyActive"
+        }
+      ]
+    },
+    {
+      "type": "java.awt.geom.AffineTransform",
+      "fields": [
+        {
+          "name": "m00"
+        },
+        {
+          "name": "m01"
+        },
+        {
+          "name": "m02"
+        },
+        {
+          "name": "m10"
+        },
+        {
+          "name": "m11"
+        },
+        {
+          "name": "m12"
+        }
+      ]
+    },
+    {
+      "type": "java.awt.geom.GeneralPath",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        },
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "int",
+            "byte[]",
+            "int",
+            "float[]",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.awt.geom.Path2D",
+      "fields": [
+        {
+          "name": "numTypes"
+        },
+        {
+          "name": "pointTypes"
+        },
+        {
+          "name": "windingRule"
+        }
+      ]
+    },
+    {
+      "type": "java.awt.geom.Path2D$Float",
+      "fields": [
+        {
+          "name": "floatCoords"
+        }
+      ]
+    },
+    {
+      "type": "java.awt.geom.Point2D$Float",
+      "fields": [
+        {
+          "name": "x"
+        },
+        {
+          "name": "y"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "float",
+            "float"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.awt.geom.Rectangle2D$Float",
+      "fields": [
+        {
+          "name": "height"
+        },
+        {
+          "name": "width"
+        },
+        {
+          "name": "x"
+        },
+        {
+          "name": "y"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        },
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "float",
+            "float",
+            "float",
+            "float"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.awt.image.BufferedImage",
+      "fields": [
+        {
+          "name": "colorModel"
+        },
+        {
+          "name": "imageType"
+        },
+        {
+          "name": "raster"
+        }
+      ],
+      "methods": [
+        {
+          "name": "getRGB",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int",
+            "int[]",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "setRGB",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int",
+            "int[]",
+            "int",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.awt.image.ColorModel",
+      "fields": [
+        {
+          "name": "colorSpace"
+        },
+        {
+          "name": "colorSpaceType"
+        },
+        {
+          "name": "isAlphaPremultiplied"
+        },
+        {
+          "name": "is_sRGB"
+        },
+        {
+          "name": "nBits"
+        },
+        {
+          "name": "numComponents"
+        },
+        {
+          "name": "supportsAlpha"
+        },
+        {
+          "name": "transparency"
+        }
+      ],
+      "methods": [
+        {
+          "name": "getRGBdefault",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.awt.image.DirectColorModel",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.awt.image.IndexColorModel",
+      "fields": [
+        {
+          "name": "allgrayopaque"
+        },
+        {
+          "name": "colorData"
+        },
+        {
+          "name": "map_size"
+        },
+        {
+          "name": "rgb"
+        },
+        {
+          "name": "transparent_index"
+        }
+      ]
+    },
+    {
+      "type": "java.awt.image.Raster",
+      "fields": [
+        {
+          "name": "dataBuffer"
+        },
+        {
+          "name": "height"
+        },
+        {
+          "name": "minX"
+        },
+        {
+          "name": "minY"
+        },
+        {
+          "name": "numBands"
+        },
+        {
+          "name": "numDataElements"
+        },
+        {
+          "name": "sampleModel"
+        },
+        {
+          "name": "sampleModelTranslateX"
+        },
+        {
+          "name": "sampleModelTranslateY"
+        },
+        {
+          "name": "width"
+        }
+      ]
+    },
+    {
+      "type": "java.awt.image.SampleModel",
+      "fields": [
+        {
+          "name": "height"
+        },
+        {
+          "name": "width"
+        }
+      ],
+      "methods": [
+        {
+          "name": "getPixels",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int",
+            "int[]",
+            "java.awt.image.DataBuffer"
+          ]
+        },
+        {
+          "name": "setPixels",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int",
+            "int[]",
+            "java.awt.image.DataBuffer"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.awt.image.SinglePixelPackedSampleModel",
+      "fields": [
+        {
+          "name": "bitMasks"
+        },
+        {
+          "name": "bitOffsets"
+        },
+        {
+          "name": "bitSizes"
+        },
+        {
+          "name": "maxBitSize"
+        }
+      ]
+    },
+    {
+      "type": "java.io.InputStream",
+      "methods": [
+        {
+          "name": "read",
+          "parameterTypes": [
+            "byte[]",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "skip",
+          "parameterTypes": [
+            "long"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Boolean",
+      "methods": [
+        {
+          "name": "getBoolean",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Iterable",
+      "methods": [
+        {
+          "name": "iterator",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Runnable",
+      "methods": [
+        {
+          "name": "run",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.String",
+      "methods": [
+        {
+          "name": "toLowerCase",
+          "parameterTypes": [
+            "java.util.Locale"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.System",
+      "methods": [
+        {
+          "name": "load",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Thread",
+      "methods": [
+        {
+          "name": "yield",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.nio.ByteBuffer",
+      "methods": [
+        {
+          "name": "array",
+          "parameterTypes": []
+        },
+        {
+          "name": "wrap",
+          "parameterTypes": [
+            "byte[]"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.util.ArrayList",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        },
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "add",
+          "parameterTypes": [
+            "java.lang.Object"
+          ]
+        },
+        {
+          "name": "get",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.util.HashMap",
+      "methods": [
+        {
+          "name": "containsKey",
+          "parameterTypes": [
+            "java.lang.Object"
+          ]
+        },
+        {
+          "name": "get",
+          "parameterTypes": [
+            "java.lang.Object"
+          ]
+        },
+        {
+          "name": "put",
+          "parameterTypes": [
+            "java.lang.Object",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.util.HashSet",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.util.Iterator",
+      "methods": [
+        {
+          "name": "hasNext",
+          "parameterTypes": []
+        },
+        {
+          "name": "next",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.util.Map",
+      "methods": [
+        {
+          "name": "containsKey",
+          "parameterTypes": [
+            "java.lang.Object"
+          ]
+        },
+        {
+          "name": "get",
+          "parameterTypes": [
+            "java.lang.Object"
+          ]
+        },
+        {
+          "name": "keySet",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.util.Set",
+      "methods": [
+        {
+          "name": "add",
+          "parameterTypes": [
+            "java.lang.Object"
+          ]
+        },
+        {
+          "name": "size",
+          "parameterTypes": []
+        },
+        {
+          "name": "toArray",
+          "parameterTypes": [
+            "java.lang.Object[]"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.SunHints",
+      "fields": [
+        {
+          "name": "INTVAL_STROKE_PURE"
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.SunToolkit",
+      "methods": [
+        {
+          "name": "awtLock",
+          "parameterTypes": []
+        },
+        {
+          "name": "awtLockNotify",
+          "parameterTypes": []
+        },
+        {
+          "name": "awtLockNotifyAll",
+          "parameterTypes": []
+        },
+        {
+          "name": "awtLockWait",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "awtUnlock",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.X11.XBaseWindow",
+      "fields": [
+        {
+          "name": "window"
+        }
+      ],
+      "methods": [
+        {
+          "name": "getWindow",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.X11.XContentWindow"
+    },
+    {
+      "type": "sun.awt.X11.XDialogPeer"
+    },
+    {
+      "type": "sun.awt.X11.XErrorHandlerUtil",
+      "methods": [
+        {
+          "name": "init",
+          "parameterTypes": [
+            "long"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.X11.XFramePeer"
+    },
+    {
+      "type": "sun.awt.X11.XToolkit",
+      "fields": [
+        {
+          "name": "modLockIsShiftLock"
+        },
+        {
+          "name": "numLockMask"
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.X11.XWindow",
+      "fields": [
+        {
+          "name": "drawState"
+        },
+        {
+          "name": "graphicsConfig"
+        },
+        {
+          "name": "target"
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.X11.XWindowPeer"
+    },
+    {
+      "type": "sun.awt.X11GraphicsConfig",
+      "fields": [
+        {
+          "name": "aData"
+        },
+        {
+          "name": "bitsPerPixel"
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.X11GraphicsDevice",
+      "methods": [
+        {
+          "name": "addDoubleBufferVisual",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.X11InputMethodBase",
+      "fields": [
+        {
+          "name": "pData"
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.image.BufImgSurfaceData$ICMColorData",
+      "fields": [
+        {
+          "name": "pData"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.image.ByteComponentRaster",
+      "fields": [
+        {
+          "name": "data"
+        },
+        {
+          "name": "dataOffsets"
+        },
+        {
+          "name": "pixelStride"
+        },
+        {
+          "name": "scanlineStride"
+        },
+        {
+          "name": "type"
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.image.GifImageDecoder",
+      "fields": [
+        {
+          "name": "outCode"
+        },
+        {
+          "name": "prefix"
+        },
+        {
+          "name": "suffix"
+        }
+      ],
+      "methods": [
+        {
+          "name": "readBytes",
+          "parameterTypes": [
+            "byte[]",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "sendPixels",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int",
+            "int",
+            "byte[]",
+            "java.awt.image.ColorModel"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.image.ImageRepresentation",
+      "fields": [
+        {
+          "name": "numSrcLUT"
+        },
+        {
+          "name": "srcLUTtransIndex"
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.image.IntegerComponentRaster",
+      "fields": [
+        {
+          "name": "data"
+        },
+        {
+          "name": "dataOffsets"
+        },
+        {
+          "name": "pixelStride"
+        },
+        {
+          "name": "scanlineStride"
+        },
+        {
+          "name": "type"
+        }
+      ]
+    },
+    {
+      "type": "sun.font.CharToGlyphMapper",
+      "methods": [
+        {
+          "name": "charToGlyph",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.font.Font2D",
+      "methods": [
+        {
+          "name": "canDisplay",
+          "parameterTypes": [
+            "char"
+          ]
+        },
+        {
+          "name": "charToGlyph",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "charToVariationGlyph",
+          "parameterTypes": [
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "getMapper",
+          "parameterTypes": []
+        },
+        {
+          "name": "getTableBytes",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.font.FontConfigManager$FcCompFont",
+      "fields": [
+        {
+          "name": "allFonts"
+        },
+        {
+          "name": "fcName"
+        },
+        {
+          "name": "firstFont"
+        }
+      ]
+    },
+    {
+      "type": "sun.font.FontConfigManager$FontConfigFont",
+      "fields": [
+        {
+          "name": "familyName"
+        },
+        {
+          "name": "fontFile"
+        },
+        {
+          "name": "fullName"
+        },
+        {
+          "name": "styleStr"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.font.FontConfigManager$FontConfigInfo",
+      "fields": [
+        {
+          "name": "cacheDirs"
+        },
+        {
+          "name": "fcVersion"
+        }
+      ]
+    },
+    {
+      "type": "sun.font.FontStrike",
+      "methods": [
+        {
+          "name": "getGlyphMetrics",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.font.FontUtilities",
+      "methods": [
+        {
+          "name": "debugFonts",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.font.FreetypeFontScaler",
+      "methods": [
+        {
+          "name": "invalidateScaler",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.font.GlyphList",
+      "fields": [
+        {
+          "name": "gposx"
+        },
+        {
+          "name": "gposy"
+        },
+        {
+          "name": "images"
+        },
+        {
+          "name": "lcdRGBOrder"
+        },
+        {
+          "name": "lcdSubPixPos"
+        },
+        {
+          "name": "len"
+        },
+        {
+          "name": "positions"
+        },
+        {
+          "name": "usePositions"
+        }
+      ]
+    },
+    {
+      "type": "sun.font.PhysicalStrike",
+      "fields": [
+        {
+          "name": "pScalerContext"
+        }
+      ],
+      "methods": [
+        {
+          "name": "adjustPoint",
+          "parameterTypes": [
+            "java.awt.geom.Point2D$Float"
+          ]
+        },
+        {
+          "name": "getGlyphPoint",
+          "parameterTypes": [
+            "int",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.font.StrikeMetrics",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "float",
+            "float",
+            "float",
+            "float",
+            "float",
+            "float",
+            "float",
+            "float",
+            "float",
+            "float"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.font.TrueTypeFont",
+      "methods": [
+        {
+          "name": "readBlock",
+          "parameterTypes": [
+            "java.nio.ByteBuffer",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "readBytes",
+          "parameterTypes": [
+            "int",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.font.Type1Font",
+      "methods": [
+        {
+          "name": "readFile",
+          "parameterTypes": [
+            "java.nio.ByteBuffer"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.Disposer",
+      "methods": [
+        {
+          "name": "addRecord",
+          "parameterTypes": [
+            "java.lang.Object",
+            "long",
+            "long"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.InvalidPipeException"
+    },
+    {
+      "type": "sun.java2d.NullSurfaceData"
+    },
+    {
+      "type": "sun.java2d.SunGraphics2D",
+      "fields": [
+        {
+          "name": "clipRegion"
+        },
+        {
+          "name": "composite"
+        },
+        {
+          "name": "eargb"
+        },
+        {
+          "name": "lcdTextContrast"
+        },
+        {
+          "name": "pixel"
+        },
+        {
+          "name": "strokeHint"
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.SunGraphicsEnvironment",
+      "methods": [
+        {
+          "name": "isDisplayLocal",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.SurfaceData",
+      "fields": [
+        {
+          "name": "pData"
+        },
+        {
+          "name": "valid"
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.Blit",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.BlitBg",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.CompositeType",
+      "fields": [
+        {
+          "name": "AnyAlpha"
+        },
+        {
+          "name": "Src"
+        },
+        {
+          "name": "SrcNoEa"
+        },
+        {
+          "name": "SrcOver"
+        },
+        {
+          "name": "SrcOverNoEa"
+        },
+        {
+          "name": "Xor"
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.DrawGlyphList",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.DrawGlyphListAA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.DrawGlyphListLCD",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.DrawLine",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.DrawParallelogram",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.DrawPath",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.DrawPolygons",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.DrawRect",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.FillParallelogram",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.FillPath",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.FillRect",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.FillSpans",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.GraphicsPrimitive",
+      "fields": [
+        {
+          "name": "pNativePrim"
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.GraphicsPrimitiveMgr",
+      "methods": [
+        {
+          "name": "register",
+          "parameterTypes": [
+            "sun.java2d.loops.GraphicsPrimitive[]"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.MaskBlit",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.MaskFill",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.ScaledBlit",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.SurfaceType",
+      "fields": [
+        {
+          "name": "Any3Byte"
+        },
+        {
+          "name": "Any4Byte"
+        },
+        {
+          "name": "AnyByte"
+        },
+        {
+          "name": "AnyColor"
+        },
+        {
+          "name": "AnyInt"
+        },
+        {
+          "name": "AnyShort"
+        },
+        {
+          "name": "ByteBinary1Bit"
+        },
+        {
+          "name": "ByteBinary2Bit"
+        },
+        {
+          "name": "ByteBinary4Bit"
+        },
+        {
+          "name": "ByteGray"
+        },
+        {
+          "name": "ByteIndexed"
+        },
+        {
+          "name": "ByteIndexedBm"
+        },
+        {
+          "name": "FourByteAbgr"
+        },
+        {
+          "name": "FourByteAbgrPre"
+        },
+        {
+          "name": "Index12Gray"
+        },
+        {
+          "name": "Index8Gray"
+        },
+        {
+          "name": "IntArgb"
+        },
+        {
+          "name": "IntArgbBm"
+        },
+        {
+          "name": "IntArgbPre"
+        },
+        {
+          "name": "IntBgr"
+        },
+        {
+          "name": "IntRgb"
+        },
+        {
+          "name": "IntRgbx"
+        },
+        {
+          "name": "OpaqueColor"
+        },
+        {
+          "name": "ThreeByteBgr"
+        },
+        {
+          "name": "Ushort4444Argb"
+        },
+        {
+          "name": "Ushort555Rgb"
+        },
+        {
+          "name": "Ushort555Rgbx"
+        },
+        {
+          "name": "Ushort565Rgb"
+        },
+        {
+          "name": "UshortGray"
+        },
+        {
+          "name": "UshortIndexed"
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.TransformHelper",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "sun.java2d.loops.SurfaceType",
+            "sun.java2d.loops.CompositeType",
+            "sun.java2d.loops.SurfaceType"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.loops.XORComposite",
+      "fields": [
+        {
+          "name": "alphaMask"
+        },
+        {
+          "name": "xorColor"
+        },
+        {
+          "name": "xorPixel"
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.pipe.Region",
+      "fields": [
+        {
+          "name": "bands"
+        },
+        {
+          "name": "endIndex"
+        },
+        {
+          "name": "hix"
+        },
+        {
+          "name": "hiy"
+        },
+        {
+          "name": "lox"
+        },
+        {
+          "name": "loy"
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.pipe.RegionIterator",
+      "fields": [
+        {
+          "name": "curIndex"
+        },
+        {
+          "name": "numXbands"
+        },
+        {
+          "name": "region"
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.xr.XRBackendNative",
+      "fields": [
+        {
+          "name": "FMTPTR_A8"
+        },
+        {
+          "name": "FMTPTR_ARGB32"
+        },
+        {
+          "name": "MASK_XIMG"
+        }
+      ]
+    },
+    {
+      "type": "sun.java2d.xr.XRSurfaceData",
+      "fields": [
+        {
+          "name": "picture"
+        },
+        {
+          "name": "xid"
+        }
+      ]
+    }
+  ]
+}

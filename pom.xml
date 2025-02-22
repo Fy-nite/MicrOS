@@ -20,6 +20,9 @@
         <lwjgl.natives.windows>natives-windows</lwjgl.natives.windows>
         <lwjgl.natives.linux>natives-linux</lwjgl.natives.linux>
         <lwjgl.natives.macos>natives-macos</lwjgl.natives.macos>
+        <graalvm.version>23.1.1</graalvm.version>
+        <native.maven.plugin.version>0.9.19</native.maven.plugin.version>
+        <javafx.version>17</javafx.version>
     </properties>
     <build>
         <plugins>
@@ -61,6 +64,48 @@
                     <sdk>
                         <platform>28</platform>
                     </sdk>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+                <version>${native.maven.plugin.version}</version>
+                <configuration>
+                    <imageName>micros</imageName>
+                    <mainClass>org.Finite.MicrOS.Main</mainClass>
+                    <buildArgs>
+                        <buildArg>--no-fallback</buildArg>
+                        <!-- GUI Support -->
+                        <buildArg>-Djava.awt.headless=false</buildArg>
+                        <buildArg>--enable-all-security-services</buildArg>
+                        <buildArg>--allow-incomplete-classpath</buildArg>
+                        <!-- Runtime initialization -->
+                        <buildArg>--initialize-at-run-time=java.awt,javax.swing,sun.awt,sun.java2d,sun.font,com.sun.glass.utils.NativeLibLoader</buildArg>
+                        <!-- Tracing and debugging -->
+                        <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+                        <buildArg>-H:+PrintClassInitialization</buildArg>
+                        <buildArg>-H:Log=registerResource:</buildArg>
+                        <!-- Agent support -->
+                        <buildArg>-H:+AllowVMInspection</buildArg>
+                        <!-- JavaFX Support -->
+                     
+                        <buildArg>--initialize-at-build-time=com.sun.javafx.runtime.VersionInfo</buildArg>
+                        <buildArg>-H:IncludeResources=.*/.*\\.css$</buildArg>
+                        <buildArg>-H:IncludeResources=.*/.*\\.properties$</buildArg>
+                        <buildArg>-H:ReflectionConfigurationFiles=src/main/resources/META-INF/native-image/reflect-config.json</buildArg>
+                        <!-- Additional JavaFX configurations -->
+                        <buildArg>--enable-url-protocols=http,https</buildArg>
+                        <!-- Native library handling -->
+                        <buildArg>--link-at-build-time</buildArg>
+                        <buildArg>-H:+StaticExecutableWithDynamicLibC</buildArg>
+                        <buildArg>--enable-native-access=ALL-UNNAMED</buildArg>
+              
+
+                        <buildArg>--initialize-at-build-time=com.sun.javafx.font.freetype.OSPango</buildArg>
+                        <buildArg>--initialize-at-build-time=com.sun.javafx.font.freetype.OSFreetype</buildArg>
+                        <!-- Link native libraries -->
+                        <buildArg>-H:CLibraryPath=/usr/lib/x86_64-linux-gnu</buildArg>
+                    </buildArgs>
                 </configuration>
             </plugin>
         </plugins>
@@ -197,6 +242,33 @@
             <version>${jna.version}</version>
         </dependency>
 
+        <!-- GraalVM Native Image dependencies -->
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>graal-sdk</artifactId>
+            <version>${graalvm.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- JavaFX Platform-specific dependencies -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>linux</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>linux</classifier>
+        </dependency>
+        <!-- GraalVM Native Components -->
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>nativeimage</artifactId>
+            <version>${graalvm.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>
@@ -258,6 +330,50 @@
             <properties>
                 <lwjgl.natives>${lwjgl.natives.macos}</lwjgl.natives>
             </properties>
+        </profile>
+        <profile>
+            <id>native-linux</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <imageName>micros-linux</imageName>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>native-windows</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <imageName>micros-windows</imageName>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
     <name>MicrOS</name>

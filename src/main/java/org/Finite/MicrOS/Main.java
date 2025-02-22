@@ -13,8 +13,8 @@ import org.Finite.MicrOS.apps.AppType;      // Add this import
 import org.Finite.MicrOS.ui.Console;
 import org.Finite.MicrOS.util.AsmRunner;
 import org.finite.ModuleManager.ModuleInit;
-import org.Finite.MicrOS.ui.FontLoader;
-import org.Finite.MicrOS.ui.ErrorDialog;
+import org.Finite.MicrOS.Android.AndroidInitializer; // Add this import
+import org.Finite.MicrOS.ui.ErrorDialog; // Add this import
 
 import java.io.IOException;
 import javafx.application.Platform;
@@ -35,6 +35,7 @@ public class Main {
 
     private static WindowManager windowManager;
     private static final String VERSION = "1.0.0";
+    private static JDesktopPane desktop; // Define desktop here
 
     /**
      * Main method to set the look and feel and launch the desktop environment.
@@ -51,19 +52,6 @@ public class Main {
 
         try {
             commander.parse(args);
-            
-            // Load system fonts
-            FontLoader.loadResourceFont("SegoeUI", "/fonts/SegoeUI.ttf");
-            FontLoader.loadResourceFont("SegoeUI-Bold", "/fonts/SegoeUI-Bold.ttf");
-            FontLoader.loadResourceFont("JetBrainsMono", "/fonts/JetBrainsMono-Regular.ttf");
-            
-            // Set default UI font
-            UIManager.put("Button.font", FontLoader.getFont("SegoeUI", Font.PLAIN, 12));
-            UIManager.put("Label.font", FontLoader.getFont("SegoeUI", Font.PLAIN, 12));
-            UIManager.put("MenuItem.font", FontLoader.getFont("SegoeUI", Font.PLAIN, 12));
-            UIManager.put("Menu.font", FontLoader.getFont("SegoeUI", Font.PLAIN, 12));
-            UIManager.put("TextArea.font", FontLoader.getFont("JetBrainsMono", Font.PLAIN, 13));
-            UIManager.put("TextField.font", FontLoader.getFont("SegoeUI", Font.PLAIN, 12));
 
             if (cliArgs.isHelp()) {
                 commander.usage();
@@ -90,18 +78,26 @@ public class Main {
                 return;
             }
 
+            if (isAndroid()) {
+                AndroidInitializer androidInitializer = new AndroidInitializer();
+                androidInitializer.onCreate();
+            }
+
+            // Update fullscreen setting based on CLI argument
+            Settings settings = Settings.getInstance();
+            settings.setIsfullscreen(cliArgs.isFullscreen());
+
             // Normal startup
             // Initialize JavaFX platform
-            Platform.startup(() -> {});
+           // Platform.startup(() -> {});
             
             ModuleInit.initallmodules();
             
             // Initialize settings and apply look and feel
-            Settings settings = Settings.getInstance();
             UIManager.setLookAndFeel(settings.getLookAndFeel());
             
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
+            ErrorDialog.showError(desktop, "An error occurred during startup:", e);
             commander.usage();
             System.exit(1);
         }
@@ -117,17 +113,21 @@ public class Main {
             }
             System.out.println("Filesystem initialized successfully");
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,
-                "Failed to initialize filesystem: " + e.getMessage(),
-                "Initialization Error",
-                JOptionPane.ERROR_MESSAGE);
+            System.err.println("Failed to initialize filesystem: " + e.getMessage());
             System.exit(1);
         }
     }
-
+    public static String getOS() {
+        return System.getProperty("os.name");
+    }
     private static void startConsoleMode() {
         // TODO: Implement console-only mode
         System.out.println("Console mode not yet implemented");
+    }
+
+    private static boolean isAndroid() {
+        String osName = System.getProperty("os.name").toLowerCase();
+        return osName.contains("android");
     }
 
     /**
@@ -144,7 +144,7 @@ public class Main {
         GraphicsDevice gd = ge.getDefaultScreenDevice();
         
         // Make sure the frame is using the screen's display mode
-        if (gd.isFullScreenSupported()) {
+        if (gd.isFullScreenSupported() && Settings.getInstance().getIsfullscreen()) {
             gd.setFullScreenWindow(frame);
         } else {
             // Fallback if full screen is not supported
@@ -157,7 +157,7 @@ public class Main {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
-        JDesktopPane desktop = new JDesktopPane();
+        desktop = new JDesktopPane(); // Initialize desktop here
         VirtualFileSystem vfs = VirtualFileSystem.getInstance();
         windowManager = new WindowManager(desktop, vfs);
 
@@ -217,35 +217,7 @@ public class Main {
 
         frame.add(desktop, BorderLayout.CENTER); // Ensure desktop is added to the frame
 
-        try {
-            // Auto-start registered apps
-            SwingUtilities.invokeLater(() -> {
-                try {
-                    JInternalFrame maverFrame = windowManager.launchAppById("org.finite.micros.maver.launcher");
-                    if (maverFrame == null) {
-                        ErrorDialog.showError(desktop, "Failed to launch Maver App Launcher", 
-                            new RuntimeException("App launcher initialization failed"));
-                    }
-                } catch (Exception e) {
-                    ErrorDialog.showError(desktop, "Error during startup", e);
-                }
-            });
-
-            frame.setVisible(true);
-            
-        } catch (Exception e) {
-            // Show error dialog for initialization errors
-            JOptionPane.showMessageDialog(null,
-                "Critical error during initialization: " + e.getMessage(),
-                "Startup Error",
-                JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        // Create initial windows
-        windowManager.createWindow("main", "Main Console", true);
-        windowManager.writeToConsole("main", "MicroAssembly Interpreter v1.0");
+        frame.setVisible(true);
 
         // Auto-start registered apps
         SwingUtilities.invokeLater(() -> {
@@ -253,10 +225,11 @@ public class Main {
                 // Launch Maver
                 JInternalFrame maverFrame = windowManager.launchAppById("org.finite.micros.maver.launcher");
                 if (maverFrame == null) {
-                    System.err.println("Failed to launch Maver App Launcher");
+                    throw new Exception("Failed to launch Maver App Launcher");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                ErrorDialog.showError(desktop, "An error occurred while launching the app:", e);
             }
         });
 

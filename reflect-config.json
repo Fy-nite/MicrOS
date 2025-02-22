@@ -1,0 +1,134 @@
+[
+  {
+    "name": "java.awt.Color",
+    "methods": [
+      {"name": "<init>", "parameterTypes": ["int", "int", "int"]},
+      {"name": "getRGB", "parameterTypes": []}
+    ]
+  },
+  {
+    "name": "java.awt.Font",
+    "methods": [
+      {"name": "<init>", "parameterTypes": ["java.lang.String", "int", "int"]}
+    ]
+  },
+  {
+    "name": "javax.swing.JComponent",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []},
+      {"name": "setLayout", "parameterTypes": ["java.awt.LayoutManager"]}
+    ]
+  },
+  {
+    "name": "javax.swing.JPanel",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []},
+      {"name": "<init>", "parameterTypes": ["java.awt.LayoutManager"]}
+    ]
+  },
+  {
+    "name": "javax.swing.JFrame",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []},
+      {"name": "<init>", "parameterTypes": ["java.lang.String"]}
+    ]
+  },
+  {
+    "name": "java.awt.BorderLayout",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []}
+    ]
+  },
+  {
+    "name": "java.awt.GridBagLayout",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []}
+    ]
+  },
+  {
+    "name": "java.awt.FlowLayout",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []},
+      {"name": "<init>", "parameterTypes": ["int"]}
+    ]
+  },
+  {
+    "name": "sun.awt.X11.XWM",
+    "fields": [
+      {"name": "awt_wmgr"},
+      {"name": "INTRINSIC_TESTING"}
+    ],
+    "methods": [
+      {"name": "getWMID", "parameterTypes": []},
+      {"name": "<init>", "parameterTypes": []}
+    ]
+  },
+  {
+    "name": "sun.awt.X11.XToolkit",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []}
+    ]
+  },
+  {
+    "name": "sun.awt.X11.XBaseWindow",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []}
+    ]
+  },
+  {
+    "name": "sun.awt.X11.XRootWindow",
+    "fields": [
+      {"name": "instance"}
+    ],
+    "methods": [
+      {"name": "<init>", "parameterTypes": []}
+    ]
+  },
+  {
+    "name": "sun.awt.X11.XWindow",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []},
+      {"name": "getWindow", "parameterTypes": []}
+    ]
+  },
+  {
+    "name": "java.awt.GraphicsEnvironment",
+    "methods": [
+      {"name": "getLocalGraphicsEnvironment", "parameterTypes": []}
+    ]
+  },
+  {
+    "name": "sun.java2d.opengl.GLXGraphicsConfig",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []}
+    ]
+  },
+  {
+    "name": "sun.awt.X11.XlibWrapper",
+    "methods": [
+      {"name": "XOpenDisplay", "parameterTypes": ["long"]},
+      {"name": "XCloseDisplay", "parameterTypes": ["long"]}
+    ]
+  },
+  {
+    "name": "sun.awt.X11GraphicsConfig",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []},
+      {"name": "getDefaultConfig", "parameterTypes": []}
+    ]
+  },
+  {
+    "name": "sun.awt.X11.WindowPropertyGetter",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []},
+      {"name": "getWindowProperty", "parameterTypes": ["long", "long", "long", "boolean"]}
+    ]
+  },
+  {
+    "name": "sun.java2d.HeadlessGraphicsEnvironment",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []},
+      {"name": "isHeadless", "parameterTypes": []}
+    ]
+  }
+]

@@ -33,7 +33,7 @@ public abstract class MicrOSApp {
      */
     protected void reportError(String message, Throwable error) {
         if (windowManager != null) {
-            ErrorDialog.showError(windowManager.getDesktop(), message, error, this);
+            ErrorDialog.showError(windowManager.getDesktop(), message, error);
         } else {
             // Fallback if windowManager not initialized
             error.printStackTrace();
