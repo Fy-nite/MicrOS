@@ -22,6 +22,9 @@ import java.io.IOException;
 import javafx.application.Platform;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
@@ -159,34 +162,51 @@ public class Main {
      * Initializes and displays the desktop environment.
      */
     public static void Desktopenviroment() {
+        // Create and show splash screen first
+        splash = new SplashScreen();
+        splash.show();
+
+        // Add small delay before creating main window
+        Timer timer = new Timer(500, e -> {
+            ((Timer)e.getSource()).stop();
+            createMainWindow();
+        });
+        timer.start();
+    }
+
+    private static void createMainWindow() {
+        // Create main frame
         JFrame frame = new JFrame("MicrOS");
         frame.setUndecorated(true);
         
-        // Get the screen size
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice gd = ge.getDefaultScreenDevice();
-        
-        // Create desktop pane first
-        desktop = new JDesktopPane() {
-            @Override
-            public void addNotify() {
-                super.addNotify();
-                // Show splash screen after desktop is added to frame
-                SwingUtilities.invokeLater(() -> {
-                    splash = new SplashScreen();
-                    splash.showSplash(desktop, true);
-                    
-                    // Start initialization after splash is shown
-                    initializeSystem();
-                });
-            }
-        };
-        
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        desktop = new JDesktopPane();
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.setLayout(new BorderLayout());
         frame.add(desktop, BorderLayout.CENTER);
         
+        // Add shutdown hook
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                initiateShutdown();
+            }
+        });
+
+        // Register Alt+F4 handler
+        KeyStroke altF4 = KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_DOWN_MASK);
+        frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(altF4, "exit");
+        frame.getRootPane().getActionMap().put("exit", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                initiateShutdown();
+            }
+        });
+
         // Setup frame size
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice gd = ge.getDefaultScreenDevice();
+        
         if (gd.isFullScreenSupported() && Settings.getInstance().getIsfullscreen()) {
             frame.setVisible(true);
             gd.setFullScreenWindow(frame);
@@ -196,9 +216,66 @@ public class Main {
             frame.setBounds(bounds);
             frame.setVisible(true);
         }
+
+        // Start initialization after frame is visible
+        SwingUtilities.invokeLater(() -> {
+            initializeSystem();
+        });
     }
 
-    private static void initializeSystem() {
+    public static void initiateShutdown() {
+        // Create and show shutdown splash
+        splash = new SplashScreen();
+        splash.setShutdownMode();
+        splash.show();
+
+        // Create shutdown thread
+        Thread shutdownThread = new Thread(() -> {
+            try {
+                WindowManager wm = getWindowManager();
+                if (wm != null) {
+                    splash.setStatus("Stopping applications...");
+                    Thread.sleep(200); // Brief pause to show message
+                    
+                    // Get list of running apps before we start closing them
+                    java.util.List<String> runningApps = new java.util.ArrayList<>();
+                    for (JInternalFrame frame : wm.getDesktop().getAllFrames()) {
+                        MicrOSApp app = (MicrOSApp) frame.getClientProperty("app");
+                        if (app != null && app.getManifest() != null) {
+                            runningApps.add(app.getManifest().getName());
+                        }
+                    }
+
+                    // Close each app with status update
+                    for (String appName : runningApps) {
+                        splash.setStatus("Stopping " + appName + "...");
+                        Thread.sleep(100); // Brief pause between apps
+                    }
+
+                    splash.setStatus("Cleaning up processes...");
+                    ProcessManager.getInstance().closeout();
+                    Thread.sleep(200);
+
+                    splash.setStatus("Saving system state...");
+                    Thread.sleep(300);
+                }
+                
+                splash.setStatus("Goodbye!");
+                Thread.sleep(500);
+                
+                splash.disposeSplash();
+                System.exit(0);
+                
+            } catch (Exception e) {
+                System.err.println("Error during shutdown: " + e.getMessage());
+                System.exit(1);
+            }
+        });
+        
+        shutdownThread.start();
+    }
+
+    public static void initializeSystem() {
         try {
             splash.setStatus("Initializing virtual filesystem...");
             VirtualFileSystem vfs = VirtualFileSystem.getInstance();

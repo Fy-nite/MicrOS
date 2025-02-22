@@ -22,9 +22,16 @@ public class ProcessManager {
     private final Map<Integer, String> threadAppIds = new HashMap<>(); // Add this field
     private int nextThreadId = 1;
 
+    private static ProcessManager instance;
+
+    public static ProcessManager getInstance() {
+        return instance;
+    }
+
     public ProcessManager(Console console) {
         this.console = console;
         this.activeProcesses = new HashMap<>();
+        instance = this;
     }
 
     public int startProcess(String command) {
@@ -259,5 +266,41 @@ public class ProcessManager {
 
     public void cleanup() {
         killAllProcesses();
+    }
+
+    public void closeout() {
+        // First stop all app threads gracefully
+        for (Map.Entry<Integer, Thread> entry : appThreads.entrySet()) {
+            int threadId = entry.getKey();
+            String appId = threadAppIds.get(threadId);
+            if (appId != null) {
+                logShutdown("Stopping app: " + appId);
+                entry.getValue().interrupt();
+                try {
+                    entry.getValue().join(1000); // Wait up to 1 second for thread to stop
+                } catch (InterruptedException e) {
+                    // Ignore
+                }
+            }
+        }
+        appThreads.clear();
+        threadAppIds.clear();
+
+        // Then terminate any remaining processes
+        for (Map.Entry<Integer, Process> entry : activeProcesses.entrySet()) {
+            int pid = entry.getKey();
+            logShutdown("Terminating process: " + pid);
+            entry.getValue().destroyForcibly();
+        }
+        activeProcesses.clear();
+        
+        logShutdown("All processes terminated");
+    }
+
+    private void logShutdown(String message) {
+        if (console != null) {
+            console.appendText("[Shutdown] " + message + "\n", Color.YELLOW);
+        }
+        System.out.println("[Shutdown] " + message);
     }
 }

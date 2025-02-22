@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import org.Finite.MicrOS.Main;
 
 public class StartMenu extends JPopupMenu {
     private final WindowManager windowManager;
@@ -44,7 +45,7 @@ public class StartMenu extends JPopupMenu {
         
         // Power section
         add(createSection("Power"));
-        // add(createMenuItem("Exit", e -> , "🚪"));
+        add(createMenuItem("Shut Down", e -> Main.initiateShutdown(), "🔌"));
     }
 
     private JLabel createSection(String text) {

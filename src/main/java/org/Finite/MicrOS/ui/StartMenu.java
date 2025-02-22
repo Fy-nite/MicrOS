@@ -8,6 +8,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import org.Finite.MicrOS.apps.AppManifest;
+import org.Finite.MicrOS.ui.SplashScreen;
+import org.Finite.MicrOS.Main;
+import org.Finite.MicrOS.core.MessageBus;
+import org.Finite.MicrOS.core.Intent;
 import org.Finite.MicrOS.apps.AppType;
 
 public class StartMenu extends JPopupMenu {
@@ -55,7 +59,7 @@ public class StartMenu extends JPopupMenu {
         
         // Power section
         add(createSection("Power"));
-        add(createMenuItem("Exit", e -> System.exit(0), "🚪"));
+        add(createMenuItem("Exit", e -> Main.initiateShutdown(), "🚪"));
     }
 
     private JLabel createSection(String text) {
