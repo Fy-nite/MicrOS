@@ -6,6 +6,7 @@ import java.util.*;
 import javax.swing.SwingUtilities;
 
 import org.Finite.MicrOS.ui.Console;
+import org.finite.Common.common;
 
 public class ProcessManager {
 
@@ -18,6 +19,7 @@ public class ProcessManager {
     // Add new fields for thread management
     private final Map<Integer, Thread> appThreads = new HashMap<>();
     private final Map<Integer, String> threadNames = new HashMap<>();
+    private final Map<Integer, String> threadAppIds = new HashMap<>(); // Add this field
     private int nextThreadId = 1;
 
     public ProcessManager(Console console) {
@@ -154,29 +156,31 @@ public class ProcessManager {
         console.appendText("All processes and threads terminated\n", Color.YELLOW);
     }
 
+   
+
     /**
-     * Starts a new application thread with the given Runnable and name
+     * Starts a new application thread with the given Runnable and appId
      * @param runnable The Runnable to execute
-     * @param name Name of the thread/application
+     * @param appId ID of the app
      * @return The thread ID
      */
-    public int startAppThread(Runnable runnable, String name) {
+    public int startAppThread(Runnable runnable, String appId) {
         int threadId = nextThreadId++;
         Thread thread = new Thread(() -> {
             try {
-                console.appendText("[Thread " + threadId + "] Starting: " + name + "\n", Color.YELLOW);
+                common.print("[Thread " + threadId + "] Starting app: " + appId + "\n", Color.YELLOW);
                 runnable.run();
-                console.appendText("[Thread " + threadId + "] Completed: " + name + "\n", Color.GREEN);
+                common.print("[Thread " + threadId + "] Completed app: " + appId + "\n", Color.GREEN);
             } catch (Exception e) {
-                console.appendText("[Thread " + threadId + "] Error: " + e.getMessage() + "\n", Color.RED);
+                common.print("[Thread " + threadId + "] Error in app " + appId + ": " + e.getMessage() + "\n", Color.RED);
             } finally {
                 appThreads.remove(threadId);
-                threadNames.remove(threadId);
+                threadAppIds.remove(threadId);
             }
         });
         
         appThreads.put(threadId, thread);
-        threadNames.put(threadId, name);
+        threadAppIds.put(threadId, appId);
         thread.start();
         return threadId;
     }
@@ -190,9 +194,10 @@ public class ProcessManager {
         Thread thread = appThreads.get(threadId);
         if (thread != null) {
             thread.interrupt();
-            console.appendText("[Thread " + threadId + "] Terminated: " + threadNames.get(threadId) + "\n", Color.YELLOW);
+            String appId = threadAppIds.get(threadId);
+            console.appendText("[Thread " + threadId + "] Terminated app: " + appId + "\n", Color.YELLOW);
             appThreads.remove(threadId);
-            threadNames.remove(threadId);
+            threadAppIds.remove(threadId);
             return true;
         }
         console.appendText("No thread found with ID: " + threadId + "\n", Color.RED);
@@ -209,11 +214,11 @@ public class ProcessManager {
             console.appendText("Active application threads:\n", Color.CYAN);
             for (Map.Entry<Integer, Thread> entry : appThreads.entrySet()) {
                 int threadId = entry.getKey();
-                String name = threadNames.get(threadId);
+                String appId = threadAppIds.get(threadId);
                 console.appendText(
-                    String.format("TID: %d - %s (%s)\n", 
+                    String.format("TID: %d - App: %s (%s)\n", 
                         threadId, 
-                        name, 
+                        appId, 
                         entry.getValue().isAlive() ? "Running" : "Stopped"),
                     Color.WHITE
                 );

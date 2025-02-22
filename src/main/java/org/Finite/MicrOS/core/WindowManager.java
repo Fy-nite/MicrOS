@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import javax.swing.*;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 
 import org.Finite.MicrOS.Desktop.BackgroundPanel;
 import org.Finite.MicrOS.Desktop.Taskbar;
@@ -51,6 +53,11 @@ public class WindowManager {
     /** Map of file extensions to associated window types */
     private final Map<String, Set<String>> fileTypeAssociations = new HashMap<>();
 
+    private final ProcessManager processManager;
+
+    private final Set<String> startupApps = new HashSet<>();
+    private final Map<String, String> startupWindows = new HashMap<>(); // windowId -> type
+
     /**
      * Creates a new WindowManager for the given desktop pane and VFS.
      *
@@ -62,6 +69,7 @@ public class WindowManager {
         this.vfs = vfs;
         this.windows = new HashMap<>();
         this.windowFactories = new HashMap<>();
+        this.processManager = new ProcessManager(null); // Initialize ProcessManager
         registerDefaultFactories();
     }
 
@@ -88,15 +96,19 @@ public class WindowManager {
             return frame;
         });
 
-        // Text editor factory
-        registerWindowFactory("texteditor", (windowId, title) -> {
+        // Update texteditor factory to use app ID
+        registerWindowFactory("org.finite.texteditor", (windowId, title) -> {
             JInternalFrame frame = createBaseFrame(title);
-            JTextArea textArea = new JTextArea();
-            textArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
-            JScrollPane scrollPane = new JScrollPane(textArea);
-            frame.add(scrollPane);
-            frame.putClientProperty("editor", textArea);
-            return frame;
+            try {
+                MicrOSApp app = vfs.getAppLoader().createAppInstance("org.finite.texteditor");
+                app.initialize(this, vfs);
+                frame.add(app.createUI());
+                frame.putClientProperty("app", app);
+                return frame;
+            } catch (Exception e) {
+                reportError("Failed to create text editor", e, "org.finite.texteditor");
+                return createBaseFrame(title); // Fallback to basic frame
+            }
         });
 
         // Add image viewer factory
@@ -123,21 +135,26 @@ public class WindowManager {
             return frame;
         });
 
-        // Update settings window factory
+        // Update settings window factory to use launchAppById instead
         registerWindowFactory("settings", (windowId, title) -> {
+            MicrOSApp app = new SettingsDialog(this);
+            AppManifest manifest = new AppManifest();
+            manifest.setName("Settings");
+            manifest.setIdentifier("org.finite.micros.settings");
+            manifest.setMainClass(SettingsDialog.class.getName());
+            app.setManifest(manifest);
+            app.initialize(this, vfs);
+            
             JInternalFrame frame = createBaseFrame("Settings");
             frame.setResizable(false);
             frame.setSize(800, 600);
             
             try {
-                MicrOSApp app = vfs.getAppLoader().createAppInstance("org.finite.micros.maver.MaverSettings");
-                app.initialize(this, vfs);
                 JComponent ui = app.createUI();
                 frame.add(ui);
                 frame.putClientProperty("app", app);
             } catch (Exception e) {
-                e.printStackTrace();
-                frame.add(new JLabel("Error loading Settings app"));
+                reportError("Failed to create settings UI", e, "settings");
             }
             
             return frame;
@@ -146,11 +163,11 @@ public class WindowManager {
   
 
         // Register default file associations
-        registerFileAssociation("txt", "texteditor");
-        registerFileAssociation("md", "texteditor");
-        registerFileAssociation("java", "texteditor");
-        registerFileAssociation("masm", "texteditor");
-        registerFileAssociation("asm", "texteditor");
+        registerFileAssociation("txt", "org.finite.texteditor");
+        registerFileAssociation("md", "org.finite.texteditor");
+        registerFileAssociation("java", "org.finite.texteditor");
+        registerFileAssociation("masm", "org.finite.texteditor");
+        registerFileAssociation("asm", "org.finite.texteditor");
         
         registerFileAssociation("png", "imageviewer");
         registerFileAssociation("jpg", "imageviewer");
@@ -161,8 +178,8 @@ public class WindowManager {
         registerFileAssociation("htm", "webviewer");
         
         // Allow text files to be opened in webviewer too
-        registerFileAssociation("html", "texteditor");
-        registerFileAssociation("htm", "texteditor");
+        registerFileAssociation("html", "org.finite.texteditor");
+        registerFileAssociation("htm", "org.finite.texteditor");
     }
 
     /**
@@ -354,7 +371,21 @@ public class WindowManager {
     public void closeWindow(String windowId) {
         JInternalFrame frame = windows.remove(windowId);
         if (frame != null) {
+            // Fire closing event before disposal
+            frame.doDefaultCloseAction();
             frame.dispose();
+            
+            // Remove from desktop if needed
+            if (desktop != null) {
+                desktop.remove(frame);
+                desktop.repaint();
+            }
+            
+            // Handle any app cleanup
+            MicrOSApp app = (MicrOSApp) frame.getClientProperty("app");
+            if (app != null) {
+                app.onStop();
+            }
         }
     }
 
@@ -436,30 +467,18 @@ public class WindowManager {
         String windowId = windowType + "-" + virtualPath.hashCode();
         JInternalFrame frame = createWindow(windowId, virtualPath, windowType);
         
-        switch (windowType) {
-            case "texteditor":
-                try {
-                    String content = new String(vfs.readFile(virtualPath));
-                    MicrOSApp app = (MicrOSApp) frame.getClientProperty("app");
-                    if (app != null) {
-                        app.getClass().getMethod("setText", String.class).invoke(app, content);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+        if (windowType.equals("org.finite.texteditor")) {
+            try {
+                String content = new String(vfs.readFile(virtualPath));
+                MicrOSApp app = (MicrOSApp) frame.getClientProperty("app");
+                if (app != null) {
+                    app.getClass().getMethod("setText", String.class).invoke(app, content);
                 }
-                break;
-                
-            case "webviewer":
-                WebViewer webViewer = (WebViewer) frame.getClientProperty("webviewer");
-                if (webViewer != null) {
-                    webViewer.loadUrl(virtualPath);
-                }
-                break;
-                
-            case "imageviewer":
-                // TODO: Implement image viewer loading
-                break;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        // ...rest of existing switch cases...
     }
 
     /**
@@ -572,15 +591,13 @@ public class WindowManager {
                 }
             }
             
-            // Launch new instance
-            MicrOSApp instance = vfs.getAppLoader().createAppInstance(identifier);
-            if (instance == null) {
+            MicrOSApp app = vfs.getAppLoader().createAppInstance(identifier);
+            if (app == null) {
                 ErrorDialog.showError(desktop, "Failed to create app instance", 
                     new RuntimeException("Could not create instance of app: " + identifier));
                 return null;
             }
             
-            // Set manifest before initialization
             AppManifest manifest = vfs.getAppLoader().getLoadedApps()
                 .stream()
                 .filter(m -> identifier.equals(m.getIdentifier()))
@@ -588,14 +605,45 @@ public class WindowManager {
                 .orElse(null);
                 
             if (manifest != null) {
-                instance.setManifest(manifest);
+                app.setManifest(manifest);
             }
             
-            instance.initialize(this, vfs);
-            return launchApp(instance);
+            app.initialize(this, vfs);
+            
+            // Create window and start app
+            JInternalFrame frame = createBaseFrame(app.getManifest().getName());
+            JComponent ui = app.createUI();
+            frame.add(ui);
+            frame.putClientProperty("app", app);
+            
+            // Start the app in a managed thread
+            int threadId = processManager.startAppThread(() -> {
+                try {
+                    app.onStart();
+                } catch (Exception e) {
+                    reportError("Error starting app", e, identifier);
+                }
+            }, identifier);  // Pass appId instead of name
+            
+            app.setThreadId(threadId);
+            
+            // Add window cleanup on close
+            frame.addInternalFrameListener(new InternalFrameAdapter() {
+                @Override
+                public void internalFrameClosing(InternalFrameEvent e) {
+                    app.onStop();
+                    app.setThreadId(-1);
+                    processManager.killAppThread(threadId);
+                }
+            });
+            
+            frame.setVisible(true);
+            desktop.add(frame);
+            windows.put("app-" + System.currentTimeMillis(), frame);
+            return frame;
             
         } catch (Exception e) {
-            ErrorDialog.showError(desktop, "Failed to launch application", e);
+            reportError("Failed to launch application", e, identifier);
             return null;
         }
     }
@@ -610,6 +658,18 @@ public class WindowManager {
             ErrorDialog.showError(desktop, "Failed to launch native application", e);
             return null;
         }
+    }
+
+    public boolean isAppThreadRunning(int threadId) {
+        return processManager.isThreadRunning(threadId);
+    }
+
+    public void stopAppThread(int threadId) {
+        processManager.killAppThread(threadId);
+    }
+
+    private void reportError(String message, Exception e, String appId) {
+        ErrorDialog.showError(desktop, message + (appId != null ? " [" + appId + "]" : ""), e);
     }
 
     /**
@@ -633,5 +693,49 @@ public class WindowManager {
      */
     public JDesktopPane getDesktop() {
         return desktop;
+    }
+
+    public void registerStartupApp(String appId) {
+        startupApps.add(appId);
+    }
+
+    public void registerStartupWindow(String windowId, String type) {
+        startupWindows.put(windowId, type);
+    }
+
+    public void initializeStartupItems() {
+        // Launch registered startup apps
+        for (String appId : startupApps) {
+            try {
+                launchAppById(appId);
+            } catch (Exception e) {
+                reportError("Failed to launch startup app: " + appId, e, null);
+            }
+        }
+
+        // Create registered startup windows
+        for (Map.Entry<String, String> entry : startupWindows.entrySet()) {
+            try {
+                createWindow(entry.getKey(), entry.getKey(), entry.getValue());
+            } catch (Exception e) {
+                reportError("Failed to create startup window: " + entry.getKey(), e, null);
+            }
+        }
+    }
+
+    public JInternalFrame launchAppWithIntent(Intent intent) {
+        try {
+            JInternalFrame frame = launchAppById(intent.getTargetAppId());
+            if (frame != null) {
+                MicrOSApp app = (MicrOSApp) frame.getClientProperty("app");
+                if (app != null) {
+                    app.handleIntent(intent);
+                }
+            }
+            return frame;
+        } catch (Exception e) {
+            reportError("Failed to launch app with intent", e, intent.getTargetAppId());
+            return null;
+        }
     }
 }

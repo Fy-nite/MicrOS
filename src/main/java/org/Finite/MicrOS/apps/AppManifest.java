@@ -14,6 +14,7 @@ public class AppManifest {
     private AppPermissions permissions;
     private AppType appType = AppType.CUSTOM;
     private boolean pinToTaskbar = false;
+    private boolean startOnLaunch = false;
 
     public static class AppPermissions {
         public boolean fileSystemAccess;
@@ -66,5 +67,13 @@ public class AppManifest {
 
     public void setPinToTaskbar(boolean pinToTaskbar) {
         this.pinToTaskbar = pinToTaskbar;
+    }
+
+    public boolean isStartOnLaunch() {
+        return startOnLaunch;
+    }
+
+    public void setStartOnLaunch(boolean startOnLaunch) {
+        this.startOnLaunch = startOnLaunch;
     }
 }
