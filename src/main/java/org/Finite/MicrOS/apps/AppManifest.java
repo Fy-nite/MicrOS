@@ -15,6 +15,9 @@ public class AppManifest {
     private AppType appType = AppType.CUSTOM;
     private boolean pinToTaskbar = false;
     private boolean startOnLaunch = false;
+    private boolean isCLI = false;
+    private String cliCommand;  // Command to invoke the app from terminal
+    private String[] cliAliases = new String[0];  // Alternative command names
 
     public static class AppPermissions {
         public boolean fileSystemAccess;
@@ -76,4 +79,11 @@ public class AppManifest {
     public void setStartOnLaunch(boolean startOnLaunch) {
         this.startOnLaunch = startOnLaunch;
     }
+
+    public boolean isCLI() { return isCLI; }
+    public void setCLI(boolean cli) { this.isCLI = cli; }
+    public String getCLICommand() { return cliCommand; }
+    public void setCLICommand(String command) { this.cliCommand = command; }
+    public String[] getCLIAliases() { return cliAliases; }
+    public void setCLIAliases(String[] aliases) { this.cliAliases = aliases; }
 }

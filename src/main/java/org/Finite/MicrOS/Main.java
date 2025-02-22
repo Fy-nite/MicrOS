@@ -16,6 +16,7 @@ import org.finite.Common.common;
 import org.finite.ModuleManager.ModuleInit;
 import org.Finite.MicrOS.Android.AndroidInitializer; // Add this import
 import org.Finite.MicrOS.ui.ErrorDialog; // Add this import
+import org.Finite.MicrOS.ui.SplashScreen; // Add this import
 
 import java.io.IOException;
 import javafx.application.Platform;
@@ -38,6 +39,7 @@ public class Main {
     private static WindowManager windowManager;
     private static final String VERSION = "1.0.0";
     private static JDesktopPane desktop; // Define desktop here
+    private static SplashScreen splash;  // Add this field
 
     /**
      * Main method to set the look and feel and launch the desktop environment.
@@ -45,79 +47,85 @@ public class Main {
      * @param args Command-line arguments
      */
     public static void main(String[] args) {
-        LaunchOptions options = new LaunchOptions();
-        JCommander commander = JCommander.newBuilder()
-            .addObject(options)
-            .build();
-        commander.parse(args);
-
-        if (options.isHelp()) {
-            commander.usage();
-            return;
-        }
-
-        if (options.getAppId() != null) {
-            launchStandaloneApp(options.getAppId());
-        } else {
-            CommandLineArgs cliArgs = new CommandLineArgs();
-            commander = JCommander.newBuilder()
-                .addObject(cliArgs)
+        try {
+            LaunchOptions options = new LaunchOptions();
+            JCommander commander = JCommander.newBuilder()
+                .addObject(options)
                 .build();
-            
-            commander.setProgramName("MicrOS");
+            commander.parse(args);
 
-            try {
-                commander.parse(args);
-
-                if (cliArgs.isHelp()) {
-                    commander.usage();
-                    return;
-                }
-
-                if (cliArgs.isVersion()) {
-                    System.out.println("MicrOS version " + VERSION);
-                    return;
-                }
-
-                if (cliArgs.isDebug()) {
-                    // TODO: Enable debug logging
-                    System.setProperty("debug", "true");
-                }
-
-                if (cliArgs.isInit()) {
-                    initializeFilesystem(cliArgs.getConfigPath());
-                    return;
-                }
-
-                if (cliArgs.isConsoleOnly()) {
-                    startConsoleMode();
-                    return;
-                }
-
-                if (isAndroid()) {
-                    AndroidInitializer androidInitializer = new AndroidInitializer();
-                    androidInitializer.onCreate();
-                }
-
-                // Update fullscreen setting based on CLI argument
-                Settings settings = Settings.getInstance();
-                settings.setIsfullscreen(cliArgs.isFullscreen());
-
-                // Normal startup
-                // Initialize JavaFX platform
-               // Platform.startup(() -> {});
-                
-                ModuleInit.initallmodules();
-                
-                // Initialize settings and apply look and feel
-                UIManager.setLookAndFeel(settings.getLookAndFeel());
-                
-            } catch (Exception e) {
-                ErrorDialog.showError(desktop, "An error occurred during startup:", e);
+            if (options.isHelp()) {
                 commander.usage();
-                System.exit(1);
+                return;
             }
-            SwingUtilities.invokeLater(Main::Desktopenviroment);
+
+            if (options.getAppId() != null) {
+                launchStandaloneApp(options.getAppId());
+            } else {
+                CommandLineArgs cliArgs = new CommandLineArgs();
+                commander = JCommander.newBuilder()
+                    .addObject(cliArgs)
+                    .build();
+                
+                commander.setProgramName("MicrOS");
+
+                try {
+                    commander.parse(args);
+
+                    if (cliArgs.isHelp()) {
+                        commander.usage();
+                        return;
+                    }
+
+                    if (cliArgs.isVersion()) {
+                        System.out.println("MicrOS version " + VERSION);
+                        return;
+                    }
+
+                    if (cliArgs.isDebug()) {
+                        // TODO: Enable debug logging
+                        System.setProperty("debug", "true");
+                    }
+
+                    if (cliArgs.isInit()) {
+                        initializeFilesystem(cliArgs.getConfigPath());
+                        return;
+                    }
+
+                    if (cliArgs.isConsoleOnly()) {
+                        startConsoleMode();
+                        return;
+                    }
+
+                    if (isAndroid()) {
+                        AndroidInitializer androidInitializer = new AndroidInitializer();
+                        androidInitializer.onCreate();
+                    }
+
+                    // Update fullscreen setting based on CLI argument
+                    Settings settings = Settings.getInstance();
+                    settings.setIsfullscreen(cliArgs.isFullscreen());
+
+                    // Normal startup
+                    // Initialize JavaFX platform
+                   // Platform.startup(() -> {});
+                    
+                    ModuleInit.initallmodules();
+                    
+                    // Initialize settings and apply look and feel
+                    UIManager.setLookAndFeel(settings.getLookAndFeel());
+                    
+                } catch (Exception e) {
+                    ErrorDialog.showError(desktop, "An error occurred during startup:", e);
+                    commander.usage();
+                    System.exit(1);
+                }
+                SwingUtilities.invokeLater(Main::Desktopenviroment);
+            }
+        } catch (Exception e) {
+            // Use null parent since desktop isn't initialized yet
+            ErrorDialog.showError(null, "An error occurred during startup:", e);
+            System.exit(1);
         }
     }
 
@@ -152,69 +160,85 @@ public class Main {
      */
     public static void Desktopenviroment() {
         JFrame frame = new JFrame("MicrOS");
-        
-        // Set undecorated for borderless
         frame.setUndecorated(true);
         
         // Get the screen size
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
         
-        // Make sure the frame is using the screen's display mode
-        if (gd.isFullScreenSupported() && Settings.getInstance().getIsfullscreen()) {
-            gd.setFullScreenWindow(frame);
-        } else {
-            // Fallback if full screen is not supported
-            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-            // Set bounds to screen size
-            Rectangle bounds = ge.getMaximumWindowBounds();
-            frame.setBounds(bounds);
-        }
-
+        // Create desktop pane first
+        desktop = new JDesktopPane() {
+            @Override
+            public void addNotify() {
+                super.addNotify();
+                // Show splash screen after desktop is added to frame
+                SwingUtilities.invokeLater(() -> {
+                    splash = new SplashScreen();
+                    splash.showSplash(desktop, true);
+                    
+                    // Start initialization after splash is shown
+                    initializeSystem();
+                });
+            }
+        };
+        
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
+        frame.add(desktop, BorderLayout.CENTER);
+        
+        // Setup frame size
+        if (gd.isFullScreenSupported() && Settings.getInstance().getIsfullscreen()) {
+            frame.setVisible(true);
+            gd.setFullScreenWindow(frame);
+        } else {
+            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            Rectangle bounds = ge.getMaximumWindowBounds();
+            frame.setBounds(bounds);
+            frame.setVisible(true);
+        }
+    }
 
-        desktop = new JDesktopPane(); // Initialize desktop here
-        VirtualFileSystem vfs = VirtualFileSystem.getInstance();
-        windowManager = new WindowManager(desktop, vfs);
+    private static void initializeSystem() {
+        try {
+            splash.setStatus("Initializing virtual filesystem...");
+            VirtualFileSystem vfs = VirtualFileSystem.getInstance();
+            
+            splash.setStatus("Creating window manager...");
+            windowManager = new WindowManager(desktop, vfs);
+            
+            splash.setStatus("Setting up background...");
+            Settings settings = Settings.getInstance();
+            BackgroundPanel backgroundPanel = new BackgroundPanel(settings.getBackground());
+            backgroundPanel.setLayout(new BorderLayout());
+            desktop.add(backgroundPanel, JLayeredPane.FRAME_CONTENT_LAYER);
+            desktop.setLayer(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
+            backgroundPanel.setBounds(0, 0, desktop.getWidth(), desktop.getHeight());
+            
+            splash.setStatus("Creating taskbar...");
+            Taskbar taskbar = new Taskbar(windowManager);
+            desktop.getParent().add(taskbar, BorderLayout.SOUTH);
+            windowManager.setTaskbar(taskbar);
+            
+            // Register standard apps
+            splash.setStatus("Registering system applications...");
+            registerStandardApps(taskbar);
+            
+            // Launch startup apps
+            splash.setStatus("Launching startup applications...");
+            launchStartupApps();
+            
+            // Final cleanup
+            splash.setStatus("Startup complete");
+            Thread.sleep(500); // Brief pause to show completion
+            splash.disposeSplash();
+            
+        } catch (Exception e) {
+            splash.disposeSplash();
+            ErrorDialog.showError(desktop, "Error during system initialization:", e);
+        }
+    }
 
-        // Register ASM interpreter as a virtual program
-        vfs.registerProgram("asm", args -> {
-            if (args.length > 1) {
-                try {
-                    // Convert virtual path to absolute path
-                    String absolutePath = vfs.resolveVirtualPath(args[1]).toAbsolutePath().toString();
-                    String output = AsmRunner.RunASMFromFile(absolutePath);
-                    JInternalFrame mainConsole = windowManager.getWindow("main");
-                    if (mainConsole != null) {
-                        Console console = (Console) mainConsole.getClientProperty("console");
-                        if (console != null) {
-                            console.appendText(output, Color.WHITE);
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        // Use background from settings
-        Settings settings = Settings.getInstance();
-        BackgroundPanel backgroundPanel = new BackgroundPanel(settings.getBackground());
-        backgroundPanel.setLayout(new BorderLayout());
-        desktop.add(backgroundPanel, JLayeredPane.FRAME_CONTENT_LAYER);
-        desktop.setLayer(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
-        backgroundPanel.setBounds(0, 0, desktop.getWidth(), desktop.getHeight());
-        desktop.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                backgroundPanel.setBounds(0, 0, desktop.getWidth(), desktop.getHeight());
-            }
-        });
-
-        Taskbar taskbar = new Taskbar(windowManager);
-        frame.add(taskbar, BorderLayout.SOUTH);
-        windowManager.setTaskbar(taskbar);
-
+    private static void registerStandardApps(Taskbar taskbar) {
         // Register standard apps
         for (AppType appType : AppType.values()) {
             if (appType != AppType.CUSTOM && appType != AppType.DEFAULT) {
@@ -231,27 +255,19 @@ public class Main {
         windowManager.registerExecutableFileType("png", AppType.IMAGE_VIEWER.getIdentifier());
         windowManager.registerExecutableFileType("jpg", AppType.IMAGE_VIEWER.getIdentifier());
         windowManager.registerExecutableFileType("html", AppType.WEB_VIEWER.getIdentifier());
+    }
 
-        frame.add(desktop, BorderLayout.CENTER); // Ensure desktop is added to the frame
-
-        frame.setVisible(true);
-
-        // Auto-start registered apps
+    private static void launchStartupApps() {
         SwingUtilities.invokeLater(() -> {
             try {
-                // Launch Maver
                 JInternalFrame maverFrame = windowManager.launchAppById("org.finite.micros.maver.launcher");
                 if (maverFrame == null) {
                     throw new Exception("Failed to launch Maver App Launcher");
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                ErrorDialog.showError(desktop, "An error occurred while launching the app:", e);
+                ErrorDialog.showError(desktop, "Failed to launch startup applications:", e);
             }
         });
-
-        // Remove auto-start of text editor
-        // JInternalFrame editorFrame = windowManager.createWindow("editor1", "Text Editor", "texteditor");
     }
 
     /**

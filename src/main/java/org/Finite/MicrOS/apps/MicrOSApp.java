@@ -7,7 +7,7 @@ import org.Finite.MicrOS.core.VirtualFileSystem;
 import org.Finite.MicrOS.core.WindowManager;
 import org.Finite.MicrOS.ui.ErrorDialog;
 import org.Finite.MicrOS.core.MessageBus;
-
+import org.Finite.MicrOS.core.Intent;
 public abstract class MicrOSApp {
     protected WindowManager windowManager;
     protected VirtualFileSystem vfs;

@@ -13,30 +13,44 @@ public class SplashScreen extends JPanel {
     private JDesktopPane desktop;
     
     public SplashScreen() {
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(10, 10));
         setBackground(BG_COLOR);
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(40, 40, 40), 1),
+            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
         
-        // Logo/title
+        // Logo/title panel
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+        
         logoLabel = new JLabel("MicrOS", SwingConstants.CENTER);
         logoLabel.setFont(new Font("Segoe UI", Font.BOLD, 32));
         logoLabel.setForeground(TEXT_COLOR);
-        add(logoLabel, BorderLayout.CENTER);
+        headerPanel.add(logoLabel, BorderLayout.CENTER);
+        
+        // Version label
+        JLabel versionLabel = new JLabel("v1.0.0", SwingConstants.CENTER);
+        versionLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        versionLabel.setForeground(new Color(180, 180, 180));
+        headerPanel.add(versionLabel, BorderLayout.SOUTH);
+        
+        add(headerPanel, BorderLayout.CENTER);
         
         // Bottom panel for progress
         JPanel bottomPanel = new JPanel(new BorderLayout(5, 5));
         bottomPanel.setOpaque(false);
         
-        // Status label
         statusLabel = new JLabel("Starting...");
         statusLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         statusLabel.setForeground(TEXT_COLOR);
         bottomPanel.add(statusLabel, BorderLayout.NORTH);
         
-        // Progress bar
         progressBar = new JProgressBar();
         progressBar.setIndeterminate(true);
-        progressBar.setPreferredSize(new Dimension(300, 5));
+        progressBar.setPreferredSize(new Dimension(300, 3));
+        progressBar.setForeground(new Color(0, 150, 136));
+        progressBar.setBackground(new Color(40, 40, 40));
         bottomPanel.add(progressBar, BorderLayout.SOUTH);
         
         add(bottomPanel, BorderLayout.SOUTH);
