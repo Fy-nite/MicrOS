@@ -269,6 +269,23 @@
             <version>${graalvm.version}</version>
             <scope>provided</scope>
         </dependency>
+        
+        <!-- FlatLaf Dependencies -->
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf-intellij-themes</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf-extras</artifactId>
+            <version>3.2.1</version>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>

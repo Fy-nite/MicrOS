@@ -17,6 +17,9 @@ import org.finite.ModuleManager.ModuleInit;
 import org.Finite.MicrOS.Android.AndroidInitializer; // Add this import
 import org.Finite.MicrOS.ui.ErrorDialog; // Add this import
 import org.Finite.MicrOS.ui.SplashScreen; // Add this import
+import org.Finite.MicrOS.core.ProcessManager; // Add this import
+import org.Finite.MicrOS.apps.MicrOSApp;
+
 
 import java.io.IOException;
 import javafx.application.Platform;
@@ -29,10 +32,18 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
+import javax.swing.Timer;
+import javax.swing.SwingUtilities;
+import java.nio.file.*;
+import java.io.File;
 
 import com.beust.jcommander.JCommander;
 import org.Finite.MicrOS.cli.CommandLineArgs;
 import org.Finite.MicrOS.cli.LaunchOptions;
+
+// Add these imports at the top
+import com.formdev.flatlaf.*;
+import com.formdev.flatlaf.intellijthemes.*;
 
 /**
  * Main class for launching the MicrOS desktop environment.
@@ -51,6 +62,21 @@ public class Main {
      */
     public static void main(String[] args) {
         try {
+            // Add this at the beginning of main()
+            // Register FlatLaf themes
+
+            FlatLightLaf.setup();  // Set FlatLight as default
+            
+            // Register additional themes
+            UIManager.installLookAndFeel("FlatLaf Light", FlatLightLaf.class.getName());
+            UIManager.installLookAndFeel("FlatLaf Dark", FlatDarkLaf.class.getName());
+            UIManager.installLookAndFeel("FlatLaf IntelliJ", FlatIntelliJLaf.class.getName());
+            UIManager.installLookAndFeel("FlatLaf Darcula", FlatDarculaLaf.class.getName());
+
+            UIManager.installLookAndFeel("FlatLaf Arc Dark", FlatArcDarkIJTheme.class.getName());
+            UIManager.installLookAndFeel("FlatLaf Arc Dark Orange", FlatArcDarkOrangeIJTheme.class.getName());
+            
+            // Continue with existing code
             LaunchOptions options = new LaunchOptions();
             JCommander commander = JCommander.newBuilder()
                 .addObject(options)
@@ -62,7 +88,9 @@ public class Main {
                 return;
             }
 
-            if (options.getAppId() != null) {
+            if (options.getAppPath() != null) {
+                launchStandaloneAppFromPath(options.getAppPath());
+            } else if (options.getAppId() != null) {
                 launchStandaloneApp(options.getAppId());
             } else {
                 CommandLineArgs cliArgs = new CommandLineArgs();
@@ -406,6 +434,54 @@ public class Main {
             System.exit(2);
         } catch (Exception e) {
             common.print("Unexpected error while launching app", e);
+            if (frame != null) frame.dispose();
+            System.exit(1);
+        }
+    }
+
+    private static void launchStandaloneAppFromPath(String appPath) {
+        common.print("Initializing standalone app environment for path: " + appPath);
+        JFrame frame = null;
+        try {
+            frame = new JFrame("MicrOS App: " + appPath);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            
+            JDesktopPane desktop = new JDesktopPane();
+            frame.setContentPane(desktop);
+            
+            VirtualFileSystem vfs = VirtualFileSystem.getInstance();
+            WindowManager windowManager = new WindowManager(desktop, vfs);
+            vfs.getAppLoader().setWindowManager(windowManager);
+            
+            // Load app from custom path
+            File appFile = new File(appPath);
+            if (!appFile.isAbsolute()) {
+                appFile = new File(System.getProperty("user.dir"), appPath);
+            }
+            
+            if (!appFile.exists() || !appFile.getName().endsWith(".app")) {
+                throw new RuntimeException("Invalid .app path: " + appFile.getAbsolutePath());
+            }
+            
+            String appId = vfs.getAppLoader().loadAppFromPath(appFile);
+            JInternalFrame appFrame = windowManager.launchAppById(appId);
+            
+            if (appFrame != null) {
+                appFrame.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
+                    @Override
+                    public void internalFrameClosed(javax.swing.event.InternalFrameEvent e) {
+                        System.exit(0);
+                    }
+                });
+                
+                frame.setSize(800, 600);
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
+            } else {
+                throw new RuntimeException("Failed to create app window");
+            }
+        } catch (Exception e) {
+            common.print("Error launching app from path", e);
             if (frame != null) frame.dispose();
             System.exit(1);
         }

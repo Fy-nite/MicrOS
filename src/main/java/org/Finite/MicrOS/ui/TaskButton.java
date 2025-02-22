@@ -49,6 +49,22 @@ public class TaskButton extends JToggleButton {
         setBorder(new EmptyBorder(4, 8, 4, 8));
         setHorizontalAlignment(SwingConstants.LEFT);
         
+        setOpaque(true);
+        setBackground(new Color(45, 45, 45));
+        setForeground(new Color(220, 220, 220));
+        
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                setBackground(new Color(60, 60, 60));
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                setBackground(new Color(45, 45, 45));
+            }
+        });
+        
         setupListeners();
     }
 

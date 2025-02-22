@@ -101,6 +101,50 @@ public class AppLoader {
         System.out.println("Loaded app: " + appId + " with main class: " + manifest.getMainClass());
     }
 
+    public String loadAppFromPath(File appBundle) throws Exception {
+        if (!appBundle.isDirectory() || !appBundle.getName().endsWith(".app")) {
+            throw new IllegalArgumentException("Invalid app bundle: " + appBundle.getAbsolutePath());
+        }
+
+        File contentsDir = new File(appBundle, "Contents");
+        File manifestFile = new File(contentsDir, "manifest.json");
+        
+        if (!manifestFile.exists()) {
+            throw new IllegalArgumentException("Missing manifest in app bundle: " + appBundle.getAbsolutePath());
+        }
+
+        // Read and parse manifest
+        String jsonContent = new String(Files.readAllBytes(manifestFile.toPath()));
+        JSONObject json = new JSONObject(jsonContent);
+        AppManifest manifest = parseManifest(json);
+        
+        // Create class loader from Resources directory
+        File resourcesDir = new File(contentsDir, "Resources");
+        if (!resourcesDir.exists()) {
+            throw new IllegalArgumentException("Missing Resources directory in app bundle");
+        }
+
+        List<URL> urls = new ArrayList<>();
+        File[] jarFiles = resourcesDir.listFiles((dir, name) -> name.endsWith(".jar"));
+        if (jarFiles != null) {
+            for (File jar : jarFiles) {
+                urls.add(jar.toURI().toURL());
+            }
+        }
+        
+        URLClassLoader classLoader = new URLClassLoader(
+            urls.toArray(new URL[0]),
+            getClass().getClassLoader()
+        );
+        
+        // Register app
+        String appId = manifest.getIdentifier();
+        loadedApps.put(appId, manifest);
+        appClassLoaders.put(appId, classLoader);
+        
+        return appId;
+    }
+
     private AppManifest parseManifest(JSONObject json) {
         AppManifest manifest = new AppManifest();
         manifest.setName(json.getString("name"));

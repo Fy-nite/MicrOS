@@ -36,14 +36,22 @@ public class Taskbar extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         setPreferredSize(new Dimension(800, 40));
         
-        // Create gradient background
+        // Important: Make sure taskbar panel is opaque
+        setOpaque(true);
         setBackground(new Color(33, 33, 33));
         
         // Initialize components
         startArea = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         taskArea = new JPanel(new WrapLayout(FlowLayout.LEFT, 5, 2));
+        
+        // Make sure all panels are opaque and have proper background
+        startArea.setOpaque(true);
+        startArea.setBackground(new Color(33, 33, 33));
+        
+        taskArea.setOpaque(true);
         taskArea.setBackground(new Color(33, 33, 33));
         taskArea.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
+        
         systemTray = new SystemTray();
         clockPanel = new ClockPanel();
         startMenu = new StartMenu(windowManager);
@@ -72,6 +80,9 @@ public class Taskbar extends JPanel {
         startButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         startButton.setFocusPainted(false);
         startButton.setBorder(new EmptyBorder(5, 15, 5, 15));
+        startButton.setOpaque(true); // Make start button opaque
+        startButton.setBackground(new Color(45, 45, 45));
+        startButton.setForeground(new Color(220, 220, 220));
         
         // Custom button UI
         startButton.setUI(new MetalButtonUI() {
@@ -94,18 +105,20 @@ public class Taskbar extends JPanel {
     public void addWindow(String windowId, JInternalFrame frame) {
         if (!taskButtons.containsKey(windowId)) {
             TaskButton button = new TaskButton(frame);
+            button.setOpaque(true); // Make button opaque
             taskButtons.put(windowId, button);
             
             // Add button to task area with animation
             taskArea.add(button);
             button.setVisible(true);
             
-            // Animate button appearance
+            // Update animation to maintain opacity
             javax.swing.Timer timer = new javax.swing.Timer(10, null);
             float[] alpha = { 0.0f };
             timer.addActionListener(e -> {
                 alpha[0] += 0.1f;
-                button.setBackground(new Color(45, 45, 45, (int)(alpha[0] * 255)));
+                button.setBackground(new Color(45, 45, 45));
+                button.setForeground(new Color(220, 220, 220));
                 if (alpha[0] >= 1.0f) {
                     timer.stop();
                 }
