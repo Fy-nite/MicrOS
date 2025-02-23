@@ -1,7 +1,7 @@
-
-
-
-
-
-
-.idea/*.iml.classpath.project.settings/target/
+.idea/*
+.iml
+.classpath
+.project
+.settings/
+target/
+Resources/*
