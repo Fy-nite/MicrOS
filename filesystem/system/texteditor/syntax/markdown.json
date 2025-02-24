@@ -1,0 +1,33 @@
+{
+    "extensions": ["md", "markdown"],
+    "patterns": {
+        "headers": {
+            "regex": "^#{1,6}\\s.*$",
+            "color": "#569CD6"
+        },
+        "bold": {
+            "regex": "\\*\\*.*?\\*\\*|__.*?__",
+            "color": "#DCDCAA"
+        },
+        "italic": {
+            "regex": "\\*.*?\\*|_.*?_",
+            "color": "#CE9178"
+        },
+        "links": {
+            "regex": "\\[.*?\\]\\(.*?\\)",
+            "color": "#4EC9B0"
+        },
+        "codeBlocks": {
+            "regex": "```[\\s\\S]*?```|`.*?`",
+            "color": "#D16969"
+        },
+        "lists": {
+            "regex": "^[\\s]*[\\-\\*\\+]\\s|^[\\s]*\\d+\\.\\s",
+            "color": "#B5CE68"
+        },
+        "blockquotes": {
+            "regex": "^>\\s.*$",
+            "color": "#57A64A"
+        }
+    }
+}

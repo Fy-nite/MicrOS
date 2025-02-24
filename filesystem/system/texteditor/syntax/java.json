@@ -1,0 +1,25 @@
+{
+    "extensions": ["java"],
+    "patterns": {
+        "keywords": {
+            "regex": "\\b(public|private|protected|class|interface|void|int|String|boolean|return|if|else|for|while)\\b",
+            "color": "#569CD6"
+        },
+        "annotations": {
+            "regex": "@\\w+",
+            "color": "#DCDCAA"
+        },
+        "strings": {
+            "regex": "\"[^\"]*\"",
+            "color": "#CE9178"
+        },
+        "comments": {
+            "regex": "//.*$|/\\*[\\s\\S]*?\\*/",
+            "color": "#57A64A"
+        },
+        "numbers": {
+            "regex": "\\b\\d+\\b",
+            "color": "#B5CE68"
+        }
+    }
+}
