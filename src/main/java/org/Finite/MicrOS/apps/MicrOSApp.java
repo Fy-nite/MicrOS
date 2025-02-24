@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import org.Finite.MicrOS.core.VirtualFileSystem;
 import org.Finite.MicrOS.core.WindowManager;
 import org.Finite.MicrOS.ui.ErrorDialog;
+import org.Finite.MicrOS.util.AppLauncher;
 import org.Finite.MicrOS.core.MessageBus;
 import org.Finite.MicrOS.core.Intent;
 public abstract class MicrOSApp {
@@ -25,6 +26,9 @@ public abstract class MicrOSApp {
     
     public AppManifest getManifest() {
         return manifest;
+    }
+    protected boolean isRunningInMicrOS() {
+        return AppLauncher.isRunningInMicrOS();
     }
     
     public int getThreadId() {
