@@ -1,24 +1,27 @@
 package org.Finite.MicrOS.Files;
 
+import org.Finite.MicrOS.util.AppInstaller;
+import org.Finite.MicrOS.core.VirtualFileSystem;
+import org.Finite.MicrOS.core.WindowManager;
+
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import java.awt.dnd.*;
+import java.awt.datatransfer.DataFlavor;
+import java.nio.file.Files;
 import java.nio.file.*;
+import java.io.File;
+import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import org.Finite.MicrOS.*;
-import org.Finite.MicrOS.core.VirtualFileSystem;
-import org.Finite.MicrOS.core.WindowManager;
-import org.Finite.MicrOS.util.AsmRunner;
-import org.Finite.MicrOS.Files.*;
-import org.Finite.MicrOS.apps.ApplicationLauncher;
+import javax.swing.ImageIcon;
+
 
 public class FileManager extends JPanel {
 
-    private final ApplicationLauncher appLauncher;
     private JTable fileTable;
     private DefaultTableModel tableModel;
     private File currentDirectory;
@@ -28,13 +31,17 @@ public class FileManager extends JPanel {
     );
     private final VirtualFileSystem vfs;
     private final WindowManager windowManager;
+    private JLabel statusBar;
 
     public FileManager(WindowManager windowManager) {
-        this.appLauncher = new ApplicationLauncher(windowManager);
         this.vfs = VirtualFileSystem.getInstance();
         this.windowManager = windowManager;
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(10, 10)); // Add padding
+        setPreferredSize(new Dimension(800, 600)); // Set preferred size
         currentDirectory = vfs.getRootPath().toFile();
+
+        // Create status bar
+        createStatusBar();
 
         // Create toolbar
         createToolbar();
@@ -44,6 +51,30 @@ public class FileManager extends JPanel {
 
         // Load initial directory
         loadDirectory(currentDirectory);
+
+        // Add drag-and-drop support
+        new DropTarget(this, new DropTargetAdapter() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public void drop(DropTargetDropEvent dtde) {
+                try {
+                    dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                    List<File> droppedFiles = (List<File>) dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    for (File file : droppedFiles) {
+                        if (file.getName().endsWith(".zip")) {
+                            Path tempDir = Files.createTempDirectory("app_install");
+                            AppInstaller.extractZip(file, tempDir);
+                            Files.walk(tempDir)
+                                .filter(AppInstaller::isAppDirectory)
+                                .findFirst()
+                                .ifPresent(AppInstaller::installApp);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void openFile(File file) {
@@ -62,7 +93,7 @@ public class FileManager extends JPanel {
         toolbar.setFloatable(false);
 
         // Back button
-        JButton backButton = new JButton("←");
+        JButton backButton = new JButton("Back");
         backButton.addActionListener(e -> navigateUp());
 
         // Path field
@@ -72,23 +103,32 @@ public class FileManager extends JPanel {
         );
 
         // Refresh button
-        JButton refreshButton = new JButton("⟳");
+        JButton refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(e -> refresh());
 
         // New folder button
-        JButton newFolderButton = new JButton("New Folder");
+        JButton newFolderButton = new JButton("New folder");
         newFolderButton.addActionListener(e -> createNewFolder());
 
+        // New file button
+        JButton newFileButton = new JButton("New file");
+        newFileButton.addActionListener(e -> createNewFile());
+
         toolbar.add(backButton);
+        toolbar.addSeparator(new Dimension(5, 0));
         toolbar.add(pathField);
+        toolbar.addSeparator(new Dimension(5, 0));
         toolbar.add(refreshButton);
+        toolbar.addSeparator(new Dimension(5, 0));
         toolbar.add(newFolderButton);
+        toolbar.addSeparator(new Dimension(5, 0));
+        toolbar.add(newFileButton);
 
         add(toolbar, BorderLayout.NORTH);
     }
 
     private void createFileTable() {
-        String[] columns = { "Name", "Size", "Type", "Last Modified" };
+        String[] columns = { "", "Name", "Size", "Type", "Last Modified" };
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -98,6 +138,8 @@ public class FileManager extends JPanel {
 
         fileTable = new JTable(tableModel);
         fileTable.setShowGrid(false);
+        fileTable.setRowHeight(30);
+        fileTable.setIntercellSpacing(new Dimension(5, 5));
         fileTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         // Add popup menu
@@ -105,7 +147,7 @@ public class FileManager extends JPanel {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if (evt.getClickCount() == 2) {
                     int row = fileTable.rowAtPoint(evt.getPoint());
-                    String fileName = (String) tableModel.getValueAt(row, 0);
+                    String fileName = (String) tableModel.getValueAt(row, 1);
                     File selected = new File(currentDirectory, fileName);
                     if (selected.isDirectory()) {
                         navigateTo(selected);
@@ -133,7 +175,7 @@ public class FileManager extends JPanel {
             int row = fileTable.rowAtPoint(evt.getPoint());
             if (row >= 0) {
                 fileTable.setRowSelectionInterval(row, row);
-                String fileName = (String) tableModel.getValueAt(row, 0);
+                String fileName = (String) tableModel.getValueAt(row, 1);
                 File selected = new File(currentDirectory, fileName);
                 
                 if (!selected.isDirectory()) {
@@ -172,7 +214,40 @@ public class FileManager extends JPanel {
             menu.add(openWithMenu);
         }
         
+        // Add "Delete" item
+        JMenuItem deleteItem = new JMenuItem("Delete");
+        deleteItem.addActionListener(e -> deleteFile(file));
+        menu.add(deleteItem);
+
+        // Add "Rename" item
+        JMenuItem renameItem = new JMenuItem("Rename");
+        renameItem.addActionListener(e -> renameFile(file));
+        menu.add(renameItem);
+
         return menu;
+    }
+
+    private void deleteFile(File file) {
+        int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this file?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+        if (response == JOptionPane.YES_OPTION) {
+            if (file.delete()) {
+                refresh();
+            } else {
+                JOptionPane.showMessageDialog(this, "Could not delete file", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void renameFile(File file) {
+        String newName = JOptionPane.showInputDialog(this, "Enter new name:", file.getName());
+        if (newName != null && !newName.trim().isEmpty()) {
+            File newFile = new File(file.getParent(), newName);
+            if (file.renameTo(newFile)) {
+                refresh();
+            } else {
+                JOptionPane.showMessageDialog(this, "Could not rename file", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     private String getAppDisplayName(String appType) {
@@ -207,16 +282,21 @@ public class FileManager extends JPanel {
                 String modified = dateFormat.format(
                     new Date(file.lastModified())
                 );
+                ImageIcon icon = new ImageIcon(file.isDirectory() ? "Folder" : "File");
 
-                tableModel.addRow(new Object[] { name, size, type, modified });
+                tableModel.addRow(new Object[] { icon, name, size, type, modified });
             }
         }
+
+        updateStatusBar();
     }
 
     private void navigateTo(File directory) {
         if (directory.exists() && directory.isDirectory()) {
             loadDirectory(directory);
         }
+
+        updateStatusBar();
     }
 
     private void navigateUp() {
@@ -224,10 +304,13 @@ public class FileManager extends JPanel {
         if (parent != null && parent.getPath().startsWith(vfs.getRootPath().toString())) {
             navigateTo(parent);
         }
+
+        updateStatusBar();
     }
 
     private void refresh() {
         loadDirectory(currentDirectory);
+        updateStatusBar();
     }
 
     private void createNewFolder() {
@@ -241,6 +324,34 @@ public class FileManager extends JPanel {
                     JOptionPane.ERROR_MESSAGE);
             }
         }
+
+        updateStatusBar();
+    }
+
+    private void createNewFile() {
+        String fileName = JOptionPane.showInputDialog(this, "Enter file name:");
+        if (fileName != null && !fileName.trim().isEmpty()) {
+            String virtualPath = vfs.getVirtualPath(currentDirectory.toPath()) + "/" + fileName;
+            if (vfs.createFile(virtualPath)) {
+                refresh();
+            } else {
+                JOptionPane.showMessageDialog(this, "Could not create file", "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        updateStatusBar();
+    }
+
+    private void createStatusBar() {
+        statusBar = new JLabel("Ready");
+        add(statusBar, BorderLayout.SOUTH);
+    }
+
+    private void updateStatusBar() {
+        String path = currentDirectory.getAbsolutePath();
+        int itemCount = tableModel.getRowCount();
+        statusBar.setText(String.format("%s - %d item(s)", path, itemCount));
     }
 
     private String getFileExtension(File file) {
@@ -250,31 +361,5 @@ public class FileManager extends JPanel {
             return "File";
         }
         return name.substring(lastIndexOf + 1).toUpperCase();
-    }
-
-    private void runApp(File appDirectory) {
-        File mainFile = new File(appDirectory, "main.masm");
-        if (mainFile.exists()) {
-            Path masmfile = mainFile.toPath();
-            try {
-                String filepath = vfs.getVirtualPath(masmfile);
-                AsmRunner.RunASMFromFile(filepath);
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(this, "Error reading main.masm: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "main.masm not found in " + appDirectory.getName(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void runFile(File file) {
-        if (file.exists() && !file.isDirectory()) {
-            String ext = vfs.getFileExtension(file.getName());
-            if (ext.equals("masm")) {
-                runApp(file.getParentFile());
-            } else {
-                vfs.runFile(file);
-            }
-        }
     }
 }

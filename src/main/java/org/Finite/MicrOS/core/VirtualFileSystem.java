@@ -485,4 +485,9 @@ public class VirtualFileSystem {
     public AppLoader getAppLoader() {
         return appLoader;
     }
+
+    public boolean createFile(String virtualPath) {
+        // create file without content
+        return createFile(virtualPath, new byte[0]);
+    }
 }

@@ -8,18 +8,18 @@ import org.Finite.MicrOS.Desktop.Settings;
 import org.Finite.MicrOS.Desktop.Taskbar;
 import org.Finite.MicrOS.core.VirtualFileSystem;
 import org.Finite.MicrOS.core.WindowManager;
-import org.Finite.MicrOS.apps.AppManifest;  // Add this import
-import org.Finite.MicrOS.apps.AppType;      // Add this import
+import org.Finite.MicrOS.apps.AppManifest; 
+import org.Finite.MicrOS.apps.AppType;      
 import org.Finite.MicrOS.ui.Console;
 import org.Finite.MicrOS.util.AsmRunner;
 import org.finite.Common.common;
 import org.finite.ModuleManager.ModuleInit;
-import org.Finite.MicrOS.Android.AndroidInitializer; // Add this import
-import org.Finite.MicrOS.ui.ErrorDialog; // Add this import
-import org.Finite.MicrOS.ui.SplashScreen; // Add this import
-import org.Finite.MicrOS.core.ProcessManager; // Add this import
-import org.Finite.MicrOS.apps.MicrOSApp;
 
+import org.Finite.MicrOS.ui.ErrorDialog; 
+import org.Finite.MicrOS.ui.SplashScreen; 
+import org.Finite.MicrOS.core.ProcessManager; 
+import org.Finite.MicrOS.apps.MicrOSApp;
+import org.Finite.MicrOS.ui.SettingsDialog; 
 
 import java.io.IOException;
 import javafx.application.Platform;
@@ -54,6 +54,7 @@ public class Main {
     private static final String VERSION = "1.0.0";
     private static JDesktopPane desktop; // Define desktop here
     private static SplashScreen splash;  // Add this field
+    private static JFrame mainFrame; // Add this field
 
     /**
      * Main method to set the look and feel and launch the desktop environment.
@@ -128,10 +129,7 @@ public class Main {
                         return;
                     }
 
-                    if (isAndroid()) {
-                        AndroidInitializer androidInitializer = new AndroidInitializer();
-                        androidInitializer.onCreate();
-                    }
+             
 
                     // Update fullscreen setting based on CLI argument
                     Settings settings = Settings.getInstance();
@@ -191,7 +189,7 @@ public class Main {
      */
     public static void Desktopenviroment() {
         // Create and show splash screen first
-        splash = new SplashScreen();
+        splash = new SplashScreen(mainFrame); // Pass mainFrame reference
         splash.show();
 
         // Add small delay before creating main window
@@ -204,17 +202,17 @@ public class Main {
 
     private static void createMainWindow() {
         // Create main frame
-        JFrame frame = new JFrame("MicrOS");
-        frame.setUndecorated(true);
+        mainFrame = new JFrame("MicrOS"); // Initialize mainFrame
+        mainFrame.setUndecorated(true);
         
         desktop = new JDesktopPane();
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frame.setLayout(new BorderLayout());
-        frame.add(desktop, BorderLayout.CENTER);
+        mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        mainFrame.setLayout(new BorderLayout());
+        mainFrame.add(desktop, BorderLayout.CENTER);
         
         // Add shutdown hook
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frame.addWindowListener(new WindowAdapter() {
+        mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        mainFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 initiateShutdown();
@@ -223,8 +221,8 @@ public class Main {
 
         // Register Alt+F4 handler
         KeyStroke altF4 = KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_DOWN_MASK);
-        frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(altF4, "exit");
-        frame.getRootPane().getActionMap().put("exit", new AbstractAction() {
+        mainFrame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(altF4, "exit");
+        mainFrame.getRootPane().getActionMap().put("exit", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 initiateShutdown();
@@ -236,13 +234,13 @@ public class Main {
         GraphicsDevice gd = ge.getDefaultScreenDevice();
         
         if (gd.isFullScreenSupported() && Settings.getInstance().getIsfullscreen()) {
-            frame.setVisible(true);
-            gd.setFullScreenWindow(frame);
+            mainFrame.setVisible(true);
+            gd.setFullScreenWindow(mainFrame);
         } else {
-            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
             Rectangle bounds = ge.getMaximumWindowBounds();
-            frame.setBounds(bounds);
-            frame.setVisible(true);
+            mainFrame.setBounds(bounds);
+            mainFrame.setVisible(true);
         }
 
         // Start initialization after frame is visible
@@ -253,7 +251,7 @@ public class Main {
 
     public static void initiateShutdown() {
         // Create and show shutdown splash
-        splash = new SplashScreen();
+ 
         splash.setShutdownMode();
         splash.show();
 
@@ -363,16 +361,16 @@ public class Main {
     }
 
     private static void launchStartupApps() {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                JInternalFrame maverFrame = windowManager.launchAppById("org.finite.micros.maver.launcher");
-                if (maverFrame == null) {
-                    throw new Exception("Failed to launch Maver App Launcher");
-                }
-            } catch (Exception e) {
-                ErrorDialog.showError(desktop, "Failed to launch startup applications:", e);
-            }
-        });
+        // SwingUtilities.invokeLater(() -> {
+        //     try {
+        //         JInternalFrame maverFrame = windowManager.launchAppById("org.finite.micros.maver.launcher");
+        //         if (maverFrame == null) {
+        //             throw new Exception("Failed to launch Maver App Launcher");
+        //         }
+        //     } catch (Exception e) {
+        //         ErrorDialog.showError(desktop, "Failed to launch startup applications:", e);
+        //     }
+        // });
     }
 
     /**

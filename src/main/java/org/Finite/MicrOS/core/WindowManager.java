@@ -26,6 +26,8 @@ import org.Finite.MicrOS.util.AsmRunner;
 import org.Finite.MicrOS.apps.AppManifest;
 import org.Finite.MicrOS.ui.ErrorDialog;
 
+import org.Finite.MicrOS.ui.SettingsDialog;
+
 
 /**
  * Core window management class for MicrOS desktop environment.

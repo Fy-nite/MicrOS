@@ -39,3 +39,23 @@ build/
 
 *.jar
 *.war
+
+reflect-config.json
+reflection-config.json
+*.7z
+*.zip
+*.tar.gz
+*.tar
+*.gz
+*.rar
+*.tar.bz2
+*.tar.xz
+*.bz2
+*.xz
+*.exe
+*.msi
+*.bin
+*.tar.xz
+*.tar.gz
+*.tar.bz2
+*.tar

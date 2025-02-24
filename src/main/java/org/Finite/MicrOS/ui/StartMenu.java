@@ -49,11 +49,6 @@ public class StartMenu extends JPopupMenu {
         add(createAppMenuItem("Terminal", AppType.CONSOLE));
 
 
-        // hook up the button to the action listener
-        add(createMenuItem("TestnativeApp", e -> {
-            setVisible(false);
-            windowManager.launchNativeApp("env WINEPREFIX=\"/home/charlie/.wine\" wine-stable C:\\\\\\\\users\\\\\\\\Public\\\\\\\\Desktop\\\\\\\\CraftOS-PC.lnk");
-        }, "🚀"));
 
         addSeparator();
         

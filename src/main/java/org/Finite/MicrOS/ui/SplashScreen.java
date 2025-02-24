@@ -10,8 +10,10 @@ public class SplashScreen extends JPanel {
     private final Color BG_COLOR = new Color(25, 25, 25);
     private final Color TEXT_COLOR = new Color(220, 220, 220);
     private JFrame splashFrame;
+    private final JFrame mainWindow;
     
-    public SplashScreen() {
+    public SplashScreen(JFrame mainWindow) {
+        this.mainWindow = mainWindow;
         setLayout(new BorderLayout(10, 10));
         setBackground(BG_COLOR);
         setBorder(BorderFactory.createCompoundBorder(
@@ -87,7 +89,7 @@ public class SplashScreen extends JPanel {
         splashFrame.setUndecorated(true);
         splashFrame.add(this);
         splashFrame.pack();
-        splashFrame.setLocationRelativeTo(null);
+        splashFrame.setLocationRelativeTo(mainWindow); // Position relative to main window
     }
 
     public void show() {
