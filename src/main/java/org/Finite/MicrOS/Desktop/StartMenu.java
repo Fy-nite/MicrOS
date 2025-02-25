@@ -45,7 +45,7 @@ public class StartMenu extends JPopupMenu {
         
         // Power section
         add(createSection("Power"));
-        add(createMenuItem("Shut Down", e -> Main.initiateShutdown(), "🔌"));
+        add(createMenuItem("Shut Down", e -> Main.initiateShutdown(), "🚪"));
     }
 
     private JLabel createSection(String text) {
