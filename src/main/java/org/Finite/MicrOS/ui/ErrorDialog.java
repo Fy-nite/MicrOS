@@ -1,47 +1,40 @@
 package org.Finite.MicrOS.ui;
 
 import javax.swing.*;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
 import java.awt.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class ErrorDialog {
-    public static void showError(Component parent, String message, Throwable error) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            showErrorDialog(parent, message, error);
-        } else {
-            SwingUtilities.invokeLater(() -> showErrorDialog(parent, message, error));
+
+    public static void showError(JDesktopPane desktop, String message, Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+        String stackTrace = sw.toString();
+
+        JTextArea textArea = new JTextArea(stackTrace);
+        textArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(600, 400));
+
+        JInternalFrame errorFrame = new JInternalFrame("Error", true, true, true, true);
+        errorFrame.setLayout(new BorderLayout());
+        errorFrame.add(new JLabel(message), BorderLayout.NORTH);
+        errorFrame.add(scrollPane, BorderLayout.CENTER);
+        errorFrame.pack();
+        errorFrame.setVisible(true);
+
+        desktop.add(errorFrame);
+        try {
+            errorFrame.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {
+            e.printStackTrace();
         }
-    }
-    
-    private static void showErrorDialog(Component parent, String message, Throwable error) {
-        // If no parent component, create a temporary frame
-        if (parent == null) {
-            JFrame frame = new JFrame("Error");
-            frame.setUndecorated(true);
-            frame.setLocationRelativeTo(null);
-            showErrorInDialog(frame, message, error);
-            frame.dispose();
-        } else {
-            showErrorInDialog(parent, message, error);
-        }
-        
-        // Also print to console for logging
-        System.err.println(message);
-        if (error != null) {
-            error.printStackTrace();
-        }
-    }
-    
-    private static void showErrorInDialog(Component parent, String message, Throwable error) {
-        String fullMessage = message;
-        if (error != null) {
-            fullMessage += "\n\nError: " + error.getMessage();
-        }
-        
-        JOptionPane.showMessageDialog(
-            parent,
-            fullMessage,
-            "Error",
-            JOptionPane.ERROR_MESSAGE
-        );
     }
 }

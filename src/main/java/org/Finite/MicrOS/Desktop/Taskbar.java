@@ -1,12 +1,11 @@
 package org.Finite.MicrOS.Desktop;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.metal.MetalButtonUI;
 
 import org.Finite.MicrOS.core.WindowManager;
-import org.Finite.MicrOS.apps.AppManifest;  // Add this import
-import org.Finite.MicrOS.apps.AppType;      // Add this import
+import org.Finite.MicrOS.apps.AppManifest;
+import org.Finite.MicrOS.apps.AppType;
 import org.Finite.MicrOS.ui.ClockPanel;
 import org.Finite.MicrOS.ui.StartMenu;
 import org.Finite.MicrOS.ui.SystemTray;
@@ -27,69 +26,84 @@ public class Taskbar extends JPanel {
     private final SystemTray systemTray;
     private final ClockPanel clockPanel;
     
+    private static final Color TASKBAR_BG = new Color(28, 28, 32);
+    private static final Color BUTTON_BG = new Color(45, 45, 50);
+    private static final Color BUTTON_HOVER = new Color(60, 60, 65);
+    private static final Color BUTTON_ACTIVE = new Color(70, 70, 75);
+    private static final Color TEXT_COLOR = new Color(230, 230, 230);
+    
     public Taskbar(WindowManager windowManager) {
         this.windowManager = windowManager;
         this.taskButtons = new HashMap<>();
         
-        // Set up main panel
+        // Set up main panel with gradient background
         setLayout(new BorderLayout(5, 0));
-        setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        setPreferredSize(new Dimension(800, 40));
+        setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        setPreferredSize(new Dimension(800, 42));
         
-        // Important: Make sure taskbar panel is opaque
+        // Important: Make sure taskbar panel is opaque and has nice background
         setOpaque(true);
-        setBackground(new Color(33, 33, 33));
+        setBackground(TASKBAR_BG);
         
-        // Initialize components
-        startArea = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        taskArea = new JPanel(new WrapLayout(FlowLayout.LEFT, 5, 2));
+        // Initialize components with updated styling
+        startArea = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
+        taskArea = new JPanel(new WrapLayout(FlowLayout.LEFT, 6, 2));
         
         // Make sure all panels are opaque and have proper background
-        startArea.setOpaque(true);
-        startArea.setBackground(new Color(33, 33, 33));
-        
-        taskArea.setOpaque(true);
-        taskArea.setBackground(new Color(33, 33, 33));
-        taskArea.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
+        startArea.setOpaque(false);
+        taskArea.setOpaque(false);
+        taskArea.setBorder(BorderFactory.createEmptyBorder(2, 8, 2, 8));
         
         systemTray = new SystemTray();
         clockPanel = new ClockPanel();
         startMenu = new StartMenu(windowManager);
         
-        // Configure components
-        startArea.setOpaque(false);
-        taskArea.setOpaque(false);
-        
-        // Create and configure start button
-        JButton startButton = createStartButton();
-        startArea.add(startButton);
-        
         // Layout components
+        JButton startButton = initializeStartButton();
+        startArea.add(startButton);
         add(startArea, BorderLayout.WEST);
         add(taskArea, BorderLayout.CENTER);
         
-        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         rightPanel.setOpaque(false);
         rightPanel.add(systemTray);
+        rightPanel.add(Box.createHorizontalStrut(4));
         rightPanel.add(clockPanel);
         add(rightPanel, BorderLayout.EAST);
     }
 
-    private JButton createStartButton() {
+    private JButton initializeStartButton() {
         JButton startButton = new JButton("Start");
-        startButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        startButton.setFont(new Font("Segoe UI", Font.BOLD, 13));
         startButton.setFocusPainted(false);
-        startButton.setBorder(new EmptyBorder(5, 15, 5, 15));
-        startButton.setOpaque(true); // Make start button opaque
-        startButton.setBackground(new Color(45, 45, 45));
-        startButton.setForeground(new Color(220, 220, 220));
+        startButton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(50, 50, 55), 1),
+            BorderFactory.createEmptyBorder(6, 16, 6, 16)
+        ));
+        startButton.setOpaque(true);
+        startButton.setBackground(BUTTON_BG);
+        startButton.setForeground(TEXT_COLOR);
         
-        // Custom button UI
         startButton.setUI(new MetalButtonUI() {
             @Override
             protected void paintButtonPressed(Graphics g, AbstractButton b) {
-                g.setColor(new Color(60, 60, 60));
-                g.fillRect(0, 0, b.getWidth(), b.getHeight());
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(BUTTON_ACTIVE);
+                g2.fillRoundRect(0, 0, b.getWidth(), b.getHeight(), 6, 6);
+                g2.dispose();
+            }
+        });
+        
+        startButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                startButton.setBackground(BUTTON_HOVER);
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                startButton.setBackground(BUTTON_BG);
             }
         });
         
@@ -102,17 +116,30 @@ public class Taskbar extends JPanel {
         return startButton;
     }
 
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        GradientPaint gradient = new GradientPaint(
+            0, 0, new Color(33, 33, 37),
+            0, getHeight(), TASKBAR_BG
+        );
+        
+        g2.setPaint(gradient);
+        g2.fillRect(0, 0, getWidth(), getHeight());
+        g2.dispose();
+    }
+    
     public void addWindow(String windowId, JInternalFrame frame) {
         if (!taskButtons.containsKey(windowId)) {
             TaskButton button = new TaskButton(frame);
-            button.setOpaque(true); // Make button opaque
+            button.setOpaque(true);
             taskButtons.put(windowId, button);
             
-            // Add button to task area with animation
             taskArea.add(button);
             button.setVisible(true);
             
-            // Update animation to maintain opacity
             javax.swing.Timer timer = new javax.swing.Timer(10, null);
             float[] alpha = { 0.0f };
             timer.addActionListener(e -> {
@@ -144,11 +171,9 @@ public class Taskbar extends JPanel {
         String identifier = manifest.getIdentifier();
         AppType appType = manifest.getAppType();
         
-        // Create a custom internal frame for the pinned app
         JInternalFrame dummyFrame = new JInternalFrame(appName);
         dummyFrame.putClientProperty("pinned", true);
         
-        // Create a dummy app instance to store manifest
         MicrOSApp dummyApp = new MicrOSApp() {
             @Override public JComponent createUI() { return new JPanel(); }
             @Override public void onStart() {}
@@ -157,31 +182,36 @@ public class Taskbar extends JPanel {
         dummyApp.setManifest(manifest);
         dummyFrame.putClientProperty("app", dummyApp);
         
-        // Create TaskButton for pinned app
         TaskButton pinnedButton = new TaskButton(dummyFrame) {
+            {
+                setBackground(BUTTON_BG);
+                setForeground(TEXT_COLOR);
+                setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(50, 50, 55), 1),
+                    BorderFactory.createEmptyBorder(4, 12, 4, 12)
+                ));
+            }
+            
             @Override
             protected void handleClick() {
                 windowManager.createWindow("app-" + identifier, appName, appType.getIdentifier());
             }
         };
         
-        // Add to start area with same style as regular task buttons
+        pinnedButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                pinnedButton.setBackground(BUTTON_HOVER);
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                pinnedButton.setBackground(BUTTON_BG);
+            }
+        });
+        
         startArea.add(pinnedButton);
         revalidate();
         repaint();
-    }
-
-    // Deprecate old method but keep for compatibility
-    @Deprecated
-    public void addApp(String appName, String windowType) {
-        addAppFromManifest(createLegacyManifest(appName, windowType));
-    }
-
-    private AppManifest createLegacyManifest(String appName, String windowType) {
-        AppManifest manifest = new AppManifest();
-        manifest.setName(appName);
-        manifest.setIdentifier("legacy." + windowType + "." + appName.toLowerCase());
-        manifest.setAppType(AppType.fromIdentifier(windowType));
-        return manifest;
     }
 }

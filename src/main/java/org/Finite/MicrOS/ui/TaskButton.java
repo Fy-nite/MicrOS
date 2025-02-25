@@ -1,7 +1,6 @@
 package org.Finite.MicrOS.ui;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
 import org.Finite.MicrOS.apps.MicrOSApp;
@@ -9,8 +8,11 @@ import org.Finite.MicrOS.apps.AppManifest;
 
 public class TaskButton extends JToggleButton {
     private final JInternalFrame frame;
-    private final Color HOVER_COLOR = new Color(70, 70, 70);
-    private final Color SELECTED_COLOR = new Color(80, 80, 80);
+    private final Color HOVER_COLOR = new Color(70, 70, 75);
+    private final Color SELECTED_COLOR = new Color(80, 80, 85);
+    private final Color PINNED_BG = new Color(40, 40, 45);
+    private final Color DEFAULT_BG = new Color(50, 50, 55);
+    private final Color TEXT_COLOR = new Color(220, 220, 220);
     private boolean isHovered = false;
     private static final int ICON_SIZE = 24;
 
@@ -39,45 +41,40 @@ public class TaskButton extends JToggleButton {
         } else {
             setText(frame.getTitle());
         }
-
+        
+        // Setup button appearance
         setFocusPainted(false);
         setBorderPainted(false);
-        setBackground(new Color(45, 45, 45));
-        setForeground(Color.WHITE);
         setFont(new Font("Segoe UI", Font.PLAIN, 12));
         setPreferredSize(new Dimension(150, 32));
-        setBorder(new EmptyBorder(4, 8, 4, 8));
+        setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(35, 35, 40), 1),
+            BorderFactory.createEmptyBorder(4, 8, 4, 8)
+        ));
         setHorizontalAlignment(SwingConstants.LEFT);
         
         setOpaque(true);
-        setBackground(new Color(45, 45, 45));
-        setForeground(new Color(220, 220, 220));
-        
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                setBackground(new Color(60, 60, 60));
-            }
-            
-            @Override
-            public void mouseExited(MouseEvent e) {
-                setBackground(new Color(45, 45, 45));
-            }
-        });
+        setBackground(frame.getClientProperty("pinned") != null ? PINNED_BG : DEFAULT_BG);
+        setForeground(TEXT_COLOR);
         
         setupListeners();
     }
 
     private void setupListeners() {
         addActionListener(e -> handleClick());
+        
+        // Add hover effect with smooth transition
         addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseEntered(MouseEvent e) {
                 isHovered = true;
-                repaint();
+                startAnimation(true);
             }
+            
+            @Override
             public void mouseExited(MouseEvent e) {
                 isHovered = false;
-                repaint();
+                startAnimation(false);
             }
         });
         
@@ -91,12 +88,17 @@ public class TaskButton extends JToggleButton {
         frame.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent e) {
                 setSelected(true);
+                repaint();
             }
+            
             public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent e) {
                 setSelected(false);
+                repaint();
             }
+            
             public void internalFrameIconified(javax.swing.event.InternalFrameEvent e) {
                 setSelected(false);
+                repaint();
             }
         });
     }
@@ -123,23 +125,50 @@ public class TaskButton extends JToggleButton {
         }
     }
 
+    private void startAnimation(boolean mouseEntered) {
+        Color startColor = getBackground();
+        Color targetColor = mouseEntered ? HOVER_COLOR : 
+                          (frame.getClientProperty("pinned") != null ? PINNED_BG : DEFAULT_BG);
+        
+        Timer timer = new Timer(20, null);
+        float[] progress = {0f};
+        
+        timer.addActionListener(e -> {
+            progress[0] += 0.2f;
+            if (progress[0] >= 1f) {
+                setBackground(targetColor);
+                timer.stop();
+            } else {
+                Color currentColor = interpolateColor(startColor, targetColor, progress[0]);
+                setBackground(currentColor);
+            }
+            repaint();
+        });
+        
+        timer.start();
+    }
+
+    private Color interpolateColor(Color c1, Color c2, float ratio) {
+        int red = (int) (c1.getRed() * (1 - ratio) + c2.getRed() * ratio);
+        int green = (int) (c1.getGreen() * (1 - ratio) + c2.getGreen() * ratio);
+        int blue = (int) (c1.getBlue() * (1 - ratio) + c2.getBlue() * ratio);
+        return new Color(red, green, blue);
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
-        // Draw background
+        // Draw background with rounded corners based on hover state
         if (isSelected()) {
             g2.setColor(SELECTED_COLOR);
         } else if (isHovered) {
             g2.setColor(HOVER_COLOR);
         } else {
-            // Use slightly different color for pinned apps
-            g2.setColor(frame.getClientProperty("pinned") != null ? 
-                new Color(40, 40, 40) : 
-                new Color(50, 50, 50));
+            g2.setColor(getBackground());
         }
-        
         g2.fillRoundRect(2, 2, getWidth()-4, getHeight()-4, 6, 6);
 
         // Draw icon and text
@@ -148,13 +177,13 @@ public class TaskButton extends JToggleButton {
             FontMetrics fm = g2.getFontMetrics();
             int textX = ICON_SIZE + 12;
             int textY = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
-            g2.setColor(Color.WHITE);
+            g2.setColor(TEXT_COLOR);
             g2.drawString(getText(), textX, textY);
         } else {
             FontMetrics fm = g2.getFontMetrics();
             int x = 8;
             int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
-            g2.setColor(Color.WHITE);
+            g2.setColor(TEXT_COLOR);
             g2.drawString(getText(), x, y);
         }
 

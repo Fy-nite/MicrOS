@@ -9,29 +9,17 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.jar.*;
 import org.Finite.MicrOS.ui.ErrorDialog;
-import org.Finite.MicrOS.core.WindowManager;
-
 
 public class AppLoader {
     private final Map<String, AppManifest> loadedApps = new HashMap<>();
     private final Map<String, ClassLoader> appClassLoaders = new HashMap<>();
     private final String appDirectory;
-    private WindowManager windowManager; // Add WindowManager reference
 
     public AppLoader(String appDirectory) {
         this.appDirectory = appDirectory;
     }
 
-    // Add setter for WindowManager
-    public void setWindowManager(WindowManager windowManager) {
-        this.windowManager = windowManager;
-    }
-
     public void loadApps() {
-        // Load bundled system apps first
-        loadSystemApps();
-        
-        // Then load external apps
         File dir = new File(appDirectory);
         if (!dir.exists() || !dir.isDirectory()) return;
 
@@ -42,18 +30,6 @@ public class AppLoader {
                 ErrorDialog.showError(null, "Failed to load app: " + file.getName(), e);
             }
         }
-    }
-
-    private void loadSystemApps() {
-        // Register built-in settings app
-        AppManifest settingsManifest = new AppManifest();
-        settingsManifest.setName("Settings");
-        settingsManifest.setIdentifier("org.finite.micros.settings");
-        settingsManifest.setMainClass("org.Finite.MicrOS.ui.SettingsDialog");
-        settingsManifest.setVersion("1.0");
-        loadedApps.put(settingsManifest.getIdentifier(), settingsManifest);
-        
-        // Add any other system apps here
     }
 
     private void loadApp(File appBundle) throws Exception {
@@ -72,9 +48,10 @@ public class AppLoader {
         // Read manifest
         String jsonContent = new String(Files.readAllBytes(manifestFile.toPath()));
         JSONObject json = new JSONObject(jsonContent);
+        
         AppManifest manifest = parseManifest(json);
         
-        // Create class loader FIRST
+        // Create class loader for all JARs in Resources directory
         List<URL> urls = new ArrayList<>();
         File[] jarFiles = resourcesDir.listFiles((dir, name) -> name.endsWith(".jar"));
         if (jarFiles != null) {
@@ -88,61 +65,12 @@ public class AppLoader {
             getClass().getClassLoader()
         );
         
-        // Store app info using identifier
-        String appId = manifest.getIdentifier();
-        loadedApps.put(appId, manifest);
-        appClassLoaders.put(appId, classLoader);
+        // Store app info
+        loadedApps.put(manifest.getIdentifier(), manifest);
+        appClassLoaders.put(manifest.getIdentifier(), classLoader);
         
-        // Register for startup if needed and if WindowManager is available
-        if (json.optBoolean("startOnLaunch", false) && windowManager != null) {
-            windowManager.registerStartupApp(appId);
-        }
-        
-        System.out.println("Loaded app: " + appId + " with main class: " + manifest.getMainClass());
-    }
-
-    public String loadAppFromPath(File appBundle) throws Exception {
-        if (!appBundle.isDirectory() || !appBundle.getName().endsWith(".app")) {
-            throw new IllegalArgumentException("Invalid app bundle: " + appBundle.getAbsolutePath());
-        }
-
-        File contentsDir = new File(appBundle, "Contents");
-        File manifestFile = new File(contentsDir, "manifest.json");
-        
-        if (!manifestFile.exists()) {
-            throw new IllegalArgumentException("Missing manifest in app bundle: " + appBundle.getAbsolutePath());
-        }
-
-        // Read and parse manifest
-        String jsonContent = new String(Files.readAllBytes(manifestFile.toPath()));
-        JSONObject json = new JSONObject(jsonContent);
-        AppManifest manifest = parseManifest(json);
-        
-        // Create class loader from Resources directory
-        File resourcesDir = new File(contentsDir, "Resources");
-        if (!resourcesDir.exists()) {
-            throw new IllegalArgumentException("Missing Resources directory in app bundle");
-        }
-
-        List<URL> urls = new ArrayList<>();
-        File[] jarFiles = resourcesDir.listFiles((dir, name) -> name.endsWith(".jar"));
-        if (jarFiles != null) {
-            for (File jar : jarFiles) {
-                urls.add(jar.toURI().toURL());
-            }
-        }
-        
-        URLClassLoader classLoader = new URLClassLoader(
-            urls.toArray(new URL[0]),
-            getClass().getClassLoader()
-        );
-        
-        // Register app
-        String appId = manifest.getIdentifier();
-        loadedApps.put(appId, manifest);
-        appClassLoaders.put(appId, classLoader);
-        
-        return appId;
+        System.out.println("Loaded app: " + manifest.getIdentifier() + 
+                         " with main class: " + manifest.getMainClass());
     }
 
     private AppManifest parseManifest(JSONObject json) {
@@ -155,7 +83,6 @@ public class AppLoader {
         manifest.setIcon(json.optString("icon", ""));
         manifest.setCategory(json.optString("category", "Applications"));
         manifest.setMinimumOSVersion(json.optString("minimumOSVersion", "1.0"));
-        manifest.setStartOnLaunch(json.optBoolean("startOnLaunch", false));
         
         // Parse arrays
         if (json.has("authors")) {
@@ -189,17 +116,17 @@ public class AppLoader {
         return result;
     }
 
-    public MicrOSApp createAppInstance(String appId) throws Exception {
-        AppManifest manifest = loadedApps.get(appId);
+    public MicrOSApp createAppInstance(String appName) throws Exception {
+        AppManifest manifest = loadedApps.get(appName);
         if (manifest == null) {
-            throw new Exception("App not found with ID: " + appId);
+            throw new Exception("App not found: " + appName);
         }
 
-        ClassLoader loader = appClassLoaders.get(appId);
+        ClassLoader loader = appClassLoaders.get(appName);
         Class<?> mainClass = loader.loadClass(manifest.getMainClass());
         
         if (!MicrOSApp.class.isAssignableFrom(mainClass)) {
-            throw new Exception("Invalid app main class for app ID " + appId + ": " + manifest.getMainClass());
+            throw new Exception("Invalid app main class: " + manifest.getMainClass());
         }
 
         return (MicrOSApp) mainClass.getDeclaredConstructor().newInstance();
@@ -207,36 +134,5 @@ public class AppLoader {
 
     public Collection<AppManifest> getLoadedApps() {
         return loadedApps.values();
-    }
-
-    public void loadAppById(String appId) {
-        // Check system apps first
-        if (loadedApps.containsKey(appId)) {
-            return; // Already loaded
-        }
-
-        // Look in apps directory
-        File dir = new File(appDirectory);
-        if (!dir.exists() || !dir.isDirectory()) {
-            throw new RuntimeException("Apps directory not found");
-        }
-
-        // Find app bundle with matching ID
-        for (File appBundle : dir.listFiles((d, name) -> name.endsWith(".app"))) {
-            try {
-                File manifestFile = new File(new File(appBundle, "Contents"), "manifest.json");
-                if (manifestFile.exists()) {
-                    JSONObject json = new JSONObject(new String(Files.readAllBytes(manifestFile.toPath())));
-                    if (appId.equals(json.getString("identifier"))) {
-                        loadApp(appBundle);
-                        return;
-                    }
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to load app " + appId, e);
-            }
-        }
-        
-        throw new RuntimeException("App not found: " + appId);
     }
 }
