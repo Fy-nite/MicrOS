@@ -4,6 +4,10 @@ import javax.swing.*;
 import javax.swing.text.*;
 
 import org.Finite.MicrOS.core.VirtualFileSystem;
+import org.Finite.MicrOS.core.WindowManager;
+import org.Finite.MicrOS.ui.terminal.InternalConsoleHandler;
+import org.Finite.MicrOS.ui.terminal.TerminalHandler;
+import org.Finite.MicrOS.ui.terminal.TerminalHandlerFactory;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -17,6 +21,8 @@ public class Console extends JTextPane {
     private int historyIndex;
     private final int maxHistorySize = 1000;
     private int inputStart;
+    private TerminalHandler terminalHandler;
+    private WindowManager windowManager;
     
     // Colors for different elements
     private static final Color BG_COLOR = new Color(25, 25, 25);
@@ -27,6 +33,11 @@ public class Console extends JTextPane {
     private static final Color INFO_COLOR = new Color(80, 180, 255);
     
     public Console() {
+        this(null);
+    }
+    
+    public Console(WindowManager windowManager) {
+        this.windowManager = windowManager;
         styleContext = StyleContext.getDefaultStyleContext();
         commandHistory = new ArrayList<>();
         historyIndex = 0;
@@ -39,6 +50,14 @@ public class Console extends JTextPane {
         
         // Create command processor
         commandProcessor = new CommandProcessor(this, VirtualFileSystem.getInstance());
+        
+        // Initialize terminal handler
+        if (windowManager != null) {
+            TerminalHandlerFactory factory = new TerminalHandlerFactory(windowManager);
+            terminalHandler = factory.getDefaultTerminalHandler("MicrOS Terminal", this);
+        } else {
+            terminalHandler = new InternalConsoleHandler(this, "MicrOS Terminal");
+        }
         
         // Initialize with greeting
         SwingUtilities.invokeLater(() -> {
@@ -91,6 +110,60 @@ public class Console extends JTextPane {
         });
     }
 
+    /**
+     * Set the WindowManager for this console
+     * 
+     * @param windowManager WindowManager instance
+     */
+    public void setWindowManager(WindowManager windowManager) {
+        this.windowManager = windowManager;
+        
+        // Update terminal handler if needed
+        if (windowManager != null && terminalHandler instanceof InternalConsoleHandler) {
+            TerminalHandlerFactory factory = new TerminalHandlerFactory(windowManager);
+            terminalHandler = factory.getDefaultTerminalHandler("MicrOS Terminal", this);
+        }
+    }
+    
+    /**
+     * Change the terminal handler to use
+     * 
+     * @param handler The new terminal handler to use
+     */
+    public void setTerminalHandler(TerminalHandler handler) {
+        this.terminalHandler = handler;
+    }
+    
+    /**
+     * Get the current terminal handler
+     * 
+     * @return The current terminal handler
+     */
+    public TerminalHandler getTerminalHandler() {
+        return terminalHandler;
+    }
+
+    /**
+     * Show the application chooser dialog to select a terminal application
+     * 
+     * @return True if terminal selection changed, false otherwise
+     */
+    public boolean selectTerminal() {
+        if (windowManager == null) {
+            return false;
+        }
+        
+        TerminalHandlerFactory factory = new TerminalHandlerFactory(windowManager);
+        TerminalHandler newHandler = factory.createTerminalHandler("MicrOS Terminal", this, this);
+        
+        if (newHandler != null && !newHandler.getType().equals(terminalHandler.getType())) {
+            terminalHandler = newHandler;
+            return true;
+        }
+        
+        return false;
+    }
+
     private void handleKeyPress(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
             e.consume();
@@ -121,7 +194,13 @@ public class Console extends JTextPane {
     }
 
     private void processCommand(String command) {
-        commandProcessor.processCommand(command);
+        // Use terminal handler to execute the command
+        if (terminalHandler != null) {
+            terminalHandler.executeCommand(command);
+        } else {
+            // Fallback to direct execution via CommandProcessor
+            commandProcessor.processCommand(command);
+        }
         showPrompt();
     }
 
@@ -195,7 +274,22 @@ public class Console extends JTextPane {
         });
     }
 
+    @Override
+    public void setCaretPosition(int pos) {
+        try {
+            super.setCaretPosition(pos);
+        } catch (IllegalArgumentException e) {
+            super.setCaretPosition(getDocument().getLength());
+        }
+    }
+
     public void appendText(String text, Color color) {
+        if (terminalHandler != null && !(terminalHandler instanceof InternalConsoleHandler)) {
+            // If using an external terminal, we might not need to append text
+            terminalHandler.appendText(text);
+            return;
+        }
+        
         try {
             getDocument().insertString(getDocument().getLength(), text,
                     styleContext.addAttribute(SimpleAttributeSet.EMPTY, 
@@ -207,6 +301,10 @@ public class Console extends JTextPane {
     }
 
     public void clear() {
+        if (terminalHandler != null) {
+            terminalHandler.clear();
+        }
+        
         try {
             getDocument().remove(0, getDocument().getLength());
             inputStart = 0;
@@ -217,6 +315,10 @@ public class Console extends JTextPane {
     }
 
     public void setPrompt(String prompt) {
+        if (terminalHandler != null) {
+            terminalHandler.setPrompt(prompt);
+        }
+        
         try {
             // Clear the current line
             int lineStart = getDocument().getDefaultRootElement()

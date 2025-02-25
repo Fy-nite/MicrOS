@@ -8,6 +8,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -19,15 +20,14 @@ import org.Finite.MicrOS.Desktop.BackgroundPanel;
 import org.Finite.MicrOS.Desktop.Taskbar;
 import org.Finite.MicrOS.Files.FileManager;
 import org.Finite.MicrOS.apps.MicrOSApp;
+import org.Finite.MicrOS.apps.JavaFXApp;
+import org.Finite.MicrOS.ui.ApplicationChooserDialog;
 import org.Finite.MicrOS.ui.Console;
-import org.Finite.MicrOS.ui.SettingsDialog;
 import org.Finite.MicrOS.ui.WebViewer;
 import org.Finite.MicrOS.util.AsmRunner;
 import org.Finite.MicrOS.apps.AppManifest;
 import org.Finite.MicrOS.ui.ErrorDialog;
-
 import org.Finite.MicrOS.ui.SettingsDialog;
-
 
 /**
  * Core window management class for MicrOS desktop environment.
@@ -60,6 +60,18 @@ public class WindowManager {
     private final Set<String> startupApps = new HashSet<>();
     private final Map<String, String> startupWindows = new HashMap<>(); // windowId -> type
 
+    /** Application association manager */
+    private final ApplicationAssociationManager appAssociationManager;
+
+    static {
+        // Initialize JavaFX platform
+        try {
+            javafx.application.Platform.startup(() -> {});
+        } catch (IllegalStateException e) {
+            // Platform already initialized, ignore
+        }
+    }
+
     /**
      * Creates a new WindowManager for the given desktop pane and VFS.
      *
@@ -72,6 +84,7 @@ public class WindowManager {
         this.windows = new HashMap<>();
         this.windowFactories = new HashMap<>();
         this.processManager = new ProcessManager(null); // Initialize ProcessManager
+        this.appAssociationManager = new ApplicationAssociationManager(vfs);
         registerDefaultFactories();
     }
 
@@ -162,14 +175,29 @@ public class WindowManager {
             return frame;
         });
 
-  
+        // Register default JavaFX app factory
+        registerWindowFactory("javafx-app", (windowId, title) -> {
+            JInternalFrame frame = createBaseFrame(title);
+            try {
+                MicrOSApp app = vfs.getAppLoader().createAppInstance(windowId);
+                if (app instanceof JavaFXApp) {
+                    app.initialize(this, vfs);
+                    frame.add(app.createUI());
+                    frame.putClientProperty("app", app);
+                }
+                return frame;
+            } catch (Exception e) {
+                reportError("Failed to create JavaFX app", e, windowId);
+                return createBaseFrame(title);
+            }
+        });
 
         // Register default file associations
-        registerFileAssociation("txt", "org.finite.texteditor");
-        registerFileAssociation("md", "org.finite.texteditor");
-        registerFileAssociation("java", "org.finite.texteditor");
-        registerFileAssociation("masm", "org.finite.texteditor");
-        registerFileAssociation("asm", "org.finite.texteditor");
+        registerFileAssociation("txt", "org.finite.micros.texteditor.fx");
+        registerFileAssociation("md", "org.finite.micros.texteditor.fx");
+        registerFileAssociation("java", "org.finite.micros.texteditor.fx");
+        registerFileAssociation("masm", "org.finite.micros.texteditor.fx");
+        registerFileAssociation("asm", "org.finite.micros.texteditor.fx");
         
         registerFileAssociation("png", "imageviewer");
         registerFileAssociation("jpg", "imageviewer");
@@ -182,6 +210,86 @@ public class WindowManager {
         // Allow text files to be opened in webviewer too
         registerFileAssociation("html", "org.finite.texteditor");
         registerFileAssociation("htm", "org.finite.texteditor");
+
+        // Register default file associations in app association manager
+        registerDefaultApplicationAssociations();
+    }
+
+    /**
+     * Registers default application associations for common file types
+     */
+    private void registerDefaultApplicationAssociations() {
+        // Text editor associations
+        ApplicationAssociation textEditorApp = new ApplicationAssociation(
+            "org.finite.micros.texteditor.fx", 
+            "Text Editor", 
+            "MicrOS Text Editor", 
+            "/system/icons/texteditor.png",
+            true
+        );
+        
+        appAssociationManager.registerFileTypeAssociation("txt", textEditorApp);
+        appAssociationManager.registerFileTypeAssociation("md", textEditorApp);
+        appAssociationManager.registerFileTypeAssociation("java", textEditorApp);
+        appAssociationManager.registerFileTypeAssociation("asm", textEditorApp);
+        appAssociationManager.registerFileTypeAssociation("masm", textEditorApp);
+        appAssociationManager.registerFileTypeAssociation("html", textEditorApp);
+        appAssociationManager.registerFileTypeAssociation("htm", textEditorApp);
+        
+        // Image viewer associations
+        ApplicationAssociation imageViewerApp = new ApplicationAssociation(
+            "imageviewer", 
+            "Image Viewer", 
+            "MicrOS Image Viewer", 
+            "/system/icons/imageviewer.png",
+            true
+        );
+        
+        appAssociationManager.registerFileTypeAssociation("png", imageViewerApp);
+        appAssociationManager.registerFileTypeAssociation("jpg", imageViewerApp);
+        appAssociationManager.registerFileTypeAssociation("jpeg", imageViewerApp);
+        appAssociationManager.registerFileTypeAssociation("gif", imageViewerApp);
+        
+        // Web viewer associations
+        ApplicationAssociation webViewerApp = new ApplicationAssociation(
+            "webviewer", 
+            "Web Viewer", 
+            "MicrOS Web Browser", 
+            "/system/icons/webviewer.png",
+            true
+        );
+        
+        appAssociationManager.registerFileTypeAssociation("html", webViewerApp);
+        appAssociationManager.registerFileTypeAssociation("htm", webViewerApp);
+        
+        // Terminal action association
+        ApplicationAssociation internalTerminalApp = new ApplicationAssociation(
+            "console", 
+            "Internal Terminal", 
+            "Built-in MicrOS Terminal", 
+            "/system/icons/terminal.png",
+            true
+        );
+        
+        ApplicationAssociation externalKonsoleApp = new ApplicationAssociation(
+            "external:konsole", 
+            "Konsole", 
+            "KDE Terminal Emulator", 
+            "/system/icons/konsole.png",
+            false
+        );
+        
+        ApplicationAssociation externalGnomeTerminalApp = new ApplicationAssociation(
+            "external:gnome-terminal", 
+            "GNOME Terminal", 
+            "GNOME Terminal Emulator", 
+            "/system/icons/gnome-terminal.png",
+            false
+        );
+        
+        appAssociationManager.registerActionAssociation("terminal", internalTerminalApp);
+        appAssociationManager.registerActionAssociation("terminal", externalKonsoleApp);
+        appAssociationManager.registerActionAssociation("terminal", externalGnomeTerminalApp);
     }
 
     /**
@@ -460,16 +568,132 @@ public class WindowManager {
     }
 
     /**
+     * Opens a file using the default associated application, or prompts user to choose
+     * 
+     * @param virtualPath Path to the file in the VFS
+     * @param parentComponent Parent component for dialogs
+     * @return The opened window frame or null if canceled or failed
+     */
+    public JInternalFrame openFile(String virtualPath, Component parentComponent) {
+        String extension = vfs.getFileExtension(virtualPath).toLowerCase();
+        String fileName = virtualPath.substring(virtualPath.lastIndexOf('/') + 1);
+        
+        List<ApplicationAssociation> associations = appAssociationManager.getFileTypeAssociations(extension);
+        
+        if (associations.isEmpty()) {
+            // No registered applications
+            int option = JOptionPane.showConfirmDialog(
+                parentComponent,
+                "No applications registered for this file type. Would you like to open it with Text Editor?",
+                "Open File",
+                JOptionPane.YES_NO_OPTION
+            );
+            
+            if (option == JOptionPane.YES_OPTION) {
+                return openFileWith(virtualPath, "org.finite.micros.texteditor.fx");
+            } else {
+                return null;
+            }
+        } else if (associations.size() == 1) {
+            // Only one application available
+            return openFileWith(virtualPath, associations.get(0).getId());
+        } else {
+            // Multiple applications available, check for default
+            ApplicationAssociation preferredApp = appAssociationManager.getPreferredFileTypeApplication(extension);
+            
+            if (preferredApp != null) {
+                return openFileWith(virtualPath, preferredApp.getId());
+            } else {
+                // Show application chooser dialog
+                ApplicationChooserDialog dialog = new ApplicationChooserDialog(
+                    parentComponent, vfs, associations, fileName, extension
+                );
+                dialog.setVisible(true);
+                
+                String selectedAppId = dialog.getSelectedApplicationId();
+                if (selectedAppId != null) {
+                    // Save preference if requested
+                    if (dialog.isRememberChoice()) {
+                        appAssociationManager.setPreferredFileTypeApplication(extension, selectedAppId);
+                        appAssociationManager.saveUserPreferences();
+                    }
+                    
+                    return openFileWith(virtualPath, selectedAppId);
+                } else {
+                    return null; // User canceled
+                }
+            }
+        }
+    }
+    
+    /**
+     * Performs an action using the default associated application, or prompts user to choose
+     * 
+     * @param actionId Unique action identifier
+     * @param actionName User-friendly action name
+     * @param parentComponent Parent component for dialogs
+     * @return The application ID that was chosen, or null if canceled
+     */
+    public String performAction(String actionId, String actionName, Component parentComponent) {
+        List<ApplicationAssociation> associations = appAssociationManager.getActionAssociations(actionId);
+        
+        if (associations.isEmpty()) {
+            // No registered applications
+            JOptionPane.showMessageDialog(
+                parentComponent,
+                "No applications available for this action.",
+                "Action Not Available",
+                JOptionPane.ERROR_MESSAGE
+            );
+            return null;
+        } else if (associations.size() == 1) {
+            // Only one application available
+            return associations.get(0).getId();
+        } else {
+            // Multiple applications available, check for default
+            ApplicationAssociation preferredApp = appAssociationManager.getPreferredActionApplication(actionId);
+            
+            if (preferredApp != null) {
+                return preferredApp.getId();
+            } else {
+                // Show application chooser dialog
+                ApplicationChooserDialog dialog = new ApplicationChooserDialog(
+                    parentComponent, vfs, associations, actionId, actionName
+                );
+                dialog.setVisible(true);
+                
+                String selectedAppId = dialog.getSelectedApplicationId();
+                if (selectedAppId != null && dialog.isRememberChoice()) {
+                    // Save preference if requested
+                    appAssociationManager.setPreferredActionApplication(actionId, selectedAppId);
+                    appAssociationManager.saveUserPreferences();
+                }
+                
+                return selectedAppId;
+            }
+        }
+    }
+    
+    /**
      * Opens a file with a specific window type.
      *
      * @param virtualPath Path to the file in the VFS
      * @param windowType Window type identifier
+     * @return The created window frame
      */
-    public void openFileWith(String virtualPath, String windowType) {
+    public JInternalFrame openFileWith(String virtualPath, String windowType) {
+        // Check if this is an external application
+        if (windowType.startsWith("external:")) {
+            String externalApp = windowType.substring("external:".length());
+            openFileWithExternalApp(virtualPath, externalApp);
+            return null; // No internal window created
+        }
+        
+        // Open with internal application
         String windowId = windowType + "-" + virtualPath.hashCode();
         JInternalFrame frame = createWindow(windowId, virtualPath, windowType);
         
-        if (windowType.equals("org.finite.texteditor")) {
+        if (windowType.equals("org.finite.texteditor") || windowType.equals("org.finite.micros.texteditor.fx")) {
             try {
                 String content = new String(vfs.readFile(virtualPath));
                 MicrOSApp app = (MicrOSApp) frame.getClientProperty("app");
@@ -479,8 +703,100 @@ public class WindowManager {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else if (windowType.equals("imageviewer")) {
+            try {
+                byte[] imageData = vfs.readFile(virtualPath);
+                ImageIcon icon = new ImageIcon(imageData);
+                JLabel imageLabel = new JLabel(icon);
+                JScrollPane scrollPane = new JScrollPane(imageLabel);
+                frame.add(scrollPane, BorderLayout.CENTER);
+                frame.revalidate();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (windowType.equals("webviewer")) {
+            try {
+                setWebViewerUrl(windowId, "file:" + vfs.getRealPath(virtualPath).toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        // ...rest of existing switch cases...
+        
+        return frame;
+    }
+
+    /**
+     * Opens a file with an external application
+     * 
+     * @param virtualPath Virtual path to the file
+     * @param externalApp Name of the external application
+     */
+    private void openFileWithExternalApp(String virtualPath, String externalApp) {
+        try {
+            // Get the real path to the file
+            java.nio.file.Path realPath = vfs.getRealPath(virtualPath);
+            if (realPath != null) {
+                // Build the command to open the file with the external app
+                ProcessBuilder pb = new ProcessBuilder(externalApp, realPath.toString());
+                pb.inheritIO(); // Redirect I/O to console
+                pb.start();
+            } else {
+                System.err.println("Could not resolve real path for: " + virtualPath);
+            }
+        } catch (IOException e) {
+            System.err.println("Error launching external application: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Creates a terminal with the given title
+     * 
+     * @param title Terminal title
+     * @param parentComponent Parent component for dialogs
+     * @return The created terminal window or null if external terminal was launched
+     */
+    public JInternalFrame createTerminal(String title, Component parentComponent) {
+        String selectedApp = performAction("terminal", "Terminal", parentComponent);
+        if (selectedApp == null) {
+            return null; // User canceled
+        }
+        
+        if (selectedApp.startsWith("external:")) {
+            // Launch external terminal
+            String externalTerminal = selectedApp.substring("external:".length());
+            launchExternalTerminal(externalTerminal);
+            return null;
+        } else {
+            // Create internal terminal window
+            String windowId = "terminal-" + System.currentTimeMillis();
+            return createWindow(windowId, title != null ? title : "Terminal", "console");
+        }
+    }
+    
+    /**
+     * Launches an external terminal application
+     * 
+     * @param terminalApp Terminal application name
+     */
+    private void launchExternalTerminal(String terminalApp) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder(terminalApp);
+            pb.inheritIO(); // Redirect I/O to console
+            pb.start();
+        } catch (IOException e) {
+            System.err.println("Error launching external terminal: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Get the application association manager
+     * 
+     * @return Application association manager instance
+     */
+    public ApplicationAssociationManager getAppAssociationManager() {
+        return appAssociationManager;
     }
 
     /**
@@ -737,6 +1053,44 @@ public class WindowManager {
             return frame;
         } catch (Exception e) {
             reportError("Failed to launch app with intent", e, intent.getTargetAppId());
+            return null;
+        }
+    }
+
+    /**
+     * Launches a JavaFX-based application in a new window.
+     *
+     * @param app The JavaFXApp instance to launch
+     * @return The created internal frame
+     */
+    public JInternalFrame launchJavaFXApp(JavaFXApp app) {
+        String windowId = "app-" + System.currentTimeMillis();
+        String title = app.getManifest() != null ? app.getManifest().getName() : "JavaFX Application";
+        
+        JInternalFrame frame = createBaseFrame(title);
+        try {
+            app.onStart();
+            JComponent ui = app.createUI();
+            frame.add(ui);
+            frame.putClientProperty("app", app);
+            
+            frame.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
+                @Override
+                public void internalFrameClosing(javax.swing.event.InternalFrameEvent e) {
+                    app.onStop();
+                    if (desktop != null) {
+                        desktop.remove(frame);
+                        desktop.repaint();
+                    }
+                }
+            });
+            
+            desktop.add(frame);
+            windows.put(windowId, frame);
+            frame.setVisible(true);
+            return frame;
+        } catch (Exception e) {
+            reportError("Failed to launch JavaFX application", e, app.getManifest().getIdentifier());
             return null;
         }
     }

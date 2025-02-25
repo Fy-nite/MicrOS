@@ -490,4 +490,60 @@ public class VirtualFileSystem {
         // create file without content
         return createFile(virtualPath, new byte[0]);
     }
+
+    /**
+     * Gets the real filesystem path from a virtual path
+     *
+     * @param virtualPath Path in the virtual file system
+     * @return The real path in the filesystem
+     */
+    public Path getRealPath(String virtualPath) {
+        return resolveVirtualPath(virtualPath);
+    }
+
+    /**
+     * Checks if a file exists in the virtual file system
+     *
+     * @param virtualPath Path to the file in the virtual file system
+     * @return true if the file exists, false otherwise
+     */
+    public boolean fileExists(String virtualPath) {
+        Path path = resolveVirtualPath(virtualPath);
+        return Files.exists(path) && !Files.isDirectory(path);
+    }
+
+    /**
+     * Creates all parent directories for a given path
+     *
+     * @param virtualPath Path in the virtual file system
+     * @return true if the directories were created successfully, false otherwise
+     */
+    public boolean createDirectories(String virtualPath) {
+        try {
+            Path path = resolveVirtualPath(virtualPath);
+            if (Files.exists(path.getParent())) {
+                return true;
+            }
+            Files.createDirectories(path.getParent());
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Writes data to a file in the virtual file system
+     *
+     * @param virtualPath Path to the file in the virtual file system
+     * @param data Data to write
+     * @return true if the data was written successfully, false otherwise
+     * @throws IOException If an error occurs while writing the file
+     */
+    public boolean writeFile(String virtualPath, byte[] data) throws IOException {
+        Path path = resolveVirtualPath(virtualPath);
+        Files.createDirectories(path.getParent());
+        Files.write(path, data);
+        return true;
+    }
 }

@@ -1,0 +1,155 @@
+/* Default dark theme for JavaFX apps in MicrOS */
+
+.root {
+    -fx-base: #1e1e1e;
+    -fx-background-color: #1e1e1e;
+    -fx-control-inner-background: #2d2d2d;
+    -fx-accent: #0078d4;
+    -fx-focus-color: #0078d4;
+    -fx-text-fill: #e6e6e6;
+    -fx-font-family: "Segoe UI", "JetBrains Mono", sans-serif;
+}
+
+.button {
+    -fx-background-color: #2d2d2d;
+    -fx-text-fill: #e6e6e6;
+    -fx-border-color: #3d3d3d;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 5 10 5 10;
+}
+
+.button:hover {
+    -fx-background-color: #3c3c3c;
+}
+
+.button:pressed {
+    -fx-background-color: #4c4c4c;
+}
+
+.text-area {
+    -fx-background-color: #2d2d2d;
+    -fx-text-fill: #e6e6e6;
+    -fx-control-inner-background: #2d2d2d;
+}
+
+.menu-bar {
+    -fx-background-color: #2d2d2d;
+}
+
+.menu {
+    -fx-background-color: transparent;
+}
+
+.menu:hover {
+    -fx-background-color: #3c3c3c;
+}
+
+.menu-item {
+    -fx-background-color: #2d2d2d;
+}
+
+.menu-item:hover {
+    -fx-background-color: #3c3c3c;
+}
+
+.scroll-bar {
+    -fx-background-color: #2d2d2d;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #4d4d4d;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #5d5d5d;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: #2d2d2d;
+}
+
+.label {
+    -fx-text-fill: #e6e6e6;
+}
+
+.text-input {
+    -fx-background-color: #2d2d2d;
+    -fx-text-fill: #e6e6e6;
+    -fx-highlight-fill: #0078d4;
+}
+
+.combo-box {
+    -fx-background-color: #2d2d2d;
+    -fx-text-fill: #e6e6e6;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: #2d2d2d;
+    -fx-text-fill: #e6e6e6;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #2d2d2d;
+}
+
+.tooltip {
+    -fx-background-color: #2d2d2d;
+    -fx-text-fill: #e6e6e6;
+}
+
+/* Dialog styling */
+.dialog-pane {
+    -fx-background-color: #1e1e1e;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: #2d2d2d;
+}
+
+.dialog-pane .content {
+    -fx-text-fill: #e6e6e6;
+}
+
+/* Table styling */
+.table-view {
+    -fx-background-color: #2d2d2d;
+    -fx-table-cell-border-color: #3d3d3d;
+}
+
+.table-view .column-header {
+    -fx-background-color: #3d3d3d;
+}
+
+.table-row-cell {
+    -fx-background-color: #2d2d2d;
+    -fx-text-fill: #e6e6e6;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #0078d4;
+}
+
+/* Tree view styling */
+.tree-view {
+    -fx-background-color: #2d2d2d;
+}
+
+.tree-cell {
+    -fx-background-color: #2d2d2d;
+    -fx-text-fill: #e6e6e6;
+}
+
+.tree-cell:selected {
+    -fx-background-color: #0078d4;
+}
+
+/* Split pane styling */
+.split-pane {
+    -fx-background-color: #1e1e1e;
+}
+
+.split-pane-divider {
+    -fx-background-color: #3d3d3d;
+}

@@ -3,7 +3,7 @@ package org.Finite.MicrOS.Files;
 import org.Finite.MicrOS.util.AppInstaller;
 import org.Finite.MicrOS.core.VirtualFileSystem;
 import org.Finite.MicrOS.core.WindowManager;
-
+import org.Finite.MicrOS.core.ApplicationAssociation;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -78,14 +78,8 @@ public class FileManager extends JPanel {
     }
 
     private void openFile(File file) {
-        String extension = vfs.getFileExtension(file.getName()).toLowerCase();
-        Set<String> associations = windowManager.getFileAssociations(extension);
-        
-        if (!associations.isEmpty()) {
-            // Use the first association as default
-            String defaultApp = associations.iterator().next();
-            windowManager.openFileWith(vfs.getVirtualPath(file.toPath()), defaultApp);
-        }
+        String virtualPath = vfs.getVirtualPath(file.toPath());
+        windowManager.openFile(virtualPath, this);
     }
 
     private void createToolbar() {
@@ -191,25 +185,32 @@ public class FileManager extends JPanel {
         String extension = vfs.getFileExtension(file.getName()).toLowerCase();
         String virtualPath = vfs.getVirtualPath(file.toPath());
         
-        // Get all registered applications for this file type
-        Set<String> associations = windowManager.getFileAssociations(extension);
-        
         // Add "Open" item that uses default application
         JMenuItem openItem = new JMenuItem("Open");
         openItem.addActionListener(e -> openFile(file));
         menu.add(openItem);
         
         // Add "Open With" submenu
+        List<ApplicationAssociation> associations = 
+            windowManager.getAppAssociationManager().getFileTypeAssociations(extension);
+        
         if (!associations.isEmpty()) {
             JMenu openWithMenu = new JMenu("Open With");
             
             // Add all associated applications
-            for (String appType : associations) {
-                String appName = getAppDisplayName(appType);
-                JMenuItem appItem = new JMenuItem(appName);
-                appItem.addActionListener(e -> windowManager.openFileWith(virtualPath, appType));
+            for (ApplicationAssociation app : associations) {
+                JMenuItem appItem = new JMenuItem(app.getDisplayName());
+                appItem.addActionListener(e -> windowManager.openFileWith(virtualPath, app.getId()));
                 openWithMenu.add(appItem);
             }
+            
+            // Add "Choose Application..." item
+            openWithMenu.addSeparator();
+            JMenuItem chooseAppItem = new JMenuItem("Choose Application...");
+            chooseAppItem.addActionListener(e -> {
+                windowManager.openFile(virtualPath, this);
+            });
+            openWithMenu.add(chooseAppItem);
             
             menu.add(openWithMenu);
         }
