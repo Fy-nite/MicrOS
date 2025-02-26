@@ -204,32 +204,18 @@ public class Main {
             }
         }
 
-        // Register executable file types
-        windowManager.registerExecutableFileType("txt", AppType.TEXT_EDITOR.getIdentifier());
-        windowManager.registerExecutableFileType("png", AppType.IMAGE_VIEWER.getIdentifier());
-        windowManager.registerExecutableFileType("jpg", AppType.IMAGE_VIEWER.getIdentifier());
-        windowManager.registerExecutableFileType("html", AppType.WEB_VIEWER.getIdentifier());
+        // // Register executable file types
+        // windowManager.registerExecutableFileType("txt", AppType.TEXT_EDITOR.getIdentifier());
+        // windowManager.registerExecutableFileType("png", AppType.IMAGE_VIEWER.getIdentifier());
+        // windowManager.registerExecutableFileType("jpg", AppType.IMAGE_VIEWER.getIdentifier());
+        // windowManager.registerExecutableFileType("html", AppType.WEB_VIEWER.getIdentifier());
 
         frame.add(desktop, BorderLayout.CENTER); // Ensure desktop is added to the frame
 
         frame.setVisible(true);
 
-        // Auto-start registered apps
-        SwingUtilities.invokeLater(() -> {
-            try {
-                // Launch Maver
-                JInternalFrame maverFrame = windowManager.launchAppById("org.finite.micros.maver.launcher");
-                if (maverFrame == null) {
-                    throw new Exception("Failed to launch Maver App Launcher");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                ErrorDialog.showError(desktop, "An error occurred while launching the app:", e);
-            }
-        });
 
-        // Remove auto-start of text editor
-        // JInternalFrame editorFrame = windowManager.createWindow("editor1", "Text Editor", "texteditor");
+
     }
      public static void initiateShutdown() {
         // Create and show shutdown splash
