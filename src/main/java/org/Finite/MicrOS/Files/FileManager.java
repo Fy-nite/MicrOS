@@ -13,6 +13,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.nio.file.Files;
 import java.nio.file.*;
 import java.io.File;
+import java.io.IOException; // Added missing import
 import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -60,18 +61,96 @@ public class FileManager extends JPanel {
                 try {
                     dtde.acceptDrop(DnDConstants.ACTION_COPY);
                     List<File> droppedFiles = (List<File>) dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    
+                    // Track installation results for reporting
+                    int successCount = 0;
+                    int failureCount = 0;
+                    
                     for (File file : droppedFiles) {
-                        if (file.getName().endsWith(".zip")) {
+                        // Handle zip files that might contain apps
+                        if (file.getName().toLowerCase().endsWith(".zip")) {
+                            statusBar.setText("Installing app from " + file.getName() + "...");
+                            
                             Path tempDir = Files.createTempDirectory("app_install");
                             AppInstaller.extractZip(file, tempDir);
-                            Files.walk(tempDir)
-                                .filter(AppInstaller::isAppDirectory)
-                                .findFirst()
-                                .ifPresent(AppInstaller::installApp);
+                            
+                            // Look for .app directories in the extracted content
+                            boolean appFound = false;
+                            try (var paths = Files.walk(tempDir)) {
+                                for (Path path : paths.filter(AppInstaller::isAppDirectory).toList()) {
+                                    appFound = true;
+                                    if (AppInstaller.installApp(path)) {
+                                        successCount++;
+                                    } else {
+                                        failureCount++;
+                                    }
+                                }
+                            }
+                            
+                            if (!appFound) {
+                                JOptionPane.showMessageDialog(FileManager.this, 
+                                    "No valid MicrOS applications found in " + file.getName(),
+                                    "Installation Failed", JOptionPane.WARNING_MESSAGE);
+                            }
+                            
+                            // Clean up temp directory
+                            try {
+                                AppInstaller.deleteDirectory(tempDir); // Now using public method
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                        } 
+                        // Handle direct .app directories
+                        else if (file.isDirectory() && file.getName().toLowerCase().endsWith(".app")) {
+                            statusBar.setText("Installing app " + file.getName() + "...");
+                            
+                            if (AppInstaller.installApp(file.toPath())) {
+                                successCount++;
+                            } else {
+                                failureCount++;
+                            }
+                        } 
+                        // Normal file handling (copy to current directory)
+                        else if (file.isFile()) {
+                            String targetVirtualPath = vfs.getVirtualPath(currentDirectory.toPath()) + "/" + file.getName();
+                            
+                            try {
+                                vfs.createFile(targetVirtualPath, Files.readAllBytes(file.toPath()));
+                                // Successful file copy
+                            } catch (IOException e) {
+                                JOptionPane.showMessageDialog(FileManager.this,
+                                    "Error copying file: " + e.getMessage(),
+                                    "Copy Failed", JOptionPane.ERROR_MESSAGE);
+                            }
                         }
                     }
+                    
+                    // Report installation results
+                    if (successCount > 0 || failureCount > 0) {
+                        StringBuilder message = new StringBuilder();
+                        if (successCount > 0) {
+                            message.append(successCount).append(" application(s) installed successfully.\n");
+                        }
+                        if (failureCount > 0) {
+                            message.append(failureCount).append(" application(s) failed to install.");
+                        }
+                        
+                        JOptionPane.showMessageDialog(FileManager.this,
+                            message.toString(),
+                            "Installation Results",
+                            failureCount > 0 ? JOptionPane.WARNING_MESSAGE : JOptionPane.INFORMATION_MESSAGE);
+                    }
+                    
+                    // Refresh view after installations
+                    refresh();
+                    statusBar.setText("Ready");
+                    
                 } catch (Exception e) {
                     e.printStackTrace();
+                    JOptionPane.showMessageDialog(FileManager.this,
+                        "Error processing dropped files: " + e.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                    statusBar.setText("Error installing application");
                 }
             }
         });

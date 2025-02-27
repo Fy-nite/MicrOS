@@ -192,6 +192,21 @@ public class WindowManager {
             }
         });
 
+        // Register FileManagerFX
+        registerWindowFactory("filemanagerfx", (windowId, title) -> {
+            JInternalFrame frame = createBaseFrame(title);
+            try {
+                MicrOSApp app = vfs.getAppLoader().createAppInstance("org.finite.micros.filemanager.fx");
+                app.initialize(this, vfs);
+                frame.add(app.createUI());
+                frame.putClientProperty("app", app);
+                return frame;
+            } catch (Exception e) {
+                reportError("Failed to create FileManagerFX", e, windowId);
+                return createBaseFrame(title);
+            }
+        });
+
         // Register default file associations
         registerFileAssociation("txt", "org.finite.micros.texteditor.fx");
         registerFileAssociation("md", "org.finite.micros.texteditor.fx");
@@ -290,6 +305,17 @@ public class WindowManager {
         appAssociationManager.registerActionAssociation("terminal", internalTerminalApp);
         appAssociationManager.registerActionAssociation("terminal", externalKonsoleApp);
         appAssociationManager.registerActionAssociation("terminal", externalGnomeTerminalApp);
+
+        // Add File Manager FX
+        ApplicationAssociation fileManagerFXApp = new ApplicationAssociation(
+            "filemanagerfx", 
+            "File Explorer FX", 
+            "JavaFX File Explorer", 
+            "/system/icons/filemanager.png",
+            false
+        );
+        
+        appAssociationManager.registerActionAssociation("filemanager", fileManagerFXApp);
     }
 
     /**

@@ -42,6 +42,7 @@ public class Main {
      * @param args Command-line arguments
      */
     public static void main(String[] args) {
+        SplashScreen.testSplash();
         CommandLineArgs cliArgs = new CommandLineArgs();
         JCommander commander = JCommander.newBuilder()
             .addObject(cliArgs)

@@ -32,7 +32,7 @@ public class AppLoader {
         }
     }
 
-    private void loadApp(File appBundle) throws Exception {
+    public void loadApp(File appBundle) throws Exception {
         if (!appBundle.isDirectory() || !appBundle.getName().endsWith(".app")) {
             return;
         }
@@ -134,5 +134,32 @@ public class AppLoader {
 
     public Collection<AppManifest> getLoadedApps() {
         return loadedApps.values();
+    }
+
+    /**
+     * Registers a built-in app class
+     * 
+     * @param appId The application identifier
+     * @param className The fully qualified class name
+     */
+    public void registerAppClass(String appId, String className) {
+        AppManifest manifest = new AppManifest();
+        manifest.setIdentifier(appId);
+        manifest.setName(appId.substring(appId.lastIndexOf('.') + 1));
+        manifest.setMainClass(className);
+        manifest.setVersion("1.0");
+        
+        loadedApps.put(appId, manifest);
+        // Use the current class loader for built-in apps
+        appClassLoaders.put(appId, this.getClass().getClassLoader());
+        System.out.println("Registered built-in app: " + appId);
+    }
+
+    /**
+     * Registers default builtin applications
+     */
+    private void registerBuiltinApps() {
+        // Register File Manager FX
+        registerAppClass("org.finite.micros.filemanager.fx", "org.Finite.MicrOS.Files.FileManagerFX");
     }
 }

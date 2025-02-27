@@ -108,10 +108,24 @@
                     </buildArgs>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>net.sf.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>1.7.25</version>
+                <configuration>
+                    <outfile>MicrOS.exe</outfile>
+                    <jar>target/MicrOS.jar</jar>
+                    <dontWrapJar>false</dontWrapJar>
+                    <headerType>gui</headerType>
+                    <icon>src/main/resources/icon.ico</icon> <!-- Path to your icon file -->
+                    <jre>
+                        <minVersion>1.8.0</minVersion>
+                    </jre>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
-
         <dependency>
             <groupId>org.tomlj</groupId>
             <artifactId>tomlj</artifactId>
