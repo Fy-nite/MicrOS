@@ -12,13 +12,13 @@ public class ClockPanel extends JPanel {
 
     public ClockPanel() {
         setOpaque(false);
-        timeFormat = new SimpleDateFormat("HH:mm:ss");
+        timeFormat = new SimpleDateFormat("HH:mm"); // don't need to show secconds
         timeLabel = new JLabel();
         timeLabel.setForeground(Color.WHITE);
         timeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         add(timeLabel);
 
-        timer = new Timer(1000, e -> updateTime());
+        timer = new Timer(60000, e -> updateTime()); // update every minute
         timer.start();
         updateTime();
     }

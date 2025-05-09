@@ -217,11 +217,11 @@ public class Main {
         // Auto-start registered apps
         SwingUtilities.invokeLater(() -> {
             try {
-                // Launch Maver
-                JInternalFrame maverFrame = windowManager.launchAppById("org.finite.micros.maver.launcher");
-                if (maverFrame == null) {
-                    throw new Exception("Failed to launch Maver App Launcher");
-                }
+                // // Launch Maver
+                // JInternalFrame maverFrame = windowManager.launchAppById("org.finite.micros.maver.launcher");
+                // if (maverFrame == null) {
+                //     throw new Exception("Failed to launch Maver App Launcher");
+                // }
             } catch (Exception e) {
                 e.printStackTrace();
                 ErrorDialog.showError(desktop, "An error occurred while launching the app:", e);

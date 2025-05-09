@@ -4,7 +4,7 @@ import org.Finite.MicrOS.core.VirtualFileSystem;
 import org.Finite.MicrOS.core.WindowManager;
 import org.Finite.MicrOS.ui.Console;
 import org.finite.*;
-import org.finite.Common.common;
+import org.finite.*;
 import org.finite.interp;
 import org.finite.ModuleManager.ModuleInit;
 import org.finite.interp.instructions;

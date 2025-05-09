@@ -11,7 +11,7 @@ import org.Finite.MicrOS.Main;
 
 public class StartMenu extends JPopupMenu {
     private final WindowManager windowManager;
-    private final Color BG_COLOR = new Color(25, 25, 25);
+    private final Color BG_COLOR = new Color(0, 0, 0);
     private final Color HOVER_COLOR = new Color(45, 45, 45);
     private final Color SECTION_COLOR = new Color(150, 150, 150);
     private final Color TEXT_COLOR = new Color(220, 220, 220);

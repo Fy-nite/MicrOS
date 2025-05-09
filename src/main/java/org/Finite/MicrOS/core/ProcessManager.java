@@ -6,7 +6,7 @@ import java.util.*;
 import javax.swing.SwingUtilities;
 
 import org.Finite.MicrOS.ui.Console;
-import org.finite.Common.common;
+import org.finite.*;
 
 public class ProcessManager {
 
