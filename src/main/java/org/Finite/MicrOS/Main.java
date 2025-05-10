@@ -27,6 +27,8 @@ import java.awt.event.KeyEvent;
 import com.beust.jcommander.JCommander;
 import org.Finite.MicrOS.cli.CommandLineArgs;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * Main class for launching the MicrOS desktop environment.
  */
@@ -35,14 +37,32 @@ public class Main {
     private static WindowManager windowManager;
     private static final String VERSION = "1.0.0";
     private static JDesktopPane desktop; // Define desktop here
-
+    public static boolean splashisshowing = false;
+    private static final CountDownLatch splashLatch = new CountDownLatch(1);
     /**
      * Main method to set the look and feel and launch the desktop environment.
      *
      * @param args Command-line arguments
      */
     public static void main(String[] args) {
-        SplashScreen.testSplash();
+         SwingUtilities.invokeLater(() -> {
+            try {
+                final SplashScreen splash = new SplashScreen(null);
+                splash.show();
+                
+                
+                // Keep it visible for 5 seconds for testing
+                new Timer(5000, e -> {
+                    splash.disposeSplash();
+                    splashisshowing = true;
+                    splashLatch.countDown(); // Signal that the splash screen is done
+                }).start();
+                splashisshowing = false;
+            } catch (Exception e) {
+                System.err.println("Error in splash test: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
         CommandLineArgs cliArgs = new CommandLineArgs();
         JCommander commander = JCommander.newBuilder()
             .addObject(cliArgs)
@@ -93,7 +113,10 @@ public class Main {
             UIManager.setLookAndFeel(settings.getLookAndFeel());
             
         } catch (Exception e) {
-            ErrorDialog.showError(desktop, "An error occurred during startup:", e);
+           JDesktopPane newDesktop = new JDesktopPane();
+            newDesktop.setPreferredSize(new Dimension(800, 600));
+            newDesktop.setLayout(new BorderLayout());
+            ErrorDialog.showError(newDesktop, "An error occurred during startup:", e);
             commander.usage();
             System.exit(1);
         }
@@ -117,8 +140,13 @@ public class Main {
         return System.getProperty("os.name");
     }
     private static void startConsoleMode() {
-        // TODO: Implement console-only mode
-        System.out.println("Console mode not yet implemented");
+        try {
+            splashLatch.await(); // Wait for the splash screen to finish
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Interrupted while waiting for splash screen: " + e.getMessage());
+        }
+        org.Finite.MicrOS.core.Console.startConsoleMode();
     }
 
     private static boolean isAndroid() {
