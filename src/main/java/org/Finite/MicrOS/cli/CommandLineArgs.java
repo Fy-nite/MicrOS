@@ -24,6 +24,9 @@ public class CommandLineArgs {
     @Parameter(names = "--fullscreen", description = "Start in fullscreen mode")
     private boolean fullscreen = false;
 
+    @Parameter(names = "--x11", description = "Use X11 for GUI (default is disabled, for use without a existing display server)")
+    private boolean x11 = false;
+
     public boolean isHelp() { return help; }
     public boolean isVersion() { return version; }
     public boolean isInit() { return init; }
@@ -31,4 +34,5 @@ public class CommandLineArgs {
     public boolean isDebug() { return debug; }
     public String getConfigPath() { return configPath; }
     public boolean isFullscreen() { return fullscreen; }
+    public boolean isX11() { return x11; }
 }

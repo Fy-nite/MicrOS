@@ -36,7 +36,7 @@ public class Main {
     private static WindowManager windowManager;
     private static final String VERSION = "1.0.0";
     private static JDesktopPane desktop; // Define desktop here
-
+    private static CommandLineArgs commandLineArgs;
     /**
      * Main method to set the look and feel and launch the desktop environment.
      *
@@ -44,6 +44,7 @@ public class Main {
      */
     public static void main(String[] args) {
         CommandLineArgs cliArgs = new CommandLineArgs();
+        commandLineArgs = cliArgs; // Store the command line args for later use
         JCommander commander = JCommander.newBuilder()
             .addObject(cliArgs)
             .build();
@@ -158,7 +159,7 @@ public class Main {
         windowManager = new WindowManager(desktop, vfs);
 
         // Initialize X11 Manager if on Linux
-        if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+        if (commandLineArgs.isX11()) {
             try {
                 X11Manager x11Manager = X11Manager.getInstance();
                 x11Manager.initialize(desktop);
