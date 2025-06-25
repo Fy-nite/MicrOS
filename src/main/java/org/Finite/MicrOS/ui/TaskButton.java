@@ -14,7 +14,7 @@ public class TaskButton extends JToggleButton {
     private final Color DEFAULT_BG = new Color(50, 50, 55);
     private final Color TEXT_COLOR = new Color(220, 220, 220);
     private boolean isHovered = false;
-    private static final int ICON_SIZE = 24;
+    private static final int ICON_SIZE = 32; // Increased icon size for better visibility
 
     public TaskButton(JInternalFrame frame) {
         this.frame = frame;
@@ -23,7 +23,6 @@ public class TaskButton extends JToggleButton {
         MicrOSApp app = (MicrOSApp) frame.getClientProperty("app");
         if (app != null && app.getManifest() != null) {
             AppManifest manifest = app.getManifest();
-            setText(manifest.getName());
             
             // Set icon if available
             if (manifest.getIcon() != null && !manifest.getIcon().isEmpty()) {
@@ -32,11 +31,10 @@ public class TaskButton extends JToggleButton {
                     Image scaled = icon.getImage().getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH);
                     setIcon(new ImageIcon(scaled));
                 } catch (Exception e) {
-                    // Fallback to default icon
-                    setText("📱 " + getText());
+                    setText(manifest.getName()); // Fallback to text
                 }
             } else {
-                setText("📱 " + getText());
+                setText(manifest.getName()); // Fallback to text
             }
         } else {
             setText(frame.getTitle());
@@ -45,17 +43,10 @@ public class TaskButton extends JToggleButton {
         // Setup button appearance
         setFocusPainted(false);
         setBorderPainted(false);
-        setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        setPreferredSize(new Dimension(150, 32));
-        setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(35, 35, 40), 1),
-            BorderFactory.createEmptyBorder(4, 8, 4, 8)
-        ));
-        setHorizontalAlignment(SwingConstants.LEFT);
-        
-        setOpaque(true);
-        setBackground(frame.getClientProperty("pinned") != null ? PINNED_BG : DEFAULT_BG);
-        setForeground(TEXT_COLOR);
+        setPreferredSize(new Dimension(ICON_SIZE + 10, ICON_SIZE + 10));
+        setHorizontalAlignment(SwingConstants.CENTER);
+        setVerticalAlignment(SwingConstants.CENTER);
+        setOpaque(false);
         
         setupListeners();
     }
@@ -157,36 +148,12 @@ public class TaskButton extends JToggleButton {
 
     @Override
     protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g.create();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-
-        // Draw background with rounded corners based on hover state
+        super.paintComponent(g);
         if (isSelected()) {
-            g2.setColor(SELECTED_COLOR);
-        } else if (isHovered) {
-            g2.setColor(HOVER_COLOR);
+            g.setColor(new Color(80, 80, 85));
         } else {
-            g2.setColor(getBackground());
+            g.setColor(new Color(50, 50, 55));
         }
-        g2.fillRoundRect(2, 2, getWidth()-4, getHeight()-4, 6, 6);
-
-        // Draw icon and text
-        if (getIcon() != null) {
-            getIcon().paintIcon(this, g2, 8, (getHeight() - ICON_SIZE) / 2);
-            FontMetrics fm = g2.getFontMetrics();
-            int textX = ICON_SIZE + 12;
-            int textY = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
-            g2.setColor(TEXT_COLOR);
-            g2.drawString(getText(), textX, textY);
-        } else {
-            FontMetrics fm = g2.getFontMetrics();
-            int x = 8;
-            int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
-            g2.setColor(TEXT_COLOR);
-            g2.drawString(getText(), x, y);
-        }
-
-        g2.dispose();
+        g.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
     }
 }

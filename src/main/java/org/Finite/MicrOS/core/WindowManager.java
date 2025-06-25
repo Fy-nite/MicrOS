@@ -162,7 +162,45 @@ public class WindowManager {
             return frame;
         });
 
-  
+        // Register X11 window factory
+        registerWindowFactory("x11window", (windowId, title) -> {
+            JInternalFrame frame = createBaseFrame(title);
+            // The X11Manager will handle adding content when windows are created
+            return frame;
+        });
+
+        // Register X11 application launcher factory
+        registerWindowFactory("x11app", (windowId, title) -> {
+            JInternalFrame frame = createBaseFrame(title);
+            JPanel panel = new JPanel(new BorderLayout());
+            
+            JTextField commandField = new JTextField();
+            JButton launchButton = new JButton("Launch X11 Application");
+            
+            launchButton.addActionListener(e -> {
+                String command = commandField.getText().trim();
+                if (!command.isEmpty()) {
+                    try {
+                        ProcessBuilder pb = new ProcessBuilder("sh", "-c", command);
+                        pb.environment().put("DISPLAY", ":0"); // Set display
+                        pb.start();
+                    } catch (Exception ex) {
+                        reportError("Failed to launch X11 application", ex, "x11app");
+                    }
+                }
+            });
+            
+            JPanel topPanel = new JPanel(new BorderLayout());
+            topPanel.add(new JLabel("Command: "), BorderLayout.WEST);
+            topPanel.add(commandField, BorderLayout.CENTER);
+            topPanel.add(launchButton, BorderLayout.EAST);
+            
+            panel.add(topPanel, BorderLayout.NORTH);
+            panel.add(new JLabel("X11 applications will appear as internal frames"), BorderLayout.CENTER);
+            
+            frame.add(panel);
+            return frame;
+        });
 
         // Register default file associations
         registerFileAssociation("txt", "org.finite.texteditor");

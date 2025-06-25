@@ -4,7 +4,7 @@ public class AppManifest {
     private String name;
     private String version;
     private String mainClass;
-    private String icon;
+    private String icon; // Path to the app's icon
     private String description;
     private String identifier;  // e.g. "com.example.myapp"
     private String category;    // e.g. "Utilities"

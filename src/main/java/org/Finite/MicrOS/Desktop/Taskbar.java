@@ -47,7 +47,7 @@ public class Taskbar extends JPanel {
         
         // Initialize components with updated styling
         startArea = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
-        taskArea = new JPanel(new WrapLayout(FlowLayout.LEFT, 6, 2));
+        taskArea = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 4));
         
         // Make sure all panels are opaque and have proper background
         startArea.setOpaque(false);
@@ -134,24 +134,8 @@ public class Taskbar extends JPanel {
     public void addWindow(String windowId, JInternalFrame frame) {
         if (!taskButtons.containsKey(windowId)) {
             TaskButton button = new TaskButton(frame);
-            button.setOpaque(true);
             taskButtons.put(windowId, button);
-            
             taskArea.add(button);
-            button.setVisible(true);
-            
-            javax.swing.Timer timer = new javax.swing.Timer(10, null);
-            float[] alpha = { 0.0f };
-            timer.addActionListener(e -> {
-                alpha[0] += 0.1f;
-                button.setBackground(new Color(45, 45, 45));
-                button.setForeground(new Color(220, 220, 220));
-                if (alpha[0] >= 1.0f) {
-                    timer.stop();
-                }
-            });
-            timer.start();
-            
             revalidate();
             repaint();
         }

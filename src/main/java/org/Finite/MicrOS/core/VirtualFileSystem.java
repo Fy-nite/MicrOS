@@ -158,6 +158,16 @@ public class VirtualFileSystem {
     }
 
     /**
+     * Gets the mount point of the virtual file system.
+     *
+     * @return Mount point of the virtual file system
+     */
+
+    public String getMountPoint() {
+        return rootDirectory.toString();
+    }
+
+    /**
      * Gets the icon for a file based on its MIME type.
      *
      * @param virtualPath Path to the file in the virtual file system

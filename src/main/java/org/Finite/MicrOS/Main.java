@@ -18,6 +18,7 @@ import org.finite.ModuleManager.ModuleInit;
 
 import org.Finite.MicrOS.ui.ErrorDialog; // Add this import
 import org.Finite.MicrOS.ui.SplashScreen;
+import org.Finite.MicrOS.x11.X11Manager;
 
 import java.io.IOException;
 import javafx.application.Platform;
@@ -155,6 +156,22 @@ public class Main {
         desktop = new JDesktopPane(); // Initialize desktop here
         VirtualFileSystem vfs = VirtualFileSystem.getInstance();
         windowManager = new WindowManager(desktop, vfs);
+
+        // Initialize X11 Manager if on Linux
+        if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+            try {
+                X11Manager x11Manager = X11Manager.getInstance();
+                x11Manager.initialize(desktop);
+                
+                // Add shutdown hook to clean up X11
+                Runtime.getRuntime().addShutdownHook(new Thread(x11Manager::shutdown));
+                
+                System.out.println("X11 integration enabled");
+            } catch (Exception e) {
+                System.err.println("Failed to initialize X11 integration: " + e.getMessage());
+                System.out.println("Running without X11 integration");
+            }
+        }
 
         // Register ASM interpreter as a virtual program
         vfs.registerProgram("asm", args -> {

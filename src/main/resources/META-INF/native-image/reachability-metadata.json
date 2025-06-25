@@ -232,6 +232,57 @@
       ]
     },
     {
+      "type": "com.jogamp.opengl.GLProfile",
+      "methods": [
+        {
+          "name": "isAvailable",
+          "parameterTypes": []
+        },
+        {
+          "name": "getDefault",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.jogamp.opengl.GLCapabilities",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": ["com.jogamp.opengl.GLProfile"]
+        },
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.jogamp.opengl.awt.GLJPanel",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        },
+        {
+          "name": "<init>",
+          "parameterTypes": ["com.jogamp.opengl.GLCapabilities"]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.jna.platform.unix.X11"
+    },
+    {
+      "type": "com.sun.jna.platform.unix.X11$Display"
+    },
+    {
+      "type": "com.sun.jna.platform.unix.X11$Window"
+    },
+    {
+      "type": "org.Finite.MicrOS.x11.X11Manager"
+    },
+    {
       "type": "com.sun.javafx.font.freetype.FTFactory",
       "methods": [
         {

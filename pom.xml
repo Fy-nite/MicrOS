@@ -20,6 +20,10 @@
         <lwjgl.natives.windows>natives-windows</lwjgl.natives.windows>
         <lwjgl.natives.linux>natives-linux</lwjgl.natives.linux>
         <lwjgl.natives.macos>natives-macos</lwjgl.natives.macos>
+        
+        <!-- Add JOGL and X11 support -->
+        <jogl.version>2.5.0</jogl.version>
+        <x11.version>1.6.0</x11.version>
         <graalvm.version>23.1.1</graalvm.version>
         <native.maven.plugin.version>0.9.19</native.maven.plugin.version>
         <javafx.version>17</javafx.version>
@@ -123,6 +127,18 @@
             <artifactId>jcommander</artifactId>
             <version>2.0</version>
         </dependency>
+
+    <dependency>
+      <groupId>org.jogamp.gluegen</groupId>
+      <artifactId>gluegen-rt-main</artifactId>
+      <version>2.3.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jogamp.jogl</groupId>
+      <artifactId>jogl-all-main</artifactId>
+      <version>2.3.2</version>
+    </dependency>
+
 
         <dependency>
             <groupId>org.Finite</groupId>
