@@ -27,7 +27,7 @@ public class ApplicationLauncher {
         String mimeType = getMimeType(file);
 
         // Create a new internal frame for the application
-        String windowId = "app-" + System.currentTimeMillis();
+        String windowId = "MicrOS-" + System.currentTimeMillis();
         String title = file.getName();
 
         try {

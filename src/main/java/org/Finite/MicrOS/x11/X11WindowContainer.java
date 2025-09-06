@@ -17,17 +17,59 @@ public class X11WindowContainer extends JPanel {
     private boolean needsRedraw = true;
     private final Object imageLock = new Object();
     private Timer updateTimer;
-    private boolean useOpenGL = false;
+    private boolean isEmbedded = false;
 
     public X11WindowContainer(long windowId, Display display, X11 x11) {
         this.windowId = windowId;
         this.display = display;
         this.x11 = x11;
         
+        System.out.println("Creating X11WindowContainer for window: " + windowId);
+        System.out.println("Display: " + display + ", X11: " + x11);
+        
+        // Try to set up basic window tracking and get window info
+        try {
+            if (windowId > 0) {
+                // Get window attributes to verify it exists
+                com.sun.jna.platform.unix.X11.XWindowAttributes attrs = new com.sun.jna.platform.unix.X11.XWindowAttributes();
+                int result = x11.XGetWindowAttributes(display, new com.sun.jna.platform.unix.X11.Window(windowId), attrs);
+                
+                System.out.println("XGetWindowAttributes result: " + result + " for window " + windowId);
+                
+                if (result != 0) {
+                    isEmbedded = true;
+                    System.out.println("Window " + windowId + " verified: " + attrs.width + "x" + attrs.height + 
+                                     " at (" + attrs.x + "," + attrs.y + "), class=" + attrs.c_class);
+                    
+                    // Try to select events on this window for updates
+                    try {
+                        x11.XSelectInput(display, new com.sun.jna.platform.unix.X11.Window(windowId), 
+                                        new com.sun.jna.NativeLong(X11.StructureNotifyMask | X11.ExposureMask));
+                        System.out.println("Selected input events for window " + windowId);
+                    } catch (Exception e) {
+                        System.err.println("Could not select input for window " + windowId + ": " + e.getMessage());
+                    }
+                } else {
+                    System.err.println("Could not get attributes for window " + windowId);
+                }
+            } else {
+                System.err.println("Invalid window ID provided: " + windowId);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to setup basic capture for window " + windowId + ": " + e.getMessage());
+            e.printStackTrace();
+            isEmbedded = false;
+        }
+        
         initializeDisplay();
         setupLayout();
         setupEventHandling();
         startUpdateTimer();
+    }
+
+    public X11WindowContainer(long windowId2, X11 x112, Display display2) {
+        this(windowId2, display2, x112);
+        System.out.println("Created X11WindowContainer with alternative constructor for window: " + windowId2);
     }
 
     private void initializeDisplay() {
@@ -83,12 +125,19 @@ public class X11WindowContainer extends JPanel {
             public void mouseDragged(MouseEvent e) {
                 forwardMotionEvent(e);
             }
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Add click handling for better Xephyr interaction
+                forwardMouseEvent(e, X11.ButtonPress);
+                forwardMouseEvent(e, X11.ButtonRelease);
+            }
         };
         
         contentPanel.addMouseListener(mouseHandler);
         contentPanel.addMouseMotionListener(mouseHandler);
         
-        // Forward keyboard events
+        // Forward keyboard events with better focus handling
         KeyAdapter keyHandler = new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -103,6 +152,14 @@ public class X11WindowContainer extends JPanel {
         
         contentPanel.addKeyListener(keyHandler);
         contentPanel.setFocusable(true);
+        
+        // Add focus listener to ensure proper event handling
+        contentPanel.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                System.out.println("X11 container gained focus for window: " + windowId);
+            }
+        });
     }
 
     private void startUpdateTimer() {
@@ -149,7 +206,7 @@ public class X11WindowContainer extends JPanel {
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
         
-        String title = "X11 Window: " + windowId;
+        String title = windowId > 0 ? "X11 Window: " + windowId : "No Window";
         FontMetrics fm = g2d.getFontMetrics();
         int textWidth = fm.stringWidth(title);
         int textHeight = fm.getHeight();
@@ -158,7 +215,7 @@ public class X11WindowContainer extends JPanel {
         
         // Draw status
         g2d.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
-        String status = "Embedded X11 Application";
+        String status = windowId > 0 ? "Embedded X11 Application" : "Waiting for application...";
         fm = g2d.getFontMetrics();
         textWidth = fm.stringWidth(status);
         
@@ -256,18 +313,71 @@ public class X11WindowContainer extends JPanel {
         });
     }
 
-    public void cleanup() {
-        if (updateTimer != null) {
-            updateTimer.stop();
-            updateTimer = null;
+    private BufferedImage captureX11Window() {
+        // For Xephyr testing, create a more informative placeholder
+        if (isEmbedded && windowId > 0) {
+            try {
+                com.sun.jna.platform.unix.X11.XWindowAttributes attrs = new com.sun.jna.platform.unix.X11.XWindowAttributes();
+                int result = x11.XGetWindowAttributes(display, new com.sun.jna.platform.unix.X11.Window(windowId), attrs);
+                
+                if (result != 0 && attrs.width > 0 && attrs.height > 0) {
+                    int width = attrs.width;
+                    int height = attrs.height;
+                    
+                    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                    Graphics2D g2d = image.createGraphics();
+                    
+                    try {
+                        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                        
+                        // Create a distinctive look for Xephyr windows
+                        GradientPaint gradient = new GradientPaint(0, 0, new Color(20, 40, 80), 
+                                                                  width, height, new Color(10, 20, 40));
+                        g2d.setPaint(gradient);
+                        g2d.fillRect(0, 0, width, height);
+                        
+                        // Add border to show it's captured
+                        g2d.setColor(new Color(100, 150, 255));
+                        g2d.setStroke(new BasicStroke(3));
+                        g2d.drawRect(2, 2, width - 4, height - 4);
+                        
+                        g2d.setColor(Color.WHITE);
+                        g2d.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
+                        
+                        String text = "Xephyr Window " + windowId;
+                        FontMetrics fm = g2d.getFontMetrics();
+                        int textX = Math.max(10, (width - fm.stringWidth(text)) / 2);
+                        int textY = height / 2;
+                        
+                        g2d.drawString(text, textX, textY);
+                        
+                        // Show connection status
+                        g2d.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
+                        String info = width + "x" + height + " @ (" + attrs.x + "," + attrs.y + ")";
+                        fm = g2d.getFontMetrics();
+                        int infoX = Math.max(10, (width - fm.stringWidth(info)) / 2);
+                        g2d.drawString(info, infoX, textY + 20);
+                        
+                        // Add Xephyr indicator
+                        g2d.setColor(new Color(100, 255, 100));
+                        g2d.drawString("● XEPHYR READY", infoX, textY + 40);
+                        
+                        // Add interaction hint
+                        g2d.setColor(Color.YELLOW);
+                        g2d.drawString("Click to interact", infoX, textY + 60);
+                        
+                    } finally {
+                        g2d.dispose();
+                    }
+                    
+                    return image;
+                }
+            } catch (Exception e) {
+                System.err.println("Error getting Xephyr window attributes for " + windowId + ": " + e.getMessage());
+            }
         }
         
-        // Additional cleanup if needed
-        // For example, releasing X11 resources
-    }
-
-    private BufferedImage captureX11Window() {
-        // Create a simple placeholder image
+        // Fallback to placeholder
         int width = Math.max(getWidth(), 320);
         int height = Math.max(getHeight(), 240);
         
@@ -277,13 +387,12 @@ public class X11WindowContainer extends JPanel {
         try {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             
-            // Draw gradient background
+            // Standard placeholder
             GradientPaint gradient = new GradientPaint(0, 0, new Color(64, 64, 64), 
                                                       width, height, new Color(32, 32, 32));
             g2d.setPaint(gradient);
             g2d.fillRect(0, 0, width, height);
             
-            // Draw window content placeholder
             g2d.setColor(new Color(128, 128, 128, 100));
             g2d.fillRoundRect(10, 10, width - 20, height - 20, 10, 10);
             
@@ -304,7 +413,16 @@ public class X11WindowContainer extends JPanel {
         return image;
     }
 
-    
+    public void cleanup() {
+        if (updateTimer != null) {
+            updateTimer.stop();
+            updateTimer = null;
+        }
+        
+        // Basic cleanup - no composite manager references
+        System.out.println("Cleaned up X11WindowContainer for window: " + windowId);
+    }
+
     public void setNeedsRedraw(boolean needsRedraw) {
         this.needsRedraw = needsRedraw;
         if (needsRedraw) {

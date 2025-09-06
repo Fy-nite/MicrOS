@@ -30,11 +30,12 @@ public class TaskButton extends JToggleButton {
                     ImageIcon icon = new ImageIcon(manifest.getIcon());
                     Image scaled = icon.getImage().getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH);
                     setIcon(new ImageIcon(scaled));
+                    setText(""); // Clear text when we have an icon
                 } catch (Exception e) {
                     setText(manifest.getName()); // Fallback to text
                 }
             } else {
-                setText(manifest.getName()); // Fallback to text
+                setText(manifest.getName()); // Use text when no icon
             }
         } else {
             setText(frame.getTitle());
@@ -43,10 +44,18 @@ public class TaskButton extends JToggleButton {
         // Setup button appearance
         setFocusPainted(false);
         setBorderPainted(false);
-        setPreferredSize(new Dimension(ICON_SIZE + 10, ICON_SIZE + 10));
+        setContentAreaFilled(false); // Important: let us handle the painting
+        setOpaque(false); // Important: we'll paint the background ourselves
+        setPreferredSize(new Dimension(Math.max(ICON_SIZE + 20, 80), ICON_SIZE + 10));
+        setMinimumSize(new Dimension(60, ICON_SIZE + 10));
+        setMaximumSize(new Dimension(120, ICON_SIZE + 10));
         setHorizontalAlignment(SwingConstants.CENTER);
         setVerticalAlignment(SwingConstants.CENTER);
-        setOpaque(false);
+        setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        setForeground(TEXT_COLOR);
+        
+        // Set initial background
+        setBackground(frame.getClientProperty("pinned") != null ? PINNED_BG : DEFAULT_BG);
         
         setupListeners();
     }
@@ -148,12 +157,57 @@ public class TaskButton extends JToggleButton {
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        
+        // Paint background
+        Color bgColor;
         if (isSelected()) {
-            g.setColor(new Color(80, 80, 85));
+            bgColor = SELECTED_COLOR;
+        } else if (isHovered) {
+            bgColor = HOVER_COLOR;
         } else {
-            g.setColor(new Color(50, 50, 55));
+            bgColor = frame.getClientProperty("pinned") != null ? PINNED_BG : DEFAULT_BG;
         }
-        g.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+        
+        g2d.setColor(bgColor);
+        g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+        
+        // Paint border if selected
+        if (isSelected()) {
+            g2d.setColor(new Color(100, 149, 237, 180));
+            g2d.setStroke(new BasicStroke(2));
+            g2d.drawRoundRect(1, 1, getWidth() - 2, getHeight() - 2, 8, 8);
+        }
+        
+        // Paint icon and text
+        if (getIcon() != null) {
+            // Paint icon centered
+            Icon icon = getIcon();
+            int iconX = (getWidth() - icon.getIconWidth()) / 2;
+            int iconY = (getHeight() - icon.getIconHeight()) / 2;
+            icon.paintIcon(this, g2d, iconX, iconY);
+        } else if (getText() != null && !getText().isEmpty()) {
+            // Paint text centered
+            g2d.setColor(getForeground());
+            g2d.setFont(getFont());
+            FontMetrics fm = g2d.getFontMetrics();
+            
+            String text = getText();
+            // Truncate text if too long
+            if (fm.stringWidth(text) > getWidth() - 10) {
+                while (fm.stringWidth(text + "...") > getWidth() - 10 && text.length() > 1) {
+                    text = text.substring(0, text.length() - 1);
+                }
+                text += "...";
+            }
+            
+            int textX = (getWidth() - fm.stringWidth(text)) / 2;
+            int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+            g2d.drawString(text, textX, textY);
+        }
+        
+        g2d.dispose();
     }
 }

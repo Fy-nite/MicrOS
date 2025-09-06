@@ -13,7 +13,7 @@ public abstract class MicrOSApp {
     protected WindowManager windowManager;
     protected VirtualFileSystem vfs;
     private AppManifest manifest;
-    private int threadId = -1;  // Add this field
+    private int threadId = -1;  
 
     public void initialize(WindowManager windowManager, VirtualFileSystem vfs) {
         this.windowManager = windowManager;

@@ -39,20 +39,19 @@ public class Taskbar extends JPanel {
         // Set up main panel with gradient background
         setLayout(new BorderLayout(5, 0));
         setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-        setPreferredSize(new Dimension(800, 42));
+        setPreferredSize(new Dimension(800, 48)); // Increased height for better button visibility
         
         // Important: Make sure taskbar panel is opaque and has nice background
         setOpaque(true);
         setBackground(TASKBAR_BG);
         
         // Initialize components with updated styling
-        startArea = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
-        taskArea = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 4));
+        startArea = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
+        taskArea = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
         
         // Make sure all panels are opaque and have proper background
         startArea.setOpaque(false);
         taskArea.setOpaque(false);
-        taskArea.setBorder(BorderFactory.createEmptyBorder(2, 8, 2, 8));
         
         systemTray = new SystemTray();
         clockPanel = new ClockPanel();
@@ -64,7 +63,7 @@ public class Taskbar extends JPanel {
         add(startArea, BorderLayout.WEST);
         add(taskArea, BorderLayout.CENTER);
         
-        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 2));
         rightPanel.setOpaque(false);
         rightPanel.add(systemTray);
         rightPanel.add(Box.createHorizontalStrut(4));
@@ -167,34 +166,20 @@ public class Taskbar extends JPanel {
         dummyFrame.putClientProperty("app", dummyApp);
         
         TaskButton pinnedButton = new TaskButton(dummyFrame) {
-            {
-                setBackground(BUTTON_BG);
-                setForeground(TEXT_COLOR);
-                setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(50, 50, 55), 1),
-                    BorderFactory.createEmptyBorder(4, 12, 4, 12)
-                ));
-            }
-            
             @Override
             protected void handleClick() {
                 windowManager.createWindow("app-" + identifier, appName, appType.getIdentifier());
             }
         };
         
-        pinnedButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                pinnedButton.setBackground(BUTTON_HOVER);
-            }
-            
-            @Override
-            public void mouseExited(MouseEvent e) {
-                pinnedButton.setBackground(BUTTON_BG);
-            }
-        });
+        // Ensure the button is properly sized and visible
+        pinnedButton.setPreferredSize(new Dimension(80, 40));
+        pinnedButton.setMinimumSize(new Dimension(60, 40));
+        pinnedButton.setMaximumSize(new Dimension(100, 40));
         
         startArea.add(pinnedButton);
+        startArea.revalidate();
+        startArea.repaint();
         revalidate();
         repaint();
     }

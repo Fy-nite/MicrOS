@@ -29,10 +29,16 @@ public class X11Manager {
     private boolean isRunning = false;
     private Thread eventThread;
 
-    public interface X11Extended extends X11 {
+    public interface X11Extended extends X11, X11CompositeManager.X11Extended {
         int XSetIOErrorHandler(XIOErrorHandler handler);
-
         int XConfigureWindow(Display display, Window w, int valueMask, XWindowAttributes values);
+        int XConfigureWindow(Display display, Window w, int valueMask, Structure values); // Accepts XWindowChanges
+
+        // Embed X11 window into a native container
+        int XReparentWindow(Display display, Window window, Window parent, int x, int y);
+        
+        // Get the native window ID from a Java component
+        long getComponentWindow(Component component);
 
         interface XIOErrorHandler extends com.sun.jna.Callback {
             int apply(Pointer display);
@@ -108,11 +114,27 @@ public class X11Manager {
                 throw new RuntimeException("Cannot get root window");
             }
             setupErrorHandlers();
+            
+            // Initialize composite manager if extensions are available
+            initializeCompositing();
+            
         } catch (Exception e) {
             System.err.println("Failed to initialize X11Manager: " + e.getMessage());
-            // Don't throw - allow graceful degradation
             display = null;
             x11 = null;
+        }
+    }
+
+    private void initializeCompositing() {
+        try {
+            X11CompositeManager compositeManager = X11CompositeManager.getInstance(display, x11);
+            if (compositeManager.isExtensionAvailable("COMPOSITE")) {
+                System.out.println("X11 Composite extension available - enabling window capture");
+            } else {
+                System.out.println("X11 Composite extension not available - using fallback mode");
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to initialize compositing: " + e.getMessage());
         }
     }
 
@@ -159,22 +181,51 @@ public class X11Manager {
         }
         
         try {
-            // Use safer event mask values - avoid complex masks that might cause BadValue
-            long eventMask = X11.SubstructureNotifyMask | X11.PropertyChangeMask;
+            System.out.println("Setting up X11 integration for Xephyr display");
             
-            // Validate root window before selecting input
-            XWindowAttributes rootAttrs = new XWindowAttributes();
-            int result = x11.XGetWindowAttributes(display, rootWindow, rootAttrs);
-            if (result == 0) {
-                System.err.println("Cannot get root window attributes");
-                return;
-            }
+            // For Xephyr testing, don't try to become the window manager
+            // Just monitor events without SubstructureRedirectMask
+            long eventMask = X11.SubstructureNotifyMask |
+                            X11.StructureNotifyMask |
+                            X11.PropertyChangeMask;
             
+            System.out.println("Using notification-only mode for Xephyr compatibility");
             x11.XSelectInput(display, rootWindow, new NativeLong(eventMask));
             x11.XSync(display, false);
-            System.out.println("X11 window manager setup complete");
+            
+            // Don't scan existing windows in Xephyr - wait for new ones
+            System.out.println("X11 Xephyr integration setup complete");
         } catch (Exception e) {
-            System.err.println("Failed to setup window manager: " + e.getMessage());
+            System.err.println("Failed to setup X11 for Xephyr: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void scanExistingWindows() {
+        try {
+            // Query existing windows and add them to our management
+            com.sun.jna.platform.unix.X11.Window[] children = queryWindowTree(rootWindow);
+            if (children != null) {
+                for (com.sun.jna.platform.unix.X11.Window child : children) {
+                    long windowId = child.longValue();
+                    if (isValidWindow(windowId) && !windowMap.containsKey(windowId)) {
+                        System.out.println("Found existing window: " + windowId);
+                        SwingUtilities.invokeLater(() -> createInternalFrame(windowId));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error scanning existing windows: " + e.getMessage());
+        }
+    }
+
+    private com.sun.jna.platform.unix.X11.Window[] queryWindowTree(com.sun.jna.platform.unix.X11.Window window) {
+        try {
+            // This is a simplified version - you'd need proper XQueryTree implementation
+            // For now, we'll rely on events to catch new windows
+            return new com.sun.jna.platform.unix.X11.Window[0];
+        } catch (Exception e) {
+            return new com.sun.jna.platform.unix.X11.Window[0];
         }
     }
 
@@ -193,22 +244,33 @@ public class X11Manager {
             return;
         }
         
+        System.out.println("Starting X11 event loop");
         XEvent event = new XEvent();
         
         while (isRunning) {
             try {
-                if (x11.XPending(display) > 0) {
+                int pending = x11.XPending(display);
+                if (pending > 0) {
+                    System.out.println("Processing " + pending + " pending events");
                     x11.XNextEvent(display, event);
+                    
+                    System.out.println("Received event type: " + event.type + 
+                                     " (CreateNotify=" + X11.CreateNotify + 
+                                     ", MapRequest=" + X11.MapRequest + 
+                                     ", MapNotify=" + X11.MapNotify + ")");
+                    
                     handleEvent(event);
                 }
-                Thread.sleep(10); // Small delay to prevent busy waiting
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 break;
             } catch (Exception e) {
                 System.err.println("Error in X11 event loop: " + e.getMessage());
+                e.printStackTrace();
                 // Don't break on single errors - continue processing
             }
         }
+        System.out.println("X11 event loop ended");
     }
 
     private void handleEvent(XEvent event) {
@@ -247,9 +309,42 @@ public class X11Manager {
         SwingUtilities.invokeLater(() -> {
             try {
                 long windowId = getWindowFromEvent(event);
-                createInternalFrame(windowId);
+                System.out.println("CreateNotify received for window: " + windowId);
+                
+                if (windowId > 0) {
+                    // Add more debugging info
+                    System.out.println("Checking validity of window: " + windowId);
+                    
+                    // Wait a bit for the window to be fully created before validation
+                    Timer timer = new Timer(200, e -> {
+                        if (isValidWindow(windowId)) {
+                            System.out.println("Creating frame for valid window: " + windowId);
+                            createInternalFrame(windowId);
+                        } else {
+                            System.out.println("Skipping invalid/system window: " + windowId);
+                            
+                            // Add more detailed debugging for why window is invalid
+                            try {
+                                com.sun.jna.platform.unix.X11.Window window = new com.sun.jna.platform.unix.X11.Window(windowId);
+                                XWindowAttributes attrs = new XWindowAttributes();
+                                int result = x11.XGetWindowAttributes(display, window, attrs);
+                                System.out.println("Window " + windowId + " attributes result: " + result + 
+                                                 ", size: " + attrs.width + "x" + attrs.height + 
+                                                 ", class: " + attrs.c_class +
+                                                 ", root: " + (windowId == rootWindow.longValue()));
+                            } catch (Exception ex) {
+                                System.err.println("Error getting debug info for window " + windowId + ": " + ex.getMessage());
+                            }
+                        }
+                    });
+                    timer.setRepeats(false);
+                    timer.start();
+                } else {
+                    System.out.println("CreateNotify with invalid window ID: " + windowId);
+                }
             } catch (Exception e) {
                 System.err.println("Error handling CreateNotify: " + e.getMessage());
+                e.printStackTrace();
             }
         });
     }
@@ -259,18 +354,43 @@ public class X11Manager {
         
         try {
             long windowId = getWindowFromEvent(event);
-            if (windowId == 0 || !isValidWindow(windowId)) return;
+            System.out.println("MapRequest received for window: " + windowId);
+            
+            if (windowId <= 0) {
+                System.out.println("MapRequest with invalid window ID: " + windowId);
+                return;
+            }
+            
+            // Validate window before processing
+            if (!isValidWindow(windowId)) {
+                System.out.println("MapRequest for invalid/system window: " + windowId);
+                // Still allow the map operation for system compatibility
+                try {
+                    x11.XMapWindow(display, new com.sun.jna.platform.unix.X11.Window(windowId));
+                    x11.XSync(display, false);
+                } catch (Exception e) {
+                    System.err.println("Error mapping invalid window: " + e.getMessage());
+                }
+                return;
+            }
             
             // Allow the window to be mapped
             x11.XMapWindow(display, new com.sun.jna.platform.unix.X11.Window(windowId));
             x11.XSync(display, false);
             
+            // Create internal frame if it doesn't exist
             SwingUtilities.invokeLater(() -> {
+                if (!windowMap.containsKey(windowId)) {
+                    System.out.println("Creating frame for mapped window: " + windowId);
+                    createInternalFrame(windowId);
+                }
+                
                 JInternalFrame frame = windowMap.get(windowId);
                 if (frame != null) {
                     frame.setVisible(true);
                     try {
                         frame.setSelected(true);
+                        frame.moveToFront();
                     } catch (Exception e) {
                         // Ignore property veto exceptions
                     }
@@ -281,117 +401,27 @@ public class X11Manager {
         }
     }
 
-    private void handleConfigureRequest(XEvent event) {
-        if (x11 == null || display == null) return;
+    private void handleMapNotify(XEvent event) {
+        long windowId = getWindowFromEvent(event);
+        System.out.println("MapNotify received for window: " + windowId);
         
-        try {
-            long windowId = getWindowFromEvent(event);
-            if (windowId == 0 || !isValidWindow(windowId)) return;
-            
-            // Get window attributes safely
-            Rectangle bounds = getWindowBounds(windowId);
-            if (bounds.width <= 0 || bounds.height <= 0) return;
-            
-            SwingUtilities.invokeLater(() -> {
-                JInternalFrame frame = windowMap.get(windowId);
-                if (frame != null) {
-                    frame.setBounds(bounds);
-                }
-            });
-        } catch (Exception e) {
-            System.err.println("Error handling ConfigureRequest: " + e.getMessage());
+        // Only process valid windows
+        if (windowId == 0 || !isValidWindow(windowId)) {
+            return;
         }
-    }
-
-    private void createInternalFrame(long windowId) {
-        if (windowMap.containsKey(windowId) || desktop == null) {
-            return; // Already exists or no desktop
-        }
-
-        try {
-            // Get window properties safely
-            String title = getWindowTitle(windowId);
-            Rectangle bounds = getWindowBounds(windowId);
-            
-            // Validate bounds
-            if (bounds.width <= 0 || bounds.height <= 0) {
-                bounds = new Rectangle(0, 0, 640, 480);
+        
+        SwingUtilities.invokeLater(() -> {
+            // Create frame if it doesn't exist
+            if (!windowMap.containsKey(windowId)) {
+                createInternalFrame(windowId);
             }
             
-            // Create JInternalFrame
-            JInternalFrame frame = new JInternalFrame(title, true, true, true, true);
-            frame.setBounds(bounds);
-            
-            // Create X11 window container only if X11 is available
-            if (x11 != null && display != null) {
-                X11WindowContainer container = new X11WindowContainer(windowId, display, x11);
-                frame.setContentPane(container);
-            } else {
-                // Fallback to empty panel
-                frame.setContentPane(new JPanel());
-            }
-            
-            // Track the window
-            windowMap.put(windowId, frame);
-            
-            // Add to desktop
-            desktop.add(frame);
-            frame.setVisible(true);
-            
-            // Setup frame listeners for synchronization
-            setupFrameListeners(windowId, frame);
-            
-        } catch (Exception e) {
-            System.err.println("Error creating internal frame for window " + windowId + ": " + e.getMessage());
-        }
-    }
-
-    private void setupFrameListeners(long windowId, JInternalFrame frame) {
-        frame.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                synchronizeFrameToX11(windowId, frame);
-            }
-            
-            @Override
-            public void componentResized(ComponentEvent e) {
-                synchronizeFrameToX11(windowId, frame);
+            JInternalFrame frame = windowMap.get(windowId);
+            if (frame != null && !frame.isVisible()) {
+                frame.setVisible(true);
+                frame.moveToFront();
             }
         });
-        
-        frame.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
-            @Override
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent e) {
-                destroyX11Window(windowId);
-            }
-        });
-    }
-
-    private void synchronizeFrameToX11(long windowId, JInternalFrame frame) {
-        if (x11 == null || display == null) return;
-        
-        try {
-            Rectangle bounds = frame.getBounds();
-            if (bounds.width > 0 && bounds.height > 0) {
-                // Commented out the actual X11 call to prevent crashes
-                // x11.XMoveResizeWindow(display, new com.sun.jna.platform.unix.X11.Window(windowId), 
-                //     bounds.x, bounds.y, bounds.width, bounds.height);
-                x11.XSync(display, false);
-            }
-        } catch (Exception e) {
-            System.err.println("Error synchronizing frame to X11: " + e.getMessage());
-        }
-    }
-
-    private void destroyX11Window(long windowId) {
-        if (x11 == null || display == null) return;
-        
-        try {
-            x11.XDestroyWindow(display, new com.sun.jna.platform.unix.X11.Window(windowId));
-            x11.XSync(display, false);
-        } catch (Exception e) {
-            System.err.println("Error destroying X11 window: " + e.getMessage());
-        }
     }
 
     private void handleDestroyNotify(XEvent event) {
@@ -408,19 +438,13 @@ public class X11Manager {
         });
     }
 
-    private void handleMapNotify(XEvent event) {
-        long windowId = getWindowFromEvent(event);
-        
-        SwingUtilities.invokeLater(() -> {
-            JInternalFrame frame = windowMap.get(windowId);
-            if (frame != null && !frame.isVisible()) {
-                frame.setVisible(true);
-            }
-        });
-    }
-
     private void handleUnmapNotify(XEvent event) {
         long windowId = getWindowFromEvent(event);
+        
+        // Only process valid windows
+        if (windowId == 0) {
+            return;
+        }
         
         SwingUtilities.invokeLater(() -> {
             JInternalFrame frame = windowMap.get(windowId);
@@ -432,11 +456,17 @@ public class X11Manager {
 
     private void handleConfigureNotify(XEvent event) {
         long windowId = getWindowFromEvent(event);
+        
+        // Only process valid windows
+        if (windowId == 0 || !isValidWindow(windowId)) {
+            return;
+        }
+        
         Rectangle bounds = getWindowBounds(windowId);
         
         SwingUtilities.invokeLater(() -> {
             JInternalFrame frame = windowMap.get(windowId);
-            if (frame != null) {
+            if (frame != null && bounds.width > 1 && bounds.height > 1) {
                 frame.setBounds(bounds);
             }
         });
@@ -444,11 +474,87 @@ public class X11Manager {
 
     private long getWindowFromEvent(XEvent event) {
         try {
-            if (event != null && event.xany != null && event.xany.window != null) {
-                return event.xany.window.longValue();
+            if (event == null) {
+                System.err.println("Event is null");
+                return 0;
             }
+            
+            System.out.println("Processing event type: " + event.type);
+            
+            // Try the generic xany structure first (most reliable)
+            if (event.xany != null && event.xany.window != null) {
+                long windowId = event.xany.window.longValue();
+                System.out.println("Got window ID from xany: " + windowId);
+                return windowId;
+            }
+            
+            // If xany doesn't work, try type-specific structures
+            switch (event.type) {
+                case X11.CreateNotify:
+                    if (event.xcreatewindow != null && event.xcreatewindow.window != null) {
+                        long windowId = event.xcreatewindow.window.longValue();
+                        System.out.println("Got window ID from xcreatewindow: " + windowId);
+                        return windowId;
+                    }
+                    break;
+                    
+                case X11.DestroyNotify:
+                    if (event.xdestroywindow != null && event.xdestroywindow.window != null) {
+                        long windowId = event.xdestroywindow.window.longValue();
+                        System.out.println("Got window ID from xdestroywindow: " + windowId);
+                        return windowId;
+                    }
+                    break;
+                    
+                case X11.MapNotify:
+                    if (event.xmap != null && event.xmap.window != null) {
+                        long windowId = event.xmap.window.longValue();
+                        System.out.println("Got window ID from xmap: " + windowId);
+                        return windowId;
+                    }
+                    break;
+                    
+                case X11.UnmapNotify:
+                    if (event.xunmap != null && event.xunmap.window != null) {
+                        long windowId = event.xunmap.window.longValue();
+                        System.out.println("Got window ID from xunmap: " + windowId);
+                        return windowId;
+                    }
+                    break;
+                    
+                case X11.ConfigureNotify:
+                    if (event.xconfigure != null && event.xconfigure.window != null) {
+                        long windowId = event.xconfigure.window.longValue();
+                        System.out.println("Got window ID from xconfigure: " + windowId);
+                        return windowId;
+                    }
+                    break;
+                    
+                case X11.MapRequest:
+                    if (event.xmaprequest != null && event.xmaprequest.window != null) {
+                        long windowId = event.xmaprequest.window.longValue();
+                        System.out.println("Got window ID from xmaprequest: " + windowId);
+                        return windowId;
+                    }
+                    break;
+                    
+                case X11.ConfigureRequest:
+                    if (event.xconfigurerequest != null && event.xconfigurerequest.window != null) {
+                        long windowId = event.xconfigurerequest.window.longValue();
+                        System.out.println("Got window ID from xconfigurerequest: " + windowId);
+                        return windowId;
+                    }
+                    break;
+            }
+            
+            System.err.println("Could not extract window ID from event type " + event.type);
+            System.err.println("Event structures - xany: " + event.xany + 
+                             ", xcreatewindow: " + event.xcreatewindow +
+                             ", xmaprequest: " + event.xmaprequest);
+            
         } catch (Exception e) {
-            System.err.println("Error extracting window from event: " + e.getMessage());
+            System.err.println("Exception extracting window from event type " + event.type + ": " + e.getMessage());
+            e.printStackTrace();
         }
         return 0;
     }
@@ -483,17 +589,44 @@ public class X11Manager {
         return new Rectangle(0, 0, 640, 480);
     }
 
-    // Add window validation method
+    // Add better window validation for Xephyr
     private boolean isValidWindow(long windowId) {
         if (x11 == null || display == null || windowId == 0) {
             return false;
         }
         
         try {
+            com.sun.jna.platform.unix.X11.Window window = new com.sun.jna.platform.unix.X11.Window(windowId);
             XWindowAttributes attrs = new XWindowAttributes();
-            int result = x11.XGetWindowAttributes(display, new com.sun.jna.platform.unix.X11.Window(windowId), attrs);
-            return result != 0;
+            int result = x11.XGetWindowAttributes(display, window, attrs);
+            
+            if (result != 0 && attrs.width > 1 && attrs.height > 1) {
+                // Filter out root window
+                if (windowId == rootWindow.longValue()) {
+                    return false;
+                }
+                
+                // Filter out InputOnly windows
+                if (attrs.c_class == X11.InputOnly) {
+                    return false;
+                }
+                
+                // In Xephyr, be more permissive with window sizes
+                if (attrs.width < 20 || attrs.height < 20) {
+                    return false;
+                }
+                
+                // Additional check for Xephyr windows - look for WM_CLASS
+                try {
+                    // Simple check - if window has reasonable size and is InputOutput, accept it
+                    return attrs.c_class == X11.InputOutput;
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+            return false;
         } catch (Exception e) {
+            System.err.println("Error validating window " + windowId + ": " + e.getMessage());
             return false;
         }
     }
@@ -558,4 +691,127 @@ public class X11Manager {
             }
         });
     }
+
+    // Handle ConfigureRequest events from X11
+    private void handleConfigureRequest(XEvent event) {
+        if (x11 == null || display == null || event == null) return;
+
+        try {
+            // Extract window and requested configuration
+            long windowId = getWindowFromEvent(event);
+            if (windowId == 0) return;
+
+            // XConfigureRequestEvent is a union field in XEvent
+            X11.XConfigureRequestEvent req = event.xconfigurerequest;
+            if (req == null) return;
+
+            // Prepare values for XConfigureWindow
+            XWindowChanges changes = new XWindowChanges();
+            int valueMask = 0;
+
+
+            long valueMaskLong = req.value_mask.longValue();
+
+            if ((valueMaskLong & X11.CWY) != 0) {
+                changes.y = req.y;
+                valueMask |= X11.CWY;
+            }
+            if ((valueMaskLong & X11.CWWidth) != 0) {
+                changes.width = req.width;
+                valueMask |= X11.CWWidth;
+            }
+            if ((valueMaskLong & X11.CWHeight) != 0) {
+                changes.height = req.height;
+                valueMask |= X11.CWHeight;
+            }
+            if ((valueMaskLong & X11.CWSibling) != 0) {
+                changes.sibling = req.above;
+                valueMask |= X11.CWSibling;
+            }
+            if ((valueMaskLong & X11.CWStackMode) != 0) {
+                changes.stack_mode = req.detail;
+                valueMask |= X11.CWStackMode;
+            }
+
+            x11.XConfigureWindow(display, new com.sun.jna.platform.unix.X11.Window(windowId), valueMask, changes);
+            x11.XSync(display, false);
+        } catch (Exception e) {
+            System.err.println("Error handling ConfigureRequest: " + e.getMessage());
+        }
+    }
+
+    // Structure for XWindowChanges used in XConfigureWindow
+    public static class XWindowChanges extends Structure {
+        public int x;
+        public int y;
+        public int width;
+        public int height;
+        public com.sun.jna.platform.unix.X11.Window sibling;
+        public int stack_mode;
+
+        @Override
+        protected java.util.List<String> getFieldOrder() {
+            return java.util.Arrays.asList("x", "y", "width", "height", "sibling", "stack_mode");
+        }
+    }
+
+    // Creates and adds a JInternalFrame for the given X11 window ID
+    private void createInternalFrame(long windowId) {
+        if (windowMap.containsKey(windowId) || desktop == null) {
+            System.out.println("Frame already exists or desktop null for window: " + windowId);
+            return;
+        }
+        
+        if (!isValidWindow(windowId)) {
+            System.out.println("Cannot create frame for invalid window: " + windowId);
+            return;
+        }
+        
+        try {
+            String title = getWindowTitle(windowId);
+            Rectangle bounds = getWindowBounds(windowId);
+            
+            System.out.println("Creating internal frame for window " + windowId + " with bounds: " + bounds);
+
+            JInternalFrame frame = new JInternalFrame(title, true, true, true, true);
+            frame.setBounds(bounds);
+            frame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+
+            // Create container for X11 window content
+            X11WindowContainer container = new X11WindowContainer(windowId, display, x11);
+            frame.setContentPane(container);
+
+            frame.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    updateWindowContent(windowId);
+                }
+            });
+
+            // Add internal frame listener to handle closing
+            frame.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
+                @Override
+                public void internalFrameClosing(javax.swing.event.InternalFrameEvent e) {
+                    System.out.println("Internal frame closing for window: " + windowId);
+                    // Remove from our tracking but don't destroy the X11 window
+                    windowMap.remove(windowId);
+                }
+            });
+
+            desktop.add(frame);
+            windowMap.put(windowId, frame);
+
+            frame.setVisible(true);
+            try {
+                frame.setSelected(true);
+                frame.moveToFront();
+                System.out.println("Successfully created and displayed frame for window: " + windowId);
+            } catch (Exception e) {
+                System.err.println("Error selecting frame: " + e.getMessage());
+            }
+        } catch (Exception e) {
+            System.err.println("Error creating internal frame for window " + windowId + ": " + e.getMessage());
+        }
+    }
 }
+ 

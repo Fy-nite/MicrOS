@@ -23,6 +23,7 @@ import org.Finite.MicrOS.ui.Console;
 import org.Finite.MicrOS.ui.SettingsDialog;
 import org.Finite.MicrOS.ui.WebViewer;
 import org.Finite.MicrOS.util.AsmRunner;
+import org.Finite.MicrOS.x11.X11WindowContainer;
 import org.Finite.MicrOS.apps.AppManifest;
 import org.Finite.MicrOS.ui.ErrorDialog;
 
@@ -174,21 +175,56 @@ public class WindowManager {
             JInternalFrame frame = createBaseFrame(title);
             JPanel panel = new JPanel(new BorderLayout());
             
-            JTextField commandField = new JTextField();
-            JButton launchButton = new JButton("Launch X11 Application");
+            JTextField commandField = new JTextField("xterm");  // Default to xterm for Xephyr testing
+            JButton launchButton = new JButton("Launch in Xephyr");
             
             launchButton.addActionListener(e -> {
                 String command = commandField.getText().trim();
                 if (!command.isEmpty()) {
                     try {
+                        // For Xephyr, we need to set the correct DISPLAY
                         ProcessBuilder pb = new ProcessBuilder("sh", "-c", command);
-                        pb.environment().put("DISPLAY", ":0"); // Set display
+                        Map<String, String> env = pb.environment();
+                        
+                        // Detect if we're running in Xephyr by checking DISPLAY
+                        String currentDisplay = System.getenv("DISPLAY");
+                        if (currentDisplay != null) {
+                            env.put("DISPLAY", currentDisplay);
+                        } else {
+                            env.put("DISPLAY", ":5");  // Common Xephyr display
+                        }
+                        
+                        System.out.println("Launching '" + command + "' on display " + env.get("DISPLAY"));
                         pb.start();
+                        
+                        // Show feedback
+                        commandField.setText("");
+                        commandField.setBackground(new Color(200, 255, 200));
+                        Timer resetColor = new Timer(1000, evt -> commandField.setBackground(Color.WHITE));
+                        resetColor.setRepeats(false);
+                        resetColor.start();
+                        
                     } catch (Exception ex) {
-                        reportError("Failed to launch X11 application", ex, "x11app");
+                        reportError("Failed to launch Xephyr application", ex, "x11app");
+                        commandField.setBackground(new Color(255, 200, 200));
+                        Timer resetColor = new Timer(1000, evt -> commandField.setBackground(Color.WHITE));
+                        resetColor.setRepeats(false);
+                        resetColor.start();
                     }
                 }
             });
+            
+            // Add some common test applications
+            JPanel quickLaunch = new JPanel(new FlowLayout());
+            String[] testApps = {"xterm", "xclock", "xeyes", "xcalc"};
+            for (String app : testApps) {
+                JButton quickBtn = new JButton(app);
+                quickBtn.addActionListener(e -> {
+                    commandField.setText(app);
+                    launchButton.doClick();
+                });
+                quickLaunch.add(quickBtn);
+            }
             
             JPanel topPanel = new JPanel(new BorderLayout());
             topPanel.add(new JLabel("Command: "), BorderLayout.WEST);
@@ -196,7 +232,83 @@ public class WindowManager {
             topPanel.add(launchButton, BorderLayout.EAST);
             
             panel.add(topPanel, BorderLayout.NORTH);
-            panel.add(new JLabel("X11 applications will appear as internal frames"), BorderLayout.CENTER);
+            panel.add(quickLaunch, BorderLayout.CENTER);
+            
+            JLabel statusLabel = new JLabel("Xephyr applications will appear as internal frames");
+            statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            panel.add(statusLabel, BorderLayout.SOUTH);
+            
+            frame.add(panel);
+            return frame;
+        });
+
+        // Register X11 composite window factory
+        registerWindowFactory("x11composite", (windowId, title) -> {
+            JInternalFrame frame = createBaseFrame(title);
+            JPanel panel = new JPanel(new BorderLayout());
+            
+            // Add controls for window capture
+            JPanel controlPanel = new JPanel(new FlowLayout());
+            JTextField windowIdField = new JTextField("Window ID", 15);
+            JButton captureButton = new JButton("Capture Window");
+            
+            captureButton.addActionListener(e -> {
+                try {
+                    long targetWindowId = Long.parseLong(windowIdField.getText().replaceAll("\\D", ""));
+                    
+                    // Create a new window container for the captured window
+                    // Use correct parameter order: windowId, display, x11
+                    X11WindowContainer container = new X11WindowContainer(targetWindowId, (com.sun.jna.platform.unix.X11.Display) null, (com.sun.jna.platform.unix.X11) null);
+                    panel.removeAll();
+                    panel.add(container, BorderLayout.CENTER);
+                    panel.revalidate();
+                    panel.repaint();
+                    
+                } catch (Exception ex) {
+                    reportError("Failed to capture window", ex, "x11composite");
+                }
+            });
+            
+            controlPanel.add(new JLabel("Target: "));
+            controlPanel.add(windowIdField);
+            controlPanel.add(captureButton);
+            
+            panel.add(controlPanel, BorderLayout.NORTH);
+            panel.add(new JLabel("Use controls above to capture X11 windows", SwingConstants.CENTER), BorderLayout.CENTER);
+            
+            frame.add(panel);
+            return frame;
+        });
+
+        // Register X11 window manager factory for testing
+        registerWindowFactory("x11manager", (windowId, title) -> {
+            JInternalFrame frame = createBaseFrame(title);
+            JPanel panel = new JPanel(new BorderLayout());
+            
+            JTextArea logArea = new JTextArea(10, 40);
+            logArea.setEditable(false);
+            logArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+            JScrollPane scrollPane = new JScrollPane(logArea);
+            
+            JPanel buttonPanel = new JPanel(new FlowLayout());
+            JButton refreshButton = new JButton("Refresh Windows");
+            JButton enableButton = new JButton("Enable Compositing");
+            
+            refreshButton.addActionListener(e -> {
+                logArea.append("Scanning for X11 windows...\n");
+                // This would scan for available windows
+            });
+            
+            enableButton.addActionListener(e -> {
+                logArea.append("Enabling X11 composite manager...\n");
+                // This would enable the composite manager
+            });
+            
+            buttonPanel.add(refreshButton);
+            buttonPanel.add(enableButton);
+            
+            panel.add(buttonPanel, BorderLayout.NORTH);
+            panel.add(scrollPane, BorderLayout.CENTER);
             
             frame.add(panel);
             return frame;
@@ -216,8 +328,8 @@ public class WindowManager {
         
         registerFileAssociation("html", "webviewer");
         registerFileAssociation("htm", "webviewer");
-        
         // Allow text files to be opened in webviewer too
+        
         registerFileAssociation("html", "org.finite.texteditor");
         registerFileAssociation("htm", "org.finite.texteditor");
     }
