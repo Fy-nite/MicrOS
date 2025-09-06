@@ -52,6 +52,20 @@ public class Main {
         commander.setProgramName("MicrOS");
 
         try {
+                if (commandLineArgs.isX11()) {
+            try {
+                X11Manager x11Manager = X11Manager.getInstance();
+                x11Manager.initialize(desktop);
+                
+                // Add shutdown hook to clean up X11
+                Runtime.getRuntime().addShutdownHook(new Thread(x11Manager::shutdown));
+                
+                System.out.println("X11 integration enabled");
+            } catch (Exception e) {
+                System.err.println("Failed to initialize X11 integration: " + e.getMessage());
+                System.out.println("Running without X11 integration");
+            }
+        }
             commander.parse(args);
 
             if (cliArgs.isHelp()) {
@@ -88,15 +102,20 @@ public class Main {
             // Initialize JavaFX platform
            // Platform.startup(() -> {});
             
-            ModuleInit.initallmodules();
+            // ModuleInit.initallmodules();
             
             // Initialize settings and apply look and feel
             UIManager.setLookAndFeel(settings.getLookAndFeel());
             
         } catch (Exception e) {
-            ErrorDialog.showError(desktop, "An error occurred during startup:", e);
+            try {
+
+                ErrorDialog.showError(desktop, "An error occurred during startup:", e);
+            } catch (Exception ex) {
+                System.err.println("Critical error: " + ex.getMessage());
+            }
             commander.usage();
-            System.exit(1);
+            // System.exit(1);
         }
         SwingUtilities.invokeLater(Main::Desktopenviroment);
     }
