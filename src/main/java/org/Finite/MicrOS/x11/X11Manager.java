@@ -106,8 +106,14 @@ public class X11Manager {
         try {
             x11 = (X11Extended) Native.load("X11", X11Extended.class);
             display = x11.XOpenDisplay(null);
+            
             if (display == null) {
-                throw new RuntimeException("Cannot open X11 display - X11 not available or DISPLAY not set");
+                // throw new RuntimeException("Cannot open X11 display - X11 not available or DISPLAY not set");
+                System.err.println("Cannot open X11 display - X11 not available or DISPLAY not set");
+                // start the dammed thing.
+                // start X server using ProcessBuilder
+                ProcessBuilder pb = new ProcessBuilder("startx");
+                pb.start();
             }
             rootWindow = x11.XDefaultRootWindow(display);
             if (rootWindow == null) {
