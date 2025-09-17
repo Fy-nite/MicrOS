@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import org.Finite.MicrOS.core.VirtualFileSystem;
 import org.Finite.MicrOS.core.WindowManager;
 import org.Finite.MicrOS.ui.ErrorDialog;
+import org.Finite.MicrOS.ui.MicrOSWindow;
 import org.Finite.MicrOS.util.AppLauncher;
 import org.Finite.MicrOS.core.MessageBus;
 import org.Finite.MicrOS.core.Intent;
@@ -94,5 +95,18 @@ public abstract class MicrOSApp {
     
     protected void subscribeToMessages(Consumer<Object> handler) {
         MessageBus.subscribe(getManifest().getIdentifier(), handler);
+    }
+    
+    /**
+     * Creates a MicrOSWindow for this app. Override to provide custom window decorations.
+     * @param title The window title
+     * @param resizable Whether the window is resizable
+     * @param closable Whether the window is closable
+     * @param maximizable Whether the window is maximizable
+     * @param iconifiable Whether the window is iconifiable
+     * @return a MicrOSWindow instance
+     */
+    public MicrOSWindow createWindow(String title, boolean resizable, boolean closable, boolean maximizable, boolean iconifiable) {
+        return new org.Finite.MicrOS.ui.MicrOSWindow(title, resizable, closable, maximizable, iconifiable);
     }
 }

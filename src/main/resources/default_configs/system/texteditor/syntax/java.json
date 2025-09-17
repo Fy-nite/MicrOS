@@ -2,12 +2,16 @@
     "extensions": ["java"],
     "patterns": {
         "keywords": {
-            "regex": "\\b(public|private|protected|class|interface|void|int|String|boolean|return|if|else|for|while)\\b",
+            "regex": "\\b(public|private|protected|class|interface|enum|abstract|final|static|void|int|long|short|byte|float|double|char|boolean|String|return|if|else|for|while|do|switch|case|break|continue|default|try|catch|finally|throw|throws|import|package|extends|implements|new|this|super|synchronized|volatile|transient|instanceof|assert|const|goto|var|record|yield|sealed|permits|non-sealed)\\b",
             "color": "#569CD6"
         },
         "annotations": {
             "regex": "@\\w+",
             "color": "#DCDCAA"
+        },
+        "types": {
+            "regex": "\\b(Integer|Long|Short|Byte|Float|Double|Character|Boolean|Object|List|Map|Set|HashMap|ArrayList|LinkedList|HashSet|TreeSet|Queue|Deque|Optional|Stream|Runnable|Thread|Exception|Error|Throwable|StringBuilder|StringBuffer|Math|System|Arrays|Collections|Comparator|InputStream|OutputStream|File|FileInputStream|FileOutputStream|BufferedReader|BufferedWriter|PrintWriter|Scanner)\\b",
+            "color": "#4EC9B0"
         },
         "strings": {
             "regex": "\"[^\"]*\"",
@@ -18,7 +22,7 @@
             "color": "#57A64A"
         },
         "numbers": {
-            "regex": "\\b\\d+\\b",
+            "regex": "\\b\\d+(\\.\\d+)?\\b",
             "color": "#B5CE68"
         }
     }

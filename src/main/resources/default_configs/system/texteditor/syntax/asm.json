@@ -2,15 +2,15 @@
     "extensions": ["asm", "masm"],
     "patterns": {
         "keywords": {
-            "regex": "\\b(mov|add|sub|mul|div|push|pop|jmp|call|ret|hlt)\\b",
+            "regex": "\\b(mov|add|sub|mul|div|push|pop|jmp|call|ret|hlt|inc|dec|and|or|xor|not|shl|shr|cmp|test|lea|nop|int|loop|jz|jnz|je|jne|jg|jl|jge|jle|ja|jb|jae|jbe|stos|lods|scas|rep|repe|repne|cmps|movsb|movsw|movsd|movsq|xchg|in|out|cli|sti|cld|std|cwd|cdq|cqo|sal|sar|rol|ror|rcl|rcr|seta|setae|setb|setbe|sete|setne|sets|setns|setg|setge|setl|setle|seto|setno|setp|setnp|setc|setnc|int3|syscall|sysret|enter|leave|bound|arpl|lar|lsl|verr|verw|sgdt|sidt|sldt|smsw|str|lgdt|lidt|lldt|lmsw|ltr|clts|invd|wbinvd|ud2|fwait|wait|esc|lock|segment|assume|org|end|proc|endp|macro|endm|db|dw|dd|dq|dt|resb|resw|resd|resq|resdq|equ|times|section|global|extern|align|bits|use16|use32|use64)\\b",
             "color": "#569CD6"
         },
         "registers": {
-            "regex": "\\b(RAX|RBX|RCX|RDX|RSI|RDI|RSP|RBP|r\\d+[bdw]?)\\b",
+            "regex": "\\b(RAX|RBX|RCX|RDX|RSI|RDI|RSP|RBP|EAX|EBX|ECX|EDX|ESI|EDI|ESP|EBP|AX|BX|CX|DX|SI|DI|SP|BP|AL|BL|CL|DL|AH|BH|CH|DH|CS|DS|ES|FS|GS|SS|r\\d+[bdw]?|xmm\\d+|ymm\\d+|zmm\\d+)\\b",
             "color": "#DCDCAA"
         },
         "numbers": {
-            "regex": "\\b\\d+\\b",
+            "regex": "\\b(0x[0-9A-Fa-f]+|[0-9]+h|[0-9]+b|[0-9]+d|\\d+)\\b",
             "color": "#B5CE68"
         },
         "comments": {
@@ -20,6 +20,10 @@
         "strings": {
             "regex": "\"[^\"]*\"",
             "color": "#CE9178"
+        },
+        "directives": {
+            "regex": "\\b(segment|assume|org|end|proc|endp|macro|endm|db|dw|dd|dq|dt|resb|resw|resd|resq|resdq|equ|times|section|global|extern|align|bits|use16|use32|use64)\\b",
+            "color": "#4EC9B0"
         }
     }
 }

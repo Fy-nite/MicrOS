@@ -21,7 +21,9 @@ import org.Finite.MicrOS.ui.SplashScreen;
 import org.Finite.MicrOS.x11.X11Manager;
 
 import java.io.IOException;
+
 import javafx.application.Platform;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -37,6 +39,7 @@ public class Main {
     private static final String VERSION = "1.0.0";
     private static JDesktopPane desktop; // Define desktop here
     private static CommandLineArgs commandLineArgs;
+
     /**
      * Main method to set the look and feel and launch the desktop environment.
      *
@@ -46,26 +49,26 @@ public class Main {
         CommandLineArgs cliArgs = new CommandLineArgs();
         commandLineArgs = cliArgs; // Store the command line args for later use
         JCommander commander = JCommander.newBuilder()
-            .addObject(cliArgs)
-            .build();
-        
+                .addObject(cliArgs)
+                .build();
+
         commander.setProgramName("MicrOS");
 
         try {
-                if (commandLineArgs.isX11()) {
-            try {
-                X11Manager x11Manager = X11Manager.getInstance();
-                x11Manager.initialize(desktop);
-                
-                // Add shutdown hook to clean up X11
-                Runtime.getRuntime().addShutdownHook(new Thread(x11Manager::shutdown));
-                
-                System.out.println("X11 integration enabled");
-            } catch (Exception e) {
-                System.err.println("Failed to initialize X11 integration: " + e.getMessage());
-                System.out.println("Running without X11 integration");
+            if (commandLineArgs.isX11()) {
+                try {
+                    X11Manager x11Manager = X11Manager.getInstance();
+                    x11Manager.initialize(desktop);
+
+                    // Add shutdown hook to clean up X11
+                    Runtime.getRuntime().addShutdownHook(new Thread(x11Manager::shutdown));
+
+                    System.out.println("X11 integration enabled");
+                } catch (Exception e) {
+                    System.err.println("Failed to initialize X11 integration: " + e.getMessage());
+                    System.out.println("Running without X11 integration");
+                }
             }
-        }
             commander.parse(args);
 
             if (cliArgs.isHelp()) {
@@ -100,13 +103,13 @@ public class Main {
 
             // Normal startup
             // Initialize JavaFX platform
-           // Platform.startup(() -> {});
-            
+            // Platform.startup(() -> {});
+
             // ModuleInit.initallmodules();
-            
+
             // Initialize settings and apply look and feel
             UIManager.setLookAndFeel(settings.getLookAndFeel());
-            
+
         } catch (Exception e) {
             try {
 
@@ -133,12 +136,14 @@ public class Main {
             System.exit(1);
         }
     }
+
     public static String getOS() {
         return System.getProperty("os.name");
     }
+
     private static void startConsoleMode() {
         // TODO: Implement console-only mode
-        System.out.println("Console mode not yet implemented");
+
     }
 
     private static boolean isAndroid() {
@@ -151,14 +156,14 @@ public class Main {
      */
     public static void Desktopenviroment() {
         JFrame frame = new JFrame("MicrOS");
-        
+
         // Set undecorated for borderless
         frame.setUndecorated(true);
-        
+
         // Get the screen size
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
-        
+
         // Make sure the frame is using the screen's display mode
         if (gd.isFullScreenSupported() && Settings.getInstance().getIsfullscreen()) {
             gd.setFullScreenWindow(frame);
@@ -182,10 +187,10 @@ public class Main {
             try {
                 X11Manager x11Manager = X11Manager.getInstance();
                 x11Manager.initialize(desktop);
-                
+
                 // Add shutdown hook to clean up X11
                 Runtime.getRuntime().addShutdownHook(new Thread(x11Manager::shutdown));
-                
+
                 System.out.println("X11 integration enabled");
             } catch (Exception e) {
                 System.err.println("Failed to initialize X11 integration: " + e.getMessage());
@@ -268,14 +273,15 @@ public class Main {
         // Remove auto-start of text editor
         // JInternalFrame editorFrame = windowManager.createWindow("editor1", "Text Editor", "texteditor");
     }
-     public static void initiateShutdown() {
+
+    public static void initiateShutdown() {
         // Create and show shutdown splash
         Window ancestor = SwingUtilities.getWindowAncestor(desktop);
         if (!(ancestor instanceof JFrame)) {
             System.err.println("Error: Main window is not a JFrame");
             System.exit(1);
         }
-        SplashScreen splash = new SplashScreen((JFrame)ancestor);
+        SplashScreen splash = new SplashScreen((JFrame) ancestor);
         splash.setShutdownMode();
         splash.show();
 
@@ -286,7 +292,7 @@ public class Main {
                 if (wm != null) {
                     splash.setStatus("Stopping applications...");
                     Thread.sleep(200); // Brief pause to show message
-                    
+
                     // Get list of running apps before we start closing them
                     java.util.List<String> runningApps = new java.util.ArrayList<>();
                     for (JInternalFrame frame : wm.getDesktop().getAllFrames()) {
@@ -309,21 +315,22 @@ public class Main {
                     splash.setStatus("Saving system state...");
                     Thread.sleep(300);
                 }
-                
+
                 splash.setStatus("Goodbye!");
                 Thread.sleep(500);
-                
+
                 splash.disposeSplash();
                 System.exit(0);
-                
+
             } catch (Exception e) {
                 System.err.println("Error during shutdown: " + e.getMessage());
                 System.exit(1);
             }
         });
-        
+
         shutdownThread.start();
     }
+
     /**
      * Gets the WindowManager instance.
      *

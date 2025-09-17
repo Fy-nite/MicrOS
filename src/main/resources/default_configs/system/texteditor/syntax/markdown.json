@@ -10,15 +10,19 @@
             "color": "#DCDCAA"
         },
         "italic": {
-            "regex": "\\*.*?\\*|_.*?_",
+            "regex": "\\*[^*]+\\*|_[^_]+_",
             "color": "#CE9178"
         },
         "links": {
             "regex": "\\[.*?\\]\\(.*?\\)",
             "color": "#4EC9B0"
         },
+        "images": {
+            "regex": "!\\[.*?\\]\\(.*?\\)",
+            "color": "#B5CE68"
+        },
         "codeBlocks": {
-            "regex": "```[\\s\\S]*?```|`.*?`",
+            "regex": "```[\\s\\S]*?```|`[^`]+`",
             "color": "#D16969"
         },
         "lists": {
@@ -28,6 +32,10 @@
         "blockquotes": {
             "regex": "^>\\s.*$",
             "color": "#57A64A"
+        },
+        "horizontalRule": {
+            "regex": "^(-{3,}|\\*{3,}|_{3,})$",
+            "color": "#569CD6"
         }
     }
 }
